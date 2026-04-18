@@ -183,7 +183,7 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, setIncome, transactions, splits, partnerName }) {
+function HomeTab({ income, setIncome, transactions, splits, partnerName, bankConnected, connectBank }) {
   const T = useT();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(income));
@@ -214,6 +214,24 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName }) {
           </div>
         )}
       </div>
+
+      {/* Connect Bank Button */}
+      {!bankConnected && (
+        <button onClick={connectBank} style={{
+          width: "100%", marginBottom: 16, padding: "14px", borderRadius: 14, cursor: "pointer",
+          background: `linear-gradient(135deg, ${T.gradA}22, ${T.gradB}11)`,
+          border: `1px solid ${T.primary}`,
+          color: T.primary, fontFamily: "inherit", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>
+          🏦 Connect Your Bank
+        </button>
+      )}
+      {bankConnected && (
+        <div style={{ width: "100%", marginBottom: 16, padding: "10px 14px", borderRadius: 12, background: T.partnerBg, border: `1px solid ${T.partnerBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 13, color: T.green }}>🏦 Bank connected</span>
+          <button onClick={connectBank} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "4px 10px", cursor: "pointer", fontSize: 11 }}>Refresh</button>
+        </div>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
         <DonutChart data={chartData} total={myTotal} income={income} />
