@@ -1394,34 +1394,26 @@ export default function EmberApp({ user, onSignOut }) {
   };
 
   const onImport = async (newTxns) => {
-    // Delete only transactions from the same months as the import
-    const importMonths = [...new Set(newTxns.map(t => t.date?.slice(0, 7)))].filter(Boolean);
-    
-    for (const month of importMonths) {
-      const monthStart = `${month}-01`;
-      const monthEnd = `${month}-31`;
-      await supabase.from('transactions')
-        .delete()
-        .eq('user_id', user.id)
-        .gte('date', monthStart)
-        .lte('date', monthEnd);
-    }
-
-    const txnsWithUserId = newTxns.map(t => ({
-      user_id: user.id, name: t.name, amount: t.amount, category: t.category, date: t.date
-    }));
-    await supabase.from('transactions').insert(txnsWithUserId);
-
-    // Reload all transactions
-    const { data: allTxns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
-    if (allTxns) setTransactions(allTxns.map(t => ({ id: t.id, name: t.name, amount: t.amount, category: t.category, date: t.date })));
-    setBankConnected(true);
-
-    // Switch to the most recent imported month
-    if (newTxns.length > 0) {
-      const latestDate = new Date(newTxns.sort((a, b) => new Date(b.date) - new Date(a.date))[0].date);
-      setSelectedMonth({ year: latestDate.getFullYear(), month: latestDate.getMonth() });
-    }
+    try {
+      await supabase.from('transactions').delete().eq('user_id', user.id).neq('id', 0);
+      const toInsert = newTxns.map(t => ({
+        user_id: user.id,
+        name: t.name,
+        amount: Number(t.amount),
+        category: t.category || 'Other',
+        date: t.date,
+      }));
+      const { error } = await supabase.from('transactions').insert(toInsert);
+      if (error) { console.error('Insert error:', error); return; }
+      const { data: allTxns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
+      if (allTxns) setTransactions(allTxns.map(t => ({ id: t.id, name: t.name, amount: t.amount, category: t.category, date: t.date })));
+      setBankConnected(true);
+      if (newTxns.length > 0) {
+        const sorted = [...newTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const latestDate = new Date(sorted[0].date);
+        setSelectedMonth({ year: latestDate.getFullYear(), month: latestDate.getMonth() });
+      }
+    } catch (err) { console.error('Import error:', err); }
   };
 
   const connectBank = () => {
