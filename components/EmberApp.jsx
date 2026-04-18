@@ -604,18 +604,40 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
   const [budgetDraft, setBudgetDraft] = useState("");
   const [renamingCat, setRenamingCat] = useState(null);
   const [nameDraft, setNameDraft] = useState("");
+  const [oneOff, setOneOff] = useState({});
 
   const displayName = (key) => catNames[key] || key;
   const safeMeta = (cat) => CAT_META[cat] || { icon: "📦", idx: 9 };
   const SPLIT_OPTS = [100, 75, 50, 25];
 
-  const catTotals = CATS.map(c => ({
-    cat: c,
-    fullTotal: transactions.filter(t => t.category === c).reduce((s, t) => s + t.amount, 0),
-    myTotal: transactions.filter(t => t.category === c).reduce((s, t) => s + myShare(t, splits), 0),
-    txns: transactions.filter(t => t.category === c),
-    budget: budgets[c] || 0,
-  })).filter(d => d.txns.length > 0);
+  const toggleOneOff = (id) => setOneOff(p => ({ ...p, [id]: !p[id] }));
+  const deleteTxn = (id) => setTransactions(p => p.filter(t => t.id !== id));
+
+  const getDuplicates = (txns) => {
+    const dupes = new Set();
+    for (let i = 0; i < txns.length; i++) {
+      for (let j = i + 1; j < txns.length; j++) {
+        const a = txns[i], b = txns[j];
+        const sameMonth = a.date?.slice(0, 7) === b.date?.slice(0, 7);
+        const sameName = a.name?.toLowerCase().trim() === b.name?.toLowerCase().trim();
+        const similarAmt = Math.abs(a.amount - b.amount) / Math.max(a.amount, b.amount, 0.01) < 0.01;
+        if (sameMonth && sameName && similarAmt) { dupes.add(a.id); dupes.add(b.id); }
+      }
+    }
+    return dupes;
+  };
+
+  const catTotals = CATS.map(c => {
+    const txns = transactions.filter(t => t.category === c);
+    const activeTxns = txns.filter(t => !oneOff[t.id]);
+    return {
+      cat: c,
+      fullTotal: activeTxns.reduce((s, t) => s + t.amount, 0),
+      myTotal: activeTxns.reduce((s, t) => s + myShare(t, splits), 0),
+      txns,
+      budget: budgets[c] || 0,
+    };
+  }).filter(d => d.txns.length > 0);
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
@@ -630,17 +652,21 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
         const isOpen = selectedCat === cat;
         const name = displayName(cat);
         const meta = safeMeta(cat);
-        const color = cc(cat, T);
+        const dupes = getDuplicates(txns);
+        const hasDupes = dupes.size > 0;
 
         return (
           <div key={cat} style={{ marginBottom: 10 }}>
             <div onClick={() => { setSelectedCat(isOpen ? null : cat); setRenamingCat(null); }}
-              style={{ background: T.card, border: `1px solid ${isOpen ? T.primary : T.border}`, borderRadius: isOpen ? "16px 16px 0 0" : 16, padding: 16, cursor: "pointer", transition: "border-color .2s" }}>
+              style={{ background: T.card, border: `1px solid ${isOpen ? T.primary : hasDupes ? T.red : T.border}`, borderRadius: isOpen ? "16px 16px 0 0" : 16, padding: 16, cursor: "pointer", transition: "border-color .2s" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{meta.icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 15, color: T.text, fontWeight: 600 }}>{name}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 15, color: T.text, fontWeight: 600 }}>{name}</span>
+                      {hasDupes && <span style={{ fontSize: 10, background: T.red, color: "#fff", borderRadius: 10, padding: "2px 6px" }}>dupes</span>}
+                    </div>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontSize: 15, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: over ? T.red : T.primary }}>{fmt(myTotal)}</div>
                       {myTotal !== fullTotal && <div style={{ fontSize: 10, color: T.muted }}>of {fmt(fullTotal)}</div>}
@@ -704,8 +730,10 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                 <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Transactions</div>
                 {txns.map(t => {
                   const share = splits[t.id] ?? 100;
+                  const isOneOff = oneOff[t.id];
+                  const isDupe = dupes.has(t.id);
                   return (
-                    <div key={t.id} style={{ marginBottom: 10 }}>
+                    <div key={t.id} style={{ marginBottom: 10, opacity: isOneOff ? 0.45 : 1, transition: "opacity .2s" }}>
                       {reassigning === t.id ? (
                         <div style={{ background: T.card, borderRadius: 10, padding: 12 }}>
                           <div style={{ fontSize: 12, color: T.muted, marginBottom: 8 }}>Move "{t.name}" to:</div>
@@ -720,19 +748,30 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                           </div>
                         </div>
                       ) : (
-                        <div style={{ background: T.card, borderRadius: 12 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px" }}>
+                        <div style={{ background: T.card, borderRadius: 12, border: isDupe ? `1px solid ${T.red}55` : "none" }}>
+                          {isDupe && (
+                            <div style={{ padding: "4px 12px", background: `${T.red}18`, borderRadius: "12px 12px 0 0", fontSize: 11, color: T.red }}>
+                              ⚠ Possible duplicate — delete one?
+                            </div>
+                          )}
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px" }}>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
-                              <div style={{ fontSize: 11, color: T.muted }}>{t.date}</div>
+                              <div style={{ fontSize: 14, color: T.text, textDecoration: isOneOff ? "line-through" : "none" }}>{t.name}</div>
+                              <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{t.date}{isOneOff ? " · one-off (excluded)" : ""}</div>
                             </div>
-                            <div style={{ textAlign: "right", marginRight: 6 }}>
-                              <div style={{ fontSize: 14, color: T.primary, fontWeight: 700 }}>{fmt(myShare(t, splits))}</div>
-                              {share < 100 && <div style={{ fontSize: 10, color: T.muted }}>my {share}% · {fmt(t.amount)} total</div>}
+                            <div style={{ textAlign: "right", marginRight: 2 }}>
+                              <div style={{ fontSize: 14, color: isOneOff ? T.dim : T.primary, fontWeight: 700 }}>{fmt(myShare(t, splits))}</div>
+                              {share < 100 && <div style={{ fontSize: 10, color: T.muted }}>my {share}%</div>}
                             </div>
-                            <GhostBtn onClick={() => setReassigning(t.id)} style={{ padding: "4px 8px", fontSize: 11 }}>Move</GhostBtn>
+                            <div style={{ display: "flex", gap: 4 }}>
+                              <button onClick={() => toggleOneOff(t.id)} title="Mark as one-off"
+                                style={{ background: isOneOff ? `${T.amber}33` : T.card2, border: `1px solid ${isOneOff ? T.amber : T.border}`, borderRadius: 8, color: isOneOff ? T.amber : T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11, fontWeight: isOneOff ? 700 : 400 }}>1×</button>
+                              <button onClick={() => setReassigning(t.id)}
+                                style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11 }}>↕</button>
+                              <button onClick={() => deleteTxn(t.id)}
+                                style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "5px 7px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                            </div>
                           </div>
-                          {/* My share selector */}
                           <div style={{ padding: "0 12px 10px", display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ fontSize: 11, color: T.muted, flexShrink: 0 }}>My share</span>
                             <div style={{ flex: 1, display: "flex", gap: 4 }}>
