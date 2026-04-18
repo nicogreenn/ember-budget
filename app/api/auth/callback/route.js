@@ -12,23 +12,36 @@ export async function GET(request) {
   }
 
   try {
+    const redirectUri = `${baseUrl}/api/auth/callback`
+    const clientId = process.env.TRUELAYER_CLIENT_ID
+    const clientSecret = process.env.TRUELAYER_CLIENT_SECRET
+
+    console.log('Attempting token exchange...')
+    console.log('Client ID:', clientId)
+    console.log('Redirect URI:', redirectUri)
+    console.log('Code length:', code.length)
+
     const tokenResponse = await fetch('https://auth.truelayer.com/connect/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: process.env.TRUELAYER_CLIENT_ID,
-        client_secret: process.env.TRUELAYER_CLIENT_SECRET,
+        client_id: clientId,
+        client_secret: clientSecret,
         code,
-        redirect_uri: `${baseUrl}/api/auth/callback`,
+        redirect_uri: redirectUri,
       }),
     })
 
-    const tokens = await tokenResponse.json()
+    const tokenText = await tokenResponse.text()
+    console.log('Token response status:', tokenResponse.status)
+    console.log('Token response body:', tokenText)
 
-    if (!tokens.access_token) {
-      return NextResponse.redirect(new URL('/?error=no_token', request.url))
+    if (!tokenResponse.ok) {
+      return NextResponse.redirect(new URL(`/?error=token_failed&status=${tokenResponse.status}`, request.url))
     }
+
+    const tokens = JSON.parse(tokenText)
 
     const accountsResponse = await fetch('https://api.truelayer.com/data/v1/accounts', {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
@@ -67,7 +80,7 @@ export async function GET(request) {
     return NextResponse.redirect(redirectUrl)
 
   } catch (err) {
-    console.error('TrueLayer callback error:', err)
-    return NextResponse.redirect(new URL('/?error=bank_connection_failed', request.url))
+    console.error('TrueLayer callback error:', err.message)
+    return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(err.message)}`, request.url))
   }
 }
