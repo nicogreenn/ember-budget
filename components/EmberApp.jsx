@@ -288,12 +288,40 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
 }
 
 // ── CSV IMPORTER ──────────────────────────────────────────────────────────────
+const CAT_RULES = [
+  // Housing
+  { cat: "Housing", keywords: ["leek mtg", "foddc council", "council tax", "severn trent", "gigaclear", "let insurance", "proceed property", "loyd loyd", "mortgage", "rent", "rates"] },
+  // Transport
+  { cat: "Transport", keywords: ["closebrosmotfin", "admiral insurance", "dvla", "rac motor", "next wheels", "wilcomatic", "tesco pfs", "paybyphone", "1stcentral", "stellantis", "fuel", "petrol", "parking", "uber", "shell", "bp fuel", "national rail", "trainline"] },
+  // Groceries
+  { cat: "Groceries", keywords: ["tesco store", "tesco extra", "tesco express", "lidl", "morrisons", "aldi", "sainsbury", "asda", "waitrose", "marks and spencer food", "co-op food", "iceland food", "b&m"] },
+  // Utilities
+  { cat: "Utilities", keywords: ["octopus energy", "british gas", "eon ", "tesco mobile", "sky mobile", "ee mobile", "o2 mobile", "vodafone", "three mobile", "virgin media", "bt group", "talktalk", "water"] },
+  // Subscriptions
+  { cat: "Subscriptions", keywords: ["claude.ai", "netflix", "spotify", "amazon prime", "amazon* ", "amazon uk*", "apple.com/bill", "microsoft*xbox", "xbox", "disney+", "now tv", "youtube", "real-debrid", "paypal payment", "sky digital", "hips social"] },
+  // Dining
+  { cat: "Dining", keywords: ["greggs", "mcdonalds", "subway", "foodhub", "just eat", "deliveroo", "uber eats", "soho coffee", "caffe nero", "costa", "starbucks", "lobi patisserie", "kaplans", "thurabread", "nando", "kfc", "pizza", "burger king", "tg lydney", "165 - gloucester", "premier"] },
+  // Health
+  { cat: "Health", keywords: ["boots", "scottish widows", "bupa", "pharmacy", "chemist", "lloyds pharmacy", "superdrug", "gp ", "nhs", "dentist", "optician"] },
+  // Entertainment
+  { cat: "Entertainment", keywords: ["xbox game", "zettle", "mason clut", "cinema", "odeon", "vue cinema", "cineworld", "steam ", "playstation", "nintendo", "ticketmaster", "eventbrite", "bowling", "golf"] },
+  // Insurance (Transport adjacent)
+  { cat: "Transport", keywords: ["pcl/policy expert", "policy expert", "directonlineservic"] },
+];
+
+function autoCategorise(name) {
+  const lower = name.toLowerCase();
+  for (const rule of CAT_RULES) {
+    if (rule.keywords.some(k => lower.includes(k))) return rule.cat;
+  }
+  return "Other";
+}
+
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
   const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
 
-  // Detect bank format from headers
   const findCol = (...names) => {
     for (const n of names) {
       const idx = headers.findIndex(h => h.includes(n));
@@ -304,8 +332,9 @@ function parseCSV(text) {
 
   const dateCol   = findCol('date', 'transaction date', 'completed date');
   const nameCol   = findCol('description', 'merchant', 'payee', 'name', 'transaction', 'details', 'memo', 'narrative');
-  const amountCol = findCol('amount', 'debit', 'paid out', 'money out', 'withdrawals');
+  const amountCol = findCol('debit', 'amount', 'paid out', 'money out', 'withdrawals');
   const creditCol = findCol('credit', 'paid in', 'money in', 'deposits');
+  const typeCol   = findCol('transaction type', 'type');
 
   if (dateCol === -1 || nameCol === -1) return [];
 
@@ -314,14 +343,13 @@ function parseCSV(text) {
     const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
     if (!cols[dateCol] || !cols[nameCol]) continue;
 
+    // Skip incoming payments (FPI = Faster Payment In, BGC = bank credit, SO standing order in)
+    const type = typeCol !== -1 ? cols[typeCol]?.toUpperCase() : '';
+    if (['FPI', 'BGC', 'TFR'].includes(type) && creditCol !== -1 && cols[creditCol]) continue;
+
     let amount = 0;
     if (amountCol !== -1 && cols[amountCol]) {
       amount = Math.abs(parseFloat(cols[amountCol].replace(/[£,\s]/g, '')) || 0);
-    }
-    // Skip credits/income rows (money coming in)
-    if (amount === 0 && creditCol !== -1 && cols[creditCol]) {
-      const credit = parseFloat(cols[creditCol].replace(/[£,\s]/g, '')) || 0;
-      if (credit > 0) continue; // skip income rows
     }
     if (amount === 0) continue;
 
@@ -332,7 +360,8 @@ function parseCSV(text) {
       if (parts[2]?.length === 4) date = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
     }
 
-    txns.push({ name: cols[nameCol], amount, date, category: 'Other', id: Date.now() + i });
+    const name = cols[nameCol];
+    txns.push({ name, amount, date, category: autoCategorise(name), id: Date.now() + i });
   }
   return txns;
 }
