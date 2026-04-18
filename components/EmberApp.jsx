@@ -183,10 +183,11 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, setIncome, transactions, splits, partnerName, bankConnected, connectBank, onImport }) {
+function HomeTab({ income, setIncome, transactions, splits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected }) {
   const T = useT();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(income));
+  const [showAll, setShowAll] = useState(false);
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
@@ -265,10 +266,15 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
       </Card>
 
       <Card>
-        <Label>Recent</Label>
-        {recent.map((t, i) => (
-          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: i < recent.length - 1 ? 12 : 0, marginBottom: i < recent.length - 1 ? 12 : 0, borderBottom: i < recent.length - 1 ? `1px solid ${T.border}` : "none" }}>
-            <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <Label>Recent</Label>
+          <button onClick={() => setShowAll(!showAll)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12, marginTop: -8 }}>
+            {showAll ? "Show Less" : `See All (${transactions.length})`}
+          </button>
+        </div>
+        {(showAll ? [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)) : recent).map((t, i, arr) => (
+          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
+            <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon || "📦"}</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
               <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{t.category} · {t.date}</div>
@@ -282,7 +288,7 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
       </Card>
 
       {/* CSV Import */}
-      <CSVImporter onImport={onImport} />
+      <CSVImporter onImport={onImport} onIncomeDetected={onIncomeDetected} />
     </div>
   );
 }
@@ -319,7 +325,7 @@ function autoCategorise(name) {
 
 function parseCSV(text) {
   const lines = text.trim().split('\n');
-  if (lines.length < 2) return [];
+  if (lines.length < 2) return { txns: [], incoming: [] };
   const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
 
   const findCol = (...names) => {
@@ -336,24 +342,19 @@ function parseCSV(text) {
   const creditCol = findCol('credit', 'paid in', 'money in', 'deposits');
   const typeCol   = findCol('transaction type', 'type');
 
-  if (dateCol === -1 || nameCol === -1) return [];
+  if (dateCol === -1 || nameCol === -1) return { txns: [], incoming: [] };
 
   const txns = [];
+  const incomingMap = {};
+
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
     if (!cols[dateCol] || !cols[nameCol]) continue;
 
-    // Skip incoming payments (FPI = Faster Payment In, BGC = bank credit, SO standing order in)
     const type = typeCol !== -1 ? cols[typeCol]?.toUpperCase() : '';
-    if (['FPI', 'BGC', 'TFR'].includes(type) && creditCol !== -1 && cols[creditCol]) continue;
+    const isIncoming = ['FPI', 'BGC'].includes(type) && creditCol !== -1 && cols[creditCol];
 
-    let amount = 0;
-    if (amountCol !== -1 && cols[amountCol]) {
-      amount = Math.abs(parseFloat(cols[amountCol].replace(/[£,\s]/g, '')) || 0);
-    }
-    if (amount === 0) continue;
-
-    // Parse date — handle DD/MM/YYYY and YYYY-MM-DD
+    // Parse date
     let date = cols[dateCol];
     if (date.includes('/')) {
       const parts = date.split('/');
@@ -361,14 +362,40 @@ function parseCSV(text) {
     }
 
     const name = cols[nameCol];
+
+    if (isIncoming) {
+      const amount = parseFloat(cols[creditCol].replace(/[£,\s]/g, '')) || 0;
+      if (amount > 0) {
+        const key = name.toUpperCase().trim();
+        if (!incomingMap[key]) incomingMap[key] = { name, total: 0, count: 0, latestAmount: 0 };
+        incomingMap[key].total += amount;
+        incomingMap[key].count += 1;
+        incomingMap[key].latestAmount = amount;
+      }
+      continue;
+    }
+
+    if (['TFR'].includes(type) && creditCol !== -1 && cols[creditCol]) continue;
+
+    let amount = 0;
+    if (amountCol !== -1 && cols[amountCol]) {
+      amount = Math.abs(parseFloat(cols[amountCol].replace(/[£,\s]/g, '')) || 0);
+    }
+    if (amount === 0) continue;
+
     txns.push({ name, amount, date, category: autoCategorise(name), id: Date.now() + i });
   }
-  return txns;
+
+  const incoming = Object.values(incomingMap).sort((a, b) => b.total - a.total);
+  return { txns, incoming };
 }
 
-function CSVImporter({ onImport }) {
+function CSVImporter({ onImport, onIncomeDetected }) {
   const T = useT();
   const [preview, setPreview] = useState(null);
+  const [incoming, setIncoming] = useState([]);
+  const [selectedIncome, setSelectedIncome] = useState({});
+  const [step, setStep] = useState('upload'); // upload → income → confirm
   const [error, setError] = useState('');
 
   const handleFile = (e) => {
@@ -376,58 +403,105 @@ function CSVImporter({ onImport }) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const txns = parseCSV(ev.target.result);
+      const { txns, incoming } = parseCSV(ev.target.result);
       if (txns.length === 0) {
         setError('Could not read this CSV. Try exporting from your bank again.');
         setPreview(null);
       } else {
         setError('');
         setPreview(txns);
+        setIncoming(incoming);
+        // Auto-select likely salary (HIPS SOCIAL or largest regular incoming)
+        const auto = {};
+        incoming.forEach(inc => {
+          const lower = inc.name.toLowerCase();
+          if (lower.includes('hips social') || lower.includes('salary') || lower.includes('wages') || lower.includes('payroll')) {
+            auto[inc.name] = true;
+          }
+        });
+        setSelectedIncome(auto);
+        setStep(incoming.length > 0 ? 'income' : 'confirm');
       }
     };
     reader.readAsText(file);
   };
 
+  const handleImport = () => {
+    // Calculate income from selected incoming payments
+    const selectedEntries = incoming.filter(inc => selectedIncome[inc.name]);
+    if (selectedEntries.length > 0) {
+      const monthlyIncome = selectedEntries.reduce((s, inc) => s + inc.latestAmount, 0);
+      onIncomeDetected(monthlyIncome);
+    }
+    onImport(preview);
+    setPreview(null);
+    setStep('upload');
+    setSelectedIncome({});
+  };
+
   return (
     <Card style={{ marginTop: 12 }}>
       <Label>Import Bank Transactions</Label>
-      <div style={{ fontSize: 12, color: T.muted, marginBottom: 12, lineHeight: 1.6 }}>
-        Export a CSV from your bank's app or website, then import it here. Works with Barclays, Lloyds, HSBC, NatWest, Halifax, Monzo, Starling and most UK banks.
-      </div>
-      <label style={{
-        display: "block", width: "100%", padding: "12px", borderRadius: 12, cursor: "pointer",
-        background: `${T.primary}11`, border: `1px dashed ${T.primary}`,
-        color: T.primary, textAlign: "center", fontSize: 14, boxSizing: "border-box",
-      }}>
-        📂 Choose CSV File
-        <input type="file" accept=".csv" onChange={handleFile} style={{ display: "none" }} />
-      </label>
 
-      {error && <div style={{ fontSize: 13, color: T.red, marginTop: 10 }}>{error}</div>}
+      {step === 'upload' && (
+        <>
+          <div style={{ fontSize: 12, color: T.muted, marginBottom: 12, lineHeight: 1.6 }}>
+            Export a CSV from your bank and import it here. Works with Lloyds, Barclays, HSBC, NatWest, Halifax, Monzo, Starling.
+          </div>
+          <label style={{
+            display: "block", width: "100%", padding: "12px", borderRadius: 12, cursor: "pointer",
+            background: `${T.primary}11`, border: `1px dashed ${T.primary}`,
+            color: T.primary, textAlign: "center", fontSize: 14, boxSizing: "border-box",
+          }}>
+            📂 Choose CSV File
+            <input type="file" accept=".csv" onChange={handleFile} style={{ display: "none" }} />
+          </label>
+          {error && <div style={{ fontSize: 13, color: T.red, marginTop: 10 }}>{error}</div>}
+        </>
+      )}
 
-      {preview && (
-        <div style={{ marginTop: 14 }}>
-          <div style={{ fontSize: 13, color: T.green, marginBottom: 10 }}>✓ Found {preview.length} transactions</div>
+      {step === 'income' && (
+        <div>
+          <div style={{ fontSize: 13, color: T.text, marginBottom: 4 }}>Which of these are your income?</div>
+          <div style={{ fontSize: 11, color: T.muted, marginBottom: 12 }}>Tick everything that's money coming IN from work or regular sources. Ember will use the latest amount as your monthly income.</div>
+          {incoming.map(inc => (
+            <div key={inc.name} onClick={() => setSelectedIncome(p => ({ ...p, [inc.name]: !p[inc.name] }))}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", marginBottom: 8, borderRadius: 10, cursor: "pointer", background: selectedIncome[inc.name] ? `${T.primary}18` : T.card2, border: `1px solid ${selectedIncome[inc.name] ? T.primary : T.border}`, transition: "all .15s" }}>
+              <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${selectedIncome[inc.name] ? T.primary : T.dim}`, background: selectedIncome[inc.name] ? T.primary : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {selectedIncome[inc.name] && <span style={{ color: "#000", fontSize: 12, fontWeight: 700 }}>✓</span>}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, color: T.text }}>{inc.name}</div>
+                <div style={{ fontSize: 11, color: T.muted }}>{inc.count}x payment{inc.count > 1 ? 's' : ''} · latest {fmt(inc.latestAmount)}</div>
+              </div>
+              <div style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.green }}>{fmt(inc.latestAmount)}</div>
+            </div>
+          ))}
+          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+            <button onClick={() => setStep('confirm')} style={{ flex: 2, padding: "11px", background: `linear-gradient(135deg,${T.gradA},${T.gradB}88)`, border: `1px solid ${T.primary}`, borderRadius: 10, color: "#000", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Next →</button>
+            <button onClick={() => setStep('upload')} style={{ flex: 1, padding: "11px", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.muted, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Back</button>
+          </div>
+        </div>
+      )}
+
+      {step === 'confirm' && preview && (
+        <div>
+          <div style={{ fontSize: 13, color: T.green, marginBottom: 10 }}>✓ Ready to import {preview.length} transactions</div>
           <div style={{ maxHeight: 200, overflowY: "auto", marginBottom: 12 }}>
-            {preview.slice(0, 5).map((t, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${T.border}`, fontSize: 12 }}>
-                <span style={{ color: T.text, flex: 1, marginRight: 8 }}>{t.name.slice(0, 30)}</span>
-                <span style={{ color: T.muted, marginRight: 8 }}>{t.date}</span>
-                <span style={{ color: T.primary }}>{fmt(t.amount)}</span>
+            {preview.slice(0, 6).map((t, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: `1px solid ${T.border}`, fontSize: 12 }}>
+                <span style={{ color: T.text, flex: 1, marginRight: 6 }}>{t.name.slice(0, 28)}</span>
+                <span style={{ fontSize: 10, color: T.primary, marginRight: 6, background: `${T.primary}22`, padding: "2px 6px", borderRadius: 10 }}>{t.category}</span>
+                <span style={{ color: T.primary, fontFamily: "'Outfit',sans-serif" }}>{fmt(t.amount)}</span>
               </div>
             ))}
-            {preview.length > 5 && <div style={{ fontSize: 11, color: T.muted, marginTop: 6 }}>...and {preview.length - 5} more</div>}
+            {preview.length > 6 && <div style={{ fontSize: 11, color: T.muted, marginTop: 6 }}>...and {preview.length - 6} more</div>}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => { onImport(preview); setPreview(null); }} style={{
-              flex: 2, padding: "11px", background: `linear-gradient(135deg,${T.gradA},${T.gradB}88)`,
-              border: `1px solid ${T.primary}`, borderRadius: 10, color: "#000",
-              fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit",
-            }}>Import {preview.length} Transactions</button>
-            <button onClick={() => setPreview(null)} style={{
-              flex: 1, padding: "11px", background: T.card2, border: `1px solid ${T.border}`,
-              borderRadius: 10, color: T.muted, fontSize: 14, cursor: "pointer", fontFamily: "inherit",
-            }}>Cancel</button>
+            <button onClick={handleImport} style={{ flex: 2, padding: "11px", background: `linear-gradient(135deg,${T.gradA},${T.gradB}88)`, border: `1px solid ${T.primary}`, borderRadius: 10, color: "#000", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>
+              Import {preview.length} Transactions
+            </button>
+            <button onClick={() => { setStep('upload'); setPreview(null); }} style={{ flex: 1, padding: "11px", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.muted, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -1251,6 +1325,10 @@ export default function EmberApp({ user, onSignOut }) {
     supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames }, { onConflict: 'user_id' });
   }, [income, partnerName, themeKey, lightMode, catNames]);
 
+  const onIncomeDetected = (amount) => {
+    setIncome(amount);
+  };
+
   const onImport = async (newTxns) => {
     const txnsWithUserId = newTxns.map(t => ({ ...t, user_id: user.id }));
     await supabase.from('transactions').delete().eq('user_id', user.id);
@@ -1282,7 +1360,7 @@ export default function EmberApp({ user, onSignOut }) {
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
         <style>{`*{box-sizing:border-box}input::placeholder{color:#4b5563}select{appearance:none}::-webkit-scrollbar{width:0}`}</style>
 
-        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={transactions} splits={splits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} />}
+        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={transactions} splits={splits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={transactions} splits={splits} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={transactions} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
