@@ -1394,26 +1394,29 @@ export default function EmberApp({ user, onSignOut }) {
   };
 
   const onImport = async (newTxns) => {
+    // Update state immediately so UI works regardless of Supabase
+    const withIds = newTxns.map((t, i) => ({ ...t, id: Date.now() + i }));
+    setTransactions(withIds);
+    setBankConnected(true);
+
+    // Switch to most recent month in import
+    if (newTxns.length > 0) {
+      const sorted = [...newTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const latestDate = new Date(sorted[0].date);
+      setSelectedMonth({ year: latestDate.getFullYear(), month: latestDate.getMonth() });
+    }
+
+    // Try to persist to Supabase in background
     try {
-      await supabase.from('transactions').delete().eq('user_id', user.id).neq('id', 0);
-      const toInsert = newTxns.map(t => ({
-        user_id: user.id,
-        name: t.name,
-        amount: Number(t.amount),
-        category: t.category || 'Other',
-        date: t.date,
-      }));
-      const { error } = await supabase.from('transactions').insert(toInsert);
-      if (error) { console.error('Insert error:', error); return; }
-      const { data: allTxns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
-      if (allTxns) setTransactions(allTxns.map(t => ({ id: t.id, name: t.name, amount: t.amount, category: t.category, date: t.date })));
-      setBankConnected(true);
-      if (newTxns.length > 0) {
-        const sorted = [...newTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
-        const latestDate = new Date(sorted[0].date);
-        setSelectedMonth({ year: latestDate.getFullYear(), month: latestDate.getMonth() });
-      }
-    } catch (err) { console.error('Import error:', err); }
+      // Ensure profile exists first
+      await supabase.from('profiles').upsert({ id: user.id, email: user.email }, { onConflict: 'id' });
+      await supabase.from('transactions').delete().eq('user_id', user.id);
+      await supabase.from('transactions').insert(newTxns.map(t => ({
+        user_id: user.id, name: t.name, amount: Number(t.amount), category: t.category || 'Other', date: t.date,
+      })));
+    } catch (err) {
+      console.error('Supabase sync error (non-fatal):', err);
+    }
   };
 
   const connectBank = () => {
