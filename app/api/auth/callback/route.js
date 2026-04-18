@@ -12,7 +12,6 @@ export async function GET(request) {
   }
 
   try {
-    // Exchange code for token with TrueLayer
     const tokenResponse = await fetch('https://auth.truelayer.com/connect/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -26,21 +25,16 @@ export async function GET(request) {
     })
 
     const tokens = await tokenResponse.json()
-    console.log('TrueLayer token response:', JSON.stringify(tokens))
 
     if (!tokens.access_token) {
-      console.error('No access token received:', tokens)
       return NextResponse.redirect(new URL('/?error=no_token', request.url))
     }
 
-    // Fetch accounts first
     const accountsResponse = await fetch('https://api.truelayer.com/data/v1/accounts', {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     })
     const accountsData = await accountsResponse.json()
-    console.log('Accounts:', JSON.stringify(accountsData))
 
-    // Fetch transactions for each account
     const allTransactions = []
     if (accountsData.results) {
       for (const account of accountsData.results) {
@@ -49,14 +43,31 @@ export async function GET(request) {
           { headers: { Authorization: `Bearer ${tokens.access_token}` } }
         )
         const txnData = await txnResponse.json()
-        console.log(`Transactions for ${account.account_id}:`, JSON.stringify(txnData))
         if (txnData.results) {
           allTransactions.push(...txnData.results)
         }
       }
     }
 
-    // Store token and transactions in URL params to pass back to client
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+
+    const tempToken = code.slice(0, 20)
+    await supabase.from('pending_transactions').upsert({
+      temp_token: tempToken,
+      transactions: allTransactions,
+      created_at: new Date().toISOString()
+    })
+
     const redirectUrl = new URL('/', baseUrl)
     redirectUrl.searchParams.set('connected', 'true')
-    redirectUrl.searchParams.se
+    redirectUrl.searchParams.set('token', tempToken)
+    return NextResponse.redirect(redirectUrl)
+
+  } catch (err) {
+    console.error('TrueLayer callback error:', err)
+    return NextResponse.redirect(new URL('/?error=bank_connection_failed', request.url))
+  }
+}
