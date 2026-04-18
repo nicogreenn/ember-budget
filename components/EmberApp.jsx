@@ -198,7 +198,7 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 52, paddingBottom: 20, textAlign: "center" }}>
+      <div style={{ paddingTop: 88, paddingBottom: 20, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
         {editing ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
@@ -543,7 +543,7 @@ function InsightsTab({ income, transactions, splits }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 52, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Insights</div>
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
@@ -619,7 +619,7 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 52, paddingBottom: 4 }}>
+      <div style={{ paddingTop: 88, paddingBottom: 4 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Bills</div>
         <div style={{ fontSize: 13, color: T.muted, marginTop: 4, marginBottom: 16 }}>Tap to manage, rename & set your share</div>
       </div>
@@ -823,7 +823,7 @@ function SavingsTab({ income, transactions, splits }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 52, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Savings</div>
       </div>
 
@@ -1044,7 +1044,7 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 52, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Income</div>
       </div>
       <Card style={{ marginBottom: 16, background: `${T.primary}11`, border: `1px solid ${T.primary}`, textAlign: "center" }}>
@@ -1148,7 +1148,7 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 52, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Settings</div>
       </div>
 
@@ -1244,7 +1244,50 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
   );
 }
 
+// ── MONTH PICKER ─────────────────────────────────────────────────────────────
+function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths }) {
+  const T = useT();
+  const now = new Date();
+
+  const prevMonth = () => {
+    const m = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+    const y = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+    setSelectedMonth({ year: y, month: m });
+  };
+
+  const nextMonth = () => {
+    const m = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+    const y = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+    // Don't go beyond current month
+    if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
+    setSelectedMonth({ year: y, month: m });
+  };
+
+  const isCurrentMonth = selectedMonth.year === now.getFullYear() && selectedMonth.month === now.getMonth();
+  const canGoNext = !isCurrentMonth;
+
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto",
+      background: T.navBg, borderBottom: `1px solid ${T.border}`,
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "10px 16px", zIndex: 99,
+    }}>
+      <button onClick={prevMonth} style={{ background: "none", border: "none", color: T.primary, fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>‹</button>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 16, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>
+          {MONTH_NAMES[selectedMonth.month]} {selectedMonth.year}
+        </div>
+        {isCurrentMonth && <div style={{ fontSize: 10, color: T.primary, letterSpacing: 1, textTransform: "uppercase" }}>Current Month</div>}
+      </div>
+      <button onClick={nextMonth} style={{ background: "none", border: "none", color: canGoNext ? T.primary : T.dim, fontSize: 20, cursor: canGoNext ? "pointer" : "default", padding: "4px 8px" }}>›</button>
+    </div>
+  );
+}
+
 // ── APP ──────────────────────────────────────────────────────────────────────
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
 export default function EmberApp({ user, onSignOut }) {
   const [tab, setTab] = useState("home");
   const [themeKey, setThemeKey] = useState("fire");
@@ -1257,6 +1300,27 @@ export default function EmberApp({ user, onSignOut }) {
   const [splits, setSplits] = useState({});
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
+
+  // Default to current month
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
+
+  // Filter transactions to selected month
+  const monthTxns = transactions.filter(t => {
+    if (!t.date) return false;
+    const d = new Date(t.date);
+    return d.getFullYear() === selectedMonth.year && d.getMonth() === selectedMonth.month;
+  });
+
+  // Get list of months that have transactions
+  const availableMonths = [...new Set(transactions.map(t => {
+    if (!t.date) return null;
+    const d = new Date(t.date);
+    return `${d.getFullYear()}-${d.getMonth()}`;
+  }).filter(Boolean))].map(key => {
+    const [y, m] = key.split('-');
+    return { year: parseInt(y), month: parseInt(m), key };
+  }).sort((a, b) => b.year - a.year || b.month - a.month);
 
   // Load data from Supabase on mount
   useEffect(() => {
@@ -1330,13 +1394,34 @@ export default function EmberApp({ user, onSignOut }) {
   };
 
   const onImport = async (newTxns) => {
-    const txnsWithUserId = newTxns.map(t => ({ ...t, user_id: user.id }));
-    await supabase.from('transactions').delete().eq('user_id', user.id);
-    await supabase.from('transactions').insert(txnsWithUserId.map(t => ({
-      user_id: t.user_id, name: t.name, amount: t.amount, category: t.category, date: t.date
-    })));
-    setTransactions(newTxns);
+    // Delete only transactions from the same months as the import
+    const importMonths = [...new Set(newTxns.map(t => t.date?.slice(0, 7)))].filter(Boolean);
+    
+    for (const month of importMonths) {
+      const monthStart = `${month}-01`;
+      const monthEnd = `${month}-31`;
+      await supabase.from('transactions')
+        .delete()
+        .eq('user_id', user.id)
+        .gte('date', monthStart)
+        .lte('date', monthEnd);
+    }
+
+    const txnsWithUserId = newTxns.map(t => ({
+      user_id: user.id, name: t.name, amount: t.amount, category: t.category, date: t.date
+    }));
+    await supabase.from('transactions').insert(txnsWithUserId);
+
+    // Reload all transactions
+    const { data: allTxns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
+    if (allTxns) setTransactions(allTxns.map(t => ({ id: t.id, name: t.name, amount: t.amount, category: t.category, date: t.date })));
     setBankConnected(true);
+
+    // Switch to the most recent imported month
+    if (newTxns.length > 0) {
+      const latestDate = new Date(newTxns.sort((a, b) => new Date(b.date) - new Date(a.date))[0].date);
+      setSelectedMonth({ year: latestDate.getFullYear(), month: latestDate.getMonth() });
+    }
   };
 
   const connectBank = () => {
@@ -1360,11 +1445,16 @@ export default function EmberApp({ user, onSignOut }) {
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
         <style>{`*{box-sizing:border-box}input::placeholder{color:#4b5563}select{appearance:none}::-webkit-scrollbar{width:0}`}</style>
 
-        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={transactions} splits={splits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} />}
-        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={transactions} splits={splits} />}
-        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={transactions} splits={splits} />}
+        {/* Month Picker — shown on all main tabs */}
+        {["home","insights","categories"].includes(tab) && (
+          <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
+        )}
+
+        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} allTransactions={transactions} splits={splits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} selectedMonth={selectedMonth} />}
+        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} />}
+        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={transactions} setTransactions={setTransactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} />}
+        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} />}
         {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} user={user} />}
 
         <BottomNav tab={tab} setTab={setTab} />
