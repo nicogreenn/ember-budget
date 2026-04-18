@@ -1077,7 +1077,7 @@ export default function EmberApp({ user, onSignOut }) {
       redirect_uri: `${window.location.origin}/api/auth/callback`,
       providers: 'uk-ob-all uk-oauth-all',
     });
-    window.location.href = `https://auth.truelayer-sandbox.com/?${params}`;
+    window.location.href = `https://auth.truelayer.com/?${params}`;
   };
 
   const T = applyMode(THEMES[themeKey], lightMode);
