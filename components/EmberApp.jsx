@@ -188,6 +188,9 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(income));
   const [showAll, setShowAll] = useState(false);
+  const [txnSearch, setTxnSearch] = useState("");
+  const [txnCatFilter, setTxnCatFilter] = useState("All");
+  const [txnSort, setTxnSort] = useState("date-desc");
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
@@ -272,19 +275,62 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
             {showAll ? "Show Less" : `See All (${transactions.length})`}
           </button>
         </div>
-        {(showAll ? [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)) : recent).map((t, i, arr) => (
-          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
-            <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon || "📦"}</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
-              <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{t.category} · {t.date}</div>
+
+        {showAll && (
+          <div style={{ marginBottom: 12 }}>
+            {/* Search */}
+            <input
+              placeholder="🔍 Search transactions..."
+              value={txnSearch}
+              onChange={e => setTxnSearch(e.target.value)}
+              style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "9px 12px", color: T.text, fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 8 }}
+            />
+            {/* Category filter pills */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+              {["All", ...CATS.filter(c => transactions.some(t => t.category === c))].map(c => (
+                <button key={c} onClick={() => setTxnCatFilter(c)}
+                  style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${txnCatFilter === c ? T.primary : T.border}`, background: txnCatFilter === c ? `${T.primary}22` : T.card2, color: txnCatFilter === c ? T.primary : T.muted, fontWeight: txnCatFilter === c ? 700 : 400 }}>
+                  {c === "All" ? "All" : `${CAT_META[c]?.icon} ${c}`}
+                </button>
+              ))}
             </div>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: T.primary }}>−{fmt(myShare(t, splits))}</div>
-              {(splits[t.id] ?? 100) < 100 && <div style={{ fontSize: 10, color: T.muted }}>of {fmt(t.amount)}</div>}
+            {/* Sort */}
+            <div style={{ display: "flex", gap: 6 }}>
+              {[["date-desc","Newest"],["date-asc","Oldest"],["amount-desc","Highest"],["amount-asc","Lowest"]].map(([val, label]) => (
+                <button key={val} onClick={() => setTxnSort(val)}
+                  style={{ flex: 1, padding: "5px 4px", borderRadius: 8, fontSize: 11, cursor: "pointer", border: `1px solid ${txnSort === val ? T.primary : T.border}`, background: txnSort === val ? `${T.primary}22` : T.card2, color: txnSort === val ? T.primary : T.muted, fontWeight: txnSort === val ? 700 : 400 }}>
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
-        ))}
+        )}
+
+        {(() => {
+          let list = showAll ? [...transactions] : recent;
+          if (showAll) {
+            if (txnSearch) list = list.filter(t => t.name?.toLowerCase().includes(txnSearch.toLowerCase()));
+            if (txnCatFilter !== "All") list = list.filter(t => t.category === txnCatFilter);
+            if (txnSort === "date-desc") list.sort((a, b) => new Date(b.date) - new Date(a.date));
+            else if (txnSort === "date-asc") list.sort((a, b) => new Date(a.date) - new Date(b.date));
+            else if (txnSort === "amount-desc") list.sort((a, b) => b.amount - a.amount);
+            else if (txnSort === "amount-asc") list.sort((a, b) => a.amount - b.amount);
+          }
+          if (list.length === 0) return <div style={{ fontSize: 13, color: T.dim, textAlign: "center", padding: "16px 0" }}>No transactions found</div>;
+          return list.map((t, i, arr) => (
+            <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon || "📦"}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
+                <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{t.category} · {t.date}</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.primary }}>−{fmt(myShare(t, splits))}</div>
+                {(splits[t.id] ?? 100) < 100 && <div style={{ fontSize: 10, color: T.muted }}>of {fmt(t.amount)}</div>}
+              </div>
+            </div>
+          ));
+        })()}
       </Card>
 
       {/* CSV Import */}
