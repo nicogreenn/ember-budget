@@ -1105,7 +1105,7 @@ export default function EmberApp({ user, onSignOut }) {
       response_type: 'code',
       client_id: process.env.NEXT_PUBLIC_TRUELAYER_CLIENT_ID || '',
       scope: 'info accounts balance cards transactions',
-      redirect_uri: `${window.location.origin}/api/auth/callback`,
+      redirect_uri: `https://ember-budget.vercel.app/api/auth/callback`,
       providers: 'uk-ob-all uk-oauth-all',
     });
     window.location.href = `https://auth.truelayer.com/?${params}`;
