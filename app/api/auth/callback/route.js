@@ -16,7 +16,7 @@ export async function GET(request) {
 
   try {
     // Exchange code for token with TrueLayer
-    const tokenResponse = await fetch('https://auth.truelayer-sandbox.com/connect/token', {
+    const tokenResponse = await fetch('https://auth.truelayer.com/connect/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -32,7 +32,7 @@ export async function GET(request) {
 
     if (tokens.access_token) {
       // Fetch transactions from TrueLayer
-      const txnResponse = await fetch('https://api.truelayer-sandbox.com/data/v1/transactions', {
+      const txnResponse = await fetch('https://api.truelayer.com/data/v1/transactions', {
         headers: { Authorization: `Bearer ${tokens.access_token}` },
       })
       const txnData = await txnResponse.json()
