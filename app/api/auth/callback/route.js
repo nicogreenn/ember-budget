@@ -1,3 +1,5 @@
+export const preferredRegion = 'lhr1'
+
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -16,11 +18,6 @@ export async function GET(request) {
     const clientId = process.env.TRUELAYER_CLIENT_ID
     const clientSecret = process.env.TRUELAYER_CLIENT_SECRET
 
-    console.log('Attempting token exchange...')
-    console.log('Client ID:', clientId)
-    console.log('Redirect URI:', redirectUri)
-    console.log('Code length:', code.length)
-
     const tokenResponse = await fetch('https://auth.truelayer.com/connect/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -38,7 +35,7 @@ export async function GET(request) {
     console.log('Token response body:', tokenText)
 
     if (!tokenResponse.ok) {
-      return NextResponse.redirect(new URL(`/?error=token_failed&status=${tokenResponse.status}`, request.url))
+      return NextResponse.redirect(new URL(`/?error=token_failed`, request.url))
     }
 
     const tokens = JSON.parse(tokenText)
