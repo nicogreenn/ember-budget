@@ -1037,6 +1037,35 @@ export default function EmberApp({ user, onSignOut }) {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
+      // Check if returning from bank connection
+      const urlParams = new URLSearchParams(window.location.search);
+      const tempToken = urlParams.get('token');
+
+      if (tempToken) {
+        const { data: pending } = await supabase
+          .from('pending_transactions')
+          .select('*')
+          .eq('temp_token', tempToken)
+          .single();
+
+        if (pending && pending.transactions) {
+          const txns = pending.transactions.map(t => ({
+            user_id: user.id,
+            name: t.description,
+            amount: Math.abs(t.amount),
+            category: 'Other',
+            date: t.timestamp ? t.timestamp.slice(0, 10) : new Date().toISOString().slice(0, 10),
+          }));
+
+          await supabase.from('transactions').delete().eq('user_id', user.id);
+          await supabase.from('transactions').insert(txns);
+          await supabase.from('pending_transactions').delete().eq('temp_token', tempToken);
+          window.history.replaceState({}, '', '/');
+          setTransactions(txns.map((t, i) => ({ ...t, id: i + 1 })));
+          setBankConnected(true);
+        }
+      }
+
       // Load settings
       const { data: s } = await supabase.from('settings').select('*').eq('user_id', user.id).single();
       if (s) {
@@ -1046,12 +1075,14 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.light_mode !== undefined) setLightMode(s.light_mode);
         if (s.cat_names) setCatNames(s.cat_names);
       }
+
       // Load transactions
       const { data: txns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
       if (txns && txns.length > 0) {
         setTransactions(txns.map(t => ({ id: t.id, name: t.name, amount: t.amount, category: t.category, date: t.date })));
         setBankConnected(true);
       }
+
       // Load splits
       const { data: sp } = await supabase.from('splits').select('*').eq('user_id', user.id);
       if (sp) {
