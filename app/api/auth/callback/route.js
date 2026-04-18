@@ -1,17 +1,14 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const error = searchParams.get('error')
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://ember-budget.vercel.app'
 
-  if (error) {
+  if (error || !code) {
     return NextResponse.redirect(new URL('/?error=bank_connection_failed', request.url))
-  }
-
-  if (!code) {
-    return NextResponse.redirect(new URL('/', request.url))
   }
 
   try {
@@ -24,39 +21,42 @@ export async function GET(request) {
         client_id: process.env.TRUELAYER_CLIENT_ID,
         client_secret: process.env.TRUELAYER_CLIENT_SECRET,
         code,
-        redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback`,
+        redirect_uri: `${baseUrl}/api/auth/callback`,
       }),
     })
 
     const tokens = await tokenResponse.json()
+    console.log('TrueLayer token response:', JSON.stringify(tokens))
 
-    if (tokens.access_token) {
-      // Fetch transactions from TrueLayer
-      const txnResponse = await fetch('https://api.truelayer.com/data/v1/transactions', {
-        headers: { Authorization: `Bearer ${tokens.access_token}` },
-      })
-      const txnData = await txnResponse.json()
+    if (!tokens.access_token) {
+      console.error('No access token received:', tokens)
+      return NextResponse.redirect(new URL('/?error=no_token', request.url))
+    }
 
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser()
+    // Fetch accounts first
+    const accountsResponse = await fetch('https://api.truelayer.com/data/v1/accounts', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    })
+    const accountsData = await accountsResponse.json()
+    console.log('Accounts:', JSON.stringify(accountsData))
 
-      if (user && txnData.results) {
-        // Save transactions to Supabase
-        const transactions = txnData.results.map(t => ({
-          user_id: user.id,
-          name: t.description,
-          amount: Math.abs(t.amount),
-          category: 'Other',
-          date: t.timestamp.slice(0, 10),
-        }))
-
-        await supabase.from('transactions').insert(transactions)
+    // Fetch transactions for each account
+    const allTransactions = []
+    if (accountsData.results) {
+      for (const account of accountsData.results) {
+        const txnResponse = await fetch(
+          `https://api.truelayer.com/data/v1/accounts/${account.account_id}/transactions`,
+          { headers: { Authorization: `Bearer ${tokens.access_token}` } }
+        )
+        const txnData = await txnResponse.json()
+        console.log(`Transactions for ${account.account_id}:`, JSON.stringify(txnData))
+        if (txnData.results) {
+          allTransactions.push(...txnData.results)
+        }
       }
     }
 
-    return NextResponse.redirect(new URL('/?connected=true', request.url))
-  } catch (err) {
-    console.error('TrueLayer callback error:', err)
-    return NextResponse.redirect(new URL('/?error=bank_connection_failed', request.url))
-  }
-}
+    // Store token and transactions in URL params to pass back to client
+    const redirectUrl = new URL('/', baseUrl)
+    redirectUrl.searchParams.set('connected', 'true')
+    redirectUrl.searchParams.se
