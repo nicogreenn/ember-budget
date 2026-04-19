@@ -183,7 +183,7 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, setIncome, transactions, splits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected }) {
+function HomeTab({ income, setIncome, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected }) {
   const T = useT();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(income));
@@ -191,6 +191,7 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
   const [txnSearch, setTxnSearch] = useState("");
   const [txnCatFilter, setTxnCatFilter] = useState("All");
   const [txnSort, setTxnSort] = useState("date-desc");
+  const [reassignTxn, setReassignTxn] = useState(null);
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
@@ -218,24 +219,6 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
           </div>
         )}
       </div>
-
-      {/* Connect Bank Button */}
-      {!bankConnected && (
-        <button onClick={connectBank} style={{
-          width: "100%", marginBottom: 16, padding: "14px", borderRadius: 14, cursor: "pointer",
-          background: `linear-gradient(135deg, ${T.gradA}22, ${T.gradB}11)`,
-          border: `1px solid ${T.primary}`,
-          color: T.primary, fontFamily: "inherit", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-        }}>
-          🏦 Connect Your Bank
-        </button>
-      )}
-      {bankConnected && (
-        <div style={{ width: "100%", marginBottom: 16, padding: "10px 14px", borderRadius: 12, background: T.partnerBg, border: `1px solid ${T.partnerBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: 13, color: T.green }}>🏦 Bank connected</span>
-          <button onClick={connectBank} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "4px 10px", cursor: "pointer", fontSize: 11 }}>Refresh</button>
-        </div>
-      )}
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
         <DonutChart data={chartData} total={myTotal} income={income} />
@@ -318,24 +301,173 @@ function HomeTab({ income, setIncome, transactions, splits, partnerName, bankCon
           }
           if (list.length === 0) return <div style={{ fontSize: 13, color: T.dim, textAlign: "center", padding: "16px 0" }}>No transactions found</div>;
           return list.map((t, i, arr) => (
-            <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
-              <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon || "📦"}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
-                <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{t.category} · {t.date}</div>
+            <div key={t.id} style={{ paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon || "📦"}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
+                  <button onClick={() => setReassignTxn(reassignTxn === t.id ? null : t.id)}
+                    style={{ background: `${T.primary}18`, border: `1px solid ${T.primary}44`, borderRadius: 10, color: T.primary, padding: "2px 8px", fontSize: 10, cursor: "pointer", marginTop: 3, fontFamily: "inherit" }}>
+                    {CAT_META[t.category]?.icon} {t.category} ▾
+                  </button>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: T.primary }}>−{fmt(myShare(t, splits))}</div>
+                  <div style={{ fontSize: 10, color: T.muted }}>{t.date}</div>
+                </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: T.primary }}>−{fmt(myShare(t, splits))}</div>
-                {(splits[t.id] ?? 100) < 100 && <div style={{ fontSize: 10, color: T.muted }}>of {fmt(t.amount)}</div>}
-              </div>
+              {reassignTxn === t.id && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
+                  {CATS.map(c => (
+                    <button key={c} onClick={() => { setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x)); setReassignTxn(null); }}
+                      style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${t.category === c ? T.primary : T.border}`, background: t.category === c ? `${T.primary}22` : T.card, color: t.category === c ? T.primary : T.muted, fontWeight: t.category === c ? 700 : 400 }}>
+                      {CAT_META[c]?.icon} {c}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ));
         })()}
       </Card>
 
+      {/* Manual Payment */}
+      <ManualPayment onAdd={(txn) => setTransactions(p => [...p, txn])} splits={splits} setSplits={setSplits} />
+
       {/* CSV Import */}
       <CSVImporter onImport={onImport} onIncomeDetected={onIncomeDetected} />
     </div>
+  );
+}
+
+// ── MANUAL PAYMENT ────────────────────────────────────────────────────────────
+const PAYMENT_FREQS = ["One-off", "Weekly", "Fortnightly", "Monthly", "Quarterly", "Annually"];
+
+function ManualPayment({ onAdd, splits, setSplits }) {
+  const T = useT();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    name: "", amount: "", category: "Other", frequency: "One-off",
+    date: new Date().toISOString().slice(0, 10), mySharePct: 100,
+  });
+
+  const toMonthlyEquiv = (amount, freq) => {
+    if (freq === "Weekly") return amount * 52 / 12;
+    if (freq === "Fortnightly") return amount * 26 / 12;
+    if (freq === "Quarterly") return amount / 3;
+    if (freq === "Annually") return amount / 12;
+    return amount;
+  };
+
+  const handleAdd = () => {
+    if (!form.name || !form.amount) return;
+    const baseId = Date.now();
+    const amount = Number(form.amount);
+    const txns = [];
+
+    if (form.frequency === "One-off") {
+      txns.push({ id: baseId, name: form.name, amount, category: form.category, date: form.date });
+    } else {
+      // Generate recurring entries for the current month
+      const now = new Date(form.date);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      let current = new Date(now);
+      let i = 0;
+      while (current <= monthEnd && i < 10) {
+        txns.push({ id: baseId + i, name: form.name, amount, category: form.category, date: current.toISOString().slice(0, 10) });
+        if (form.frequency === "Weekly") current.setDate(current.getDate() + 7);
+        else if (form.frequency === "Fortnightly") current.setDate(current.getDate() + 14);
+        else break; // Monthly/Quarterly/Annually — just add once for the month
+        i++;
+      }
+    }
+
+    txns.forEach(t => onAdd(t));
+
+    // Set splits for all added transactions
+    if (form.mySharePct !== 100) {
+      const newSplits = {};
+      txns.forEach(t => { newSplits[t.id] = form.mySharePct; });
+      setSplits(p => ({ ...p, ...newSplits }));
+    }
+
+    setForm({ name: "", amount: "", category: "Other", frequency: "One-off", date: new Date().toISOString().slice(0, 10), mySharePct: 100 });
+    setOpen(false);
+  };
+
+  const monthlyEquiv = form.amount && form.frequency !== "One-off"
+    ? toMonthlyEquiv(Number(form.amount), form.frequency)
+    : null;
+
+  return (
+    <Card style={{ marginTop: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Label>Add Manual Payment</Label>
+        <button onClick={() => setOpen(!open)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12, marginTop: -8 }}>
+          {open ? "Cancel" : "+ Add"}
+        </button>
+      </div>
+
+      {!open && (
+        <div style={{ fontSize: 12, color: T.dim }}>Add a one-off or recurring payment manually</div>
+      )}
+
+      {open && (
+        <div>
+          {/* Name */}
+          <input placeholder="Payment name (e.g. Gym, Netflix)" value={form.name}
+            onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+            style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, marginBottom: 8, boxSizing: "border-box", fontFamily: "inherit", outline: "none" }} />
+
+          {/* Amount + Date */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input type="number" placeholder="£ Amount" value={form.amount}
+              onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
+              style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+            <input type="date" value={form.date}
+              onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
+              style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+          </div>
+
+          {/* Category + Frequency */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+              style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
+              {CATS.map(c => <option key={c}>{c}</option>)}
+            </select>
+            <select value={form.frequency} onChange={e => setForm(p => ({ ...p, frequency: e.target.value }))}
+              style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
+              {PAYMENT_FREQS.map(f => <option key={f}>{f}</option>)}
+            </select>
+          </div>
+
+          {/* My share */}
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: T.muted, marginBottom: 6 }}>My share</div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {[100, 75, 50, 25].map(p => (
+                <button key={p} onClick={() => setForm(prev => ({ ...prev, mySharePct: p }))}
+                  style={{ flex: 1, padding: "7px 4px", borderRadius: 8, fontSize: 12, cursor: "pointer", fontWeight: form.mySharePct === p ? 700 : 400, border: `1px solid ${form.mySharePct === p ? T.primary : T.border}`, background: form.mySharePct === p ? `${T.primary}22` : T.card2, color: form.mySharePct === p ? T.primary : T.muted }}>
+                  {p}%
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Preview */}
+          {form.name && form.amount && (
+            <div style={{ fontSize: 12, color: T.accent, padding: "8px 12px", background: T.card2, borderRadius: 8, marginBottom: 10 }}>
+              {form.frequency === "One-off"
+                ? `→ One-off ${fmt(Number(form.amount) * form.mySharePct / 100)} (your share) on ${form.date}`
+                : `→ ${form.frequency} · ${fmt(Number(form.amount))} · your share ${fmt(Number(form.amount) * form.mySharePct / 100)} · ~${fmt(monthlyEquiv)}/mo`
+              }
+            </div>
+          )}
+
+          <PrimaryBtn onClick={handleAdd} style={{ width: "100%" }}>Add Payment</PrimaryBtn>
+        </div>
+      )}
+    </Card>
   );
 }
 
@@ -1226,10 +1358,11 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
 }
 
 // ── SETTINGS ─────────────────────────────────────────────────────────────────
-function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, user }) {
+function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, onReset, user }) {
   const T = useT();
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(partnerName);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
@@ -1315,7 +1448,7 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
         <div style={{ fontSize: 12, color: T.muted, marginTop: 10 }}>Shown on the home page bill split summary</div>
       </Card>
 
-      <Card>
+      <Card style={{ marginBottom: 16 }}>
         <Label>Account</Label>
         <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, marginBottom: 10 }}>
           <div style={{ fontSize: 11, color: T.muted, marginBottom: 4 }}>Signed in as</div>
@@ -1324,6 +1457,32 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
         <button onClick={onSignOut} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
           Sign Out
         </button>
+      </Card>
+
+      <Card>
+        <Label>Danger Zone</Label>
+        <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, lineHeight: 1.6 }}>
+          Reset clears all transactions, splits, category names, budgets and income. Your account stays — just the data gets wiped. This cannot be undone.
+        </div>
+        {!confirmReset ? (
+          <button onClick={() => setConfirmReset(true)} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
+            🗑 Reset App Data
+          </button>
+        ) : (
+          <div>
+            <div style={{ fontSize: 13, color: T.red, marginBottom: 12, padding: "10px 14px", background: `${T.red}18`, borderRadius: 10, textAlign: "center" }}>
+              Are you sure? This will wipe everything.
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => { onReset(); setConfirmReset(false); }} style={{ flex: 2, padding: "12px", background: T.red, border: "none", borderRadius: 10, color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                Yes, reset everything
+              </button>
+              <button onClick={() => setConfirmReset(false)} style={{ flex: 1, padding: "12px", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.muted, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -1474,6 +1633,23 @@ export default function EmberApp({ user, onSignOut }) {
     supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames }, { onConflict: 'user_id' });
   }, [income, partnerName, themeKey, lightMode, catNames]);
 
+  const onReset = async () => {
+    setTransactions(INIT_TXN);
+    setSplits({});
+    setCatNames({});
+    setBudgets(INIT_BUDGETS);
+    setIncome(2800);
+    setSideHustles([]);
+    setBankConnected(false);
+    setTab("home");
+    // Clear from Supabase too
+    try {
+      await supabase.from('transactions').delete().eq('user_id', user.id);
+      await supabase.from('splits').delete().eq('user_id', user.id);
+      await supabase.from('settings').delete().eq('user_id', user.id);
+    } catch (err) { console.error('Reset error:', err); }
+  };
+
   const onIncomeDetected = (amount) => {
     setIncome(amount);
   };
@@ -1530,12 +1706,12 @@ export default function EmberApp({ user, onSignOut }) {
           <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} allTransactions={transactions} splits={splits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} selectedMonth={selectedMonth} />}
+        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} selectedMonth={selectedMonth} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
         {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} />}
-        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} user={user} />}
+        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} onReset={onReset} user={user} />}
 
         <BottomNav tab={tab} setTab={setTab} />
       </div>
