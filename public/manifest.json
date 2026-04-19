@@ -1,0 +1,28 @@
+{
+  "name": "Ember",
+  "short_name": "Ember",
+  "description": "Your personal budget app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/ember-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/ember-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/ember-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
