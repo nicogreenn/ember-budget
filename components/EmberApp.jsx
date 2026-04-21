@@ -187,19 +187,32 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta }) {
+function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta, starred, setStarred, spendingBudget, setSpendingBudget }) {
   const T = useT();
   const [showAll, setShowAll] = useState(false);
   const [txnSearch, setTxnSearch] = useState("");
   const [txnCatFilter, setTxnCatFilter] = useState("All");
   const [txnSort, setTxnSort] = useState("date-desc");
   const [reassignTxn, setReassignTxn] = useState(null);
-  const [editingTxn, setEditingTxn] = useState(null); // {id, name, amount, category, date}
+  const [editingTxn, setEditingTxn] = useState(null);
   const [editTxnDraft, setEditTxnDraft] = useState({});
+  const [editingSpendBudget, setEditingSpendBudget] = useState(false);
+  const [spendBudgetDraft, setSpendBudgetDraft] = useState("");
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
   const remaining = income - myTotal;
+
+  // Starred = essential bills. Unstarred = spending money.
+  const starredTotal = transactions.filter(t => starred[t.id]).reduce((s, t) => s + myShare(t, splits), 0);
+  const spendingTotal = transactions.filter(t => !starred[t.id]).reduce((s, t) => s + myShare(t, splits), 0);
+  const spendingRemaining = spendingBudget > 0 ? spendingBudget - spendingTotal : null;
+
+  const toggleStar = (id) => {
+    const updated = { ...starred, [id]: !starred[id] };
+    if (!updated[id]) delete updated[id];
+    setStarred(updated);
+  };
 
   const chartData = getCats(catMeta).map(c => ({ label: c, value: transactions.filter(t => t.category === c).reduce((s, t) => s + myShare(t, splits), 0), color: cc(c, T, catMeta) })).filter(d => d.value > 0);
   const recent = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
@@ -243,6 +256,61 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
             </div>
           ))}
         </div>
+      </Card>
+
+      {/* Spending Money Card */}
+      <Card style={{ marginBottom: 16, border: `1px solid ${spendingBudget > 0 && spendingRemaining < 0 ? T.red : T.primary}44` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div>
+            <Label>Spending Money</Label>
+            <div style={{ fontSize: 11, color: T.muted, marginTop: -6, marginBottom: 8 }}>Unstarred transactions only · tap ⭐ to mark essentials</div>
+          </div>
+          {!editingSpendBudget ? (
+            <button onClick={() => { setEditingSpendBudget(true); setSpendBudgetDraft(String(spendingBudget || "")); }}
+              style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12, flexShrink: 0 }}>
+              {spendingBudget > 0 ? "Edit budget" : "Set budget"}
+            </button>
+          ) : (
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <span style={{ fontSize: 14, color: T.primary }}>£</span>
+              <input autoFocus type="number" value={spendBudgetDraft} onChange={e => setSpendBudgetDraft(e.target.value)}
+                onBlur={() => { const v = parseFloat(spendBudgetDraft); setSpendingBudget(!isNaN(v) && v > 0 ? v : 0); setEditingSpendBudget(false); }}
+                onKeyDown={e => e.key === "Enter" && e.target.blur()}
+                style={{ width: 90, background: T.card2, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "4px 8px", color: T.text, fontSize: 14, fontFamily: "'Outfit',sans-serif", outline: "none" }} />
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: 10, marginBottom: spendingBudget > 0 ? 12 : 0 }}>
+          <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
+            <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(spendingTotal)}</div>
+          </div>
+          {spendingBudget > 0 && (
+            <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>{spendingRemaining >= 0 ? "Remaining" : "Over by"}</div>
+              <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: spendingRemaining >= 0 ? T.green : T.red }}>{fmt(Math.abs(spendingRemaining))}</div>
+            </div>
+          )}
+          {starredTotal > 0 && (
+            <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>⭐ Bills</div>
+              <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.muted }}>{fmt(starredTotal)}</div>
+            </div>
+          )}
+        </div>
+
+        {spendingBudget > 0 && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: T.muted, marginBottom: 4 }}>
+              <span>{fmt(spendingTotal)} of {fmt(spendingBudget)}</span>
+              <span>{Math.min(100, Math.round((spendingTotal / spendingBudget) * 100))}%</span>
+            </div>
+            <div style={{ height: 8, background: T.card2, borderRadius: 4 }}>
+              <div style={{ height: "100%", borderRadius: 4, width: `${Math.min(100, (spendingTotal / spendingBudget) * 100)}%`, background: spendingRemaining < 0 ? T.red : spendingTotal / spendingBudget > 0.8 ? T.accent : `linear-gradient(90deg,${T.gradA},${T.gradB})`, transition: "width .4s" }} />
+            </div>
+          </div>
+        )}
       </Card>
 
       <Card>
@@ -335,6 +403,8 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
                     </div>
                     <button onClick={() => { setEditingTxn(t.id); setEditTxnDraft({ name: t.name, amount: t.amount, category: t.category, date: t.date }); setReassignTxn(null); }}
                       style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 8px", cursor: "pointer", fontSize: 11, flexShrink: 0 }}>✏️</button>
+                    <button onClick={() => toggleStar(t.id)} title={starred[t.id] ? "Unmark essential" : "Mark as essential bill"}
+                      style={{ background: starred[t.id] ? "#facc1522" : T.card2, border: `1px solid ${starred[t.id] ? "#facc15" : T.border}`, borderRadius: 8, color: starred[t.id] ? "#facc15" : T.dim, padding: "5px 8px", cursor: "pointer", fontSize: 13, flexShrink: 0 }}>⭐</button>
                   </div>
                   {reassignTxn === t.id && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
@@ -861,7 +931,7 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
 }
 
 // ── BILLS / CATEGORIES ───────────────────────────────────────────────────────
-function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user, oneOff, setOneOff, onEditTransaction, catMeta }) {
+function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user, oneOff, setOneOff, onEditTransaction, catMeta, starred, setStarred }) {
   const T = useT();
   const [selectedCat, setSelectedCat] = useState(null);
   const [reassigning, setReassigning] = useState(null);
@@ -877,6 +947,7 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
   const SPLIT_OPTS = [100, 75, 50, 25];
 
   const toggleOneOff = (id) => { const updated = { ...oneOff, [id]: !oneOff[id] }; setOneOff(updated); };
+  const toggleStar = (id) => { const updated = { ...starred, [id]: !starred[id] }; if (!updated[id]) delete updated[id]; setStarred(updated); };
 
   const deleteTxn = async (id) => {
     setTransactions(p => p.filter(t => t.id !== id));
@@ -1072,6 +1143,8 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                             <div style={{ display: "flex", gap: 4 }}>
                               <button onClick={() => toggleOneOff(t.id)} title="Mark as one-off"
                                 style={{ background: isOneOff ? `${T.amber}33` : T.card2, border: `1px solid ${isOneOff ? T.amber : T.border}`, borderRadius: 8, color: isOneOff ? T.amber : T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11, fontWeight: isOneOff ? 700 : 400 }}>1×</button>
+                              <button onClick={() => toggleStar(t.id)} title={starred[t.id] ? "Unmark essential" : "Mark as essential"}
+                                style={{ background: starred[t.id] ? "#facc1522" : T.card2, border: `1px solid ${starred[t.id] ? "#facc15" : T.border}`, borderRadius: 8, color: starred[t.id] ? "#facc15" : T.dim, padding: "5px 7px", cursor: "pointer", fontSize: 13 }}>⭐</button>
                               <button onClick={() => { setEditingTxnId(t.id); setEditTxnDraft({ name: t.name, amount: t.amount, date: t.date }); setReassigning(null); }}
                                 style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11 }}>✏️</button>
                               <button onClick={() => setReassigning(t.id)}
@@ -2175,6 +2248,8 @@ export default function EmberApp({ user, onSignOut }) {
   const [catMeta, setCatMeta] = useState(DEFAULT_CAT_META);
   const [splits, setSplits] = useState({});
   const [oneOff, setOneOff] = useState({});
+  const [starred, setStarred] = useState({}); // txnId -> true
+  const [spendingBudget, setSpendingBudget] = useState(0);
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
 
@@ -2242,6 +2317,8 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.side_hustles) setSideHustles(s.side_hustles);
         if (s.one_off) setOneOff(s.one_off);
         if (s.cat_meta) setCatMeta(s.cat_meta);
+        if (s.starred) setStarred(s.starred);
+        if (s.spending_budget) setSpendingBudget(s.spending_budget);
       }
 
       // Load transactions
@@ -2287,6 +2364,8 @@ export default function EmberApp({ user, onSignOut }) {
     setCatNames({});
     setCatMeta(DEFAULT_CAT_META);
     setBudgets(INIT_BUDGETS);
+    setStarred({});
+    setSpendingBudget(0);
     setIncome(2800);
     setSideHustles([]);
     setBankConnected(false);
@@ -2302,8 +2381,8 @@ export default function EmberApp({ user, onSignOut }) {
   // Keep a ref of all saveable settings so saveSettings always has latest values without stale closure
   const settingsRef = useRef({});
   useEffect(() => {
-    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta };
-  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta]);
+    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta, starred, spending_budget: spendingBudget };
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, starred, spendingBudget]);
 
   const saveSettings = (patch) => {
     if (!user) return;
@@ -2321,6 +2400,8 @@ export default function EmberApp({ user, onSignOut }) {
   const handleSetSideHustles = (v) => { setSideHustles(v); saveSettings({ side_hustles: v }); };
   const handleSetOneOff = (v) => { setOneOff(v); saveSettings({ one_off: v }); };
   const handleSetCatMeta = (v) => { setCatMeta(v); saveSettings({ cat_meta: v }); };
+  const handleSetStarred = (v) => { setStarred(v); saveSettings({ starred: v }); };
+  const handleSetSpendingBudget = (v) => { setSpendingBudget(v); saveSettings({ spending_budget: v }); };
 
   const onIncomeDetected = (amount) => handleSetIncome(amount);
 
@@ -2427,11 +2508,11 @@ export default function EmberApp({ user, onSignOut }) {
           <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} />}
+        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} />}
+        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} />}
         {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
 
         <BottomNav tab={tab} setTab={setTab} />
