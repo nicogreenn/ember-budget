@@ -1081,19 +1081,52 @@ function daysUntil(date) {
 function SavingsTab({ income, transactions, splits }) {
   const T = useT();
   const today = new Date().toISOString().slice(0, 10);
+
   const [goals, setGoals] = useState([
-    { id: 1, name: "Emergency Fund", target: 3000, saved: 850,  monthsLeft: 12, aer: 4.5,  interestFreq: "Monthly",   startDate: "2025-01-01", monthsHeld: 3 },
-    { id: 2, name: "Holiday",        target: 1200, saved: 320,  monthsLeft: 6,  aer: 0,    interestFreq: "Monthly",   startDate: "2025-02-01", monthsHeld: 2 },
+    { id: 1, name: "Emergency Fund", target: 3000, saved: 850, aer: 4.5, interestFreq: "Monthly", startDate: "2025-01-01", monthsHeld: 3,
+      contributions: [{ id: 1, amount: 100, frequency: "Monthly", startDate: "2025-01-01" }] },
+    { id: 2, name: "Holiday", target: 1200, saved: 320, aer: 0, interestFreq: "Monthly", startDate: "2025-02-01", monthsHeld: 2,
+      contributions: [] },
   ]);
-  const [form, setForm] = useState({ name: "", target: "", months: "", aer: "", interestFreq: "Monthly" });
-  const [adding, setAdding] = useState(false);
+  const [addingGoal, setAddingGoal] = useState(false);
+  const [goalForm, setGoalForm] = useState({ name: "", target: "", aer: "", interestFreq: "Monthly" });
   const [expandedId, setExpandedId] = useState(null);
   const [editingInterest, setEditingInterest] = useState(null);
   const [interestDraft, setInterestDraft] = useState({ aer: "", interestFreq: "Monthly" });
+  const [addingContrib, setAddingContrib] = useState(null); // goal id
+  const [contribForm, setContribForm] = useState({ amount: "", frequency: "Monthly", startDate: today });
+  const [customDeposit, setCustomDeposit] = useState(null); // goal id
+  const [depositAmount, setDepositAmount] = useState("");
+
+  const CONTRIB_FREQS = ["Weekly", "Fortnightly", "Monthly", "Quarterly", "Annually"];
+
+  const toMonthly = (amount, freq) => {
+    if (freq === "Weekly")      return amount * 52 / 12;
+    if (freq === "Fortnightly") return amount * 26 / 12;
+    if (freq === "Quarterly")   return amount / 3;
+    if (freq === "Annually")    return amount / 12;
+    return amount; // Monthly
+  };
+
+  // Project balance N months from now for a goal
+  const projectBalance = (g, months) => {
+    const n = g.interestFreq === "Monthly" ? 12 : g.interestFreq === "Quarterly" ? 4 : 1;
+    const r = (g.aer || 0) / 100 / n;
+    let balance = g.saved;
+    const monthlyContrib = (g.contributions || []).reduce((s, c) => s + toMonthly(c.amount, c.frequency), 0);
+    for (let m = 0; m < months; m++) {
+      balance += monthlyContrib;
+      // Apply interest each period
+      if (g.aer > 0) {
+        const periodsPerMonth = n / 12;
+        balance *= (1 + r * periodsPerMonth);
+      }
+    }
+    return balance;
+  };
 
   const totalSpend = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const spare = income - totalSpend;
-  const totalGoalMonthly = goals.reduce((s, g) => s + (g.target - g.saved) / (g.monthsLeft || 12), 0);
 
   const Ring = ({ pct, size = 90, stroke = 8 }) => {
     const r = (size - stroke) / 2, circ = 2 * Math.PI * r, dash = (Math.min(100, pct) / 100) * circ;
@@ -1113,21 +1146,28 @@ function SavingsTab({ income, transactions, splits }) {
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Savings</div>
       </div>
 
-      {/* Available to save card */}
+      {/* Available to save */}
       <Card style={{ marginBottom: 16, background: spare > 0 ? T.partnerBg : "#1a0a0a", border: `1px solid ${spare > 0 ? T.partnerBorder : T.red}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <Label>Available to Save</Label>
             <div style={{ fontSize: 28, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: spare > 0 ? T.secondary : T.red }}>{fmt(Math.max(0, spare))}</div>
-            <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>after my share of bills · {spare > 0 ? `${((spare / income) * 100).toFixed(0)}% of income` : "overspent!"}</div>
+            <div style={{ fontSize: 12, color: T.muted, marginTop: 4 }}>after bills · {spare > 0 ? `${((spare / income) * 100).toFixed(0)}% of income` : "overspent!"}</div>
           </div>
           <div style={{ fontSize: 36 }}>{spare > 0 ? "💰" : "⚠️"}</div>
         </div>
-        {goals.length > 0 && (
-          <div style={{ marginTop: 12, padding: "10px 12px", background: T.card, borderRadius: 10 }}>
-            <div style={{ fontSize: 12, color: T.muted }}>Goals need <span style={{ color: T.primary, fontWeight: 700 }}>{fmt(totalGoalMonthly)}</span>/mo · You have <span style={{ color: spare > totalGoalMonthly ? T.green : T.red, fontWeight: 700 }}>{fmt(spare)}</span></div>
-          </div>
-        )}
+        {goals.length > 0 && (() => {
+          const totalMonthly = goals.reduce((s, g) =>
+            s + (g.contributions || []).reduce((cs, c) => cs + toMonthly(c.amount, c.frequency), 0), 0);
+          return totalMonthly > 0 ? (
+            <div style={{ marginTop: 12, padding: "10px 12px", background: T.card, borderRadius: 10 }}>
+              <div style={{ fontSize: 12, color: T.muted }}>
+                Saving <span style={{ color: T.primary, fontWeight: 700 }}>{fmt(totalMonthly)}</span>/mo across all goals
+                {spare > 0 && <span style={{ color: spare >= totalMonthly ? T.green : T.red }}> · {spare >= totalMonthly ? `${fmt(spare - totalMonthly)} unallocated` : `${fmt(totalMonthly - spare)} over budget`}</span>}
+              </div>
+            </div>
+          ) : null;
+        })()}
       </Card>
 
       {/* Goals */}
@@ -1135,17 +1175,14 @@ function SavingsTab({ income, transactions, splits }) {
         const interest = calcInterestEarned(g.saved, g.aer, g.interestFreq, g.monthsHeld || 1);
         const effectiveSaved = g.saved + interest;
         const pct = Math.min(100, Math.round((effectiveSaved / g.target) * 100));
-        const monthly = ((g.target - effectiveSaved) / (g.monthsLeft || 12)).toFixed(2);
+        const monthlyContrib = (g.contributions || []).reduce((s, c) => s + toMonthly(c.amount, c.frequency), 0);
+        const monthsToTarget = monthlyContrib > 0
+          ? Math.ceil((g.target - effectiveSaved) / monthlyContrib)
+          : null;
+        const proj12 = projectBalance(g, 12);
         const nextPay = g.aer > 0 ? nextPaymentDate(g.startDate || today, g.interestFreq) : null;
         const daysLeft = nextPay ? daysUntil(nextPay) : null;
         const isExpanded = expandedId === g.id;
-        const isEditingInterest = editingInterest === g.id;
-
-        // Project 12 months with interest
-        const projectedSaved = g.aer > 0
-          ? g.saved * Math.pow(1 + (g.aer / 100) / (g.interestFreq === "Monthly" ? 12 : g.interestFreq === "Quarterly" ? 4 : 1),
-              (g.interestFreq === "Monthly" ? 12 : g.interestFreq === "Quarterly" ? 4 : 1))
-          : g.saved;
 
         return (
           <Card key={g.id} style={{ marginBottom: 12 }}>
@@ -1160,109 +1197,187 @@ function SavingsTab({ income, transactions, splits }) {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 15, fontWeight: 600, color: T.text, marginBottom: 3 }}>{g.name}</div>
                 <div style={{ fontSize: 12, color: T.muted }}>{fmt(effectiveSaved)} of {fmt(g.target)}</div>
-                {interest > 0 && <div style={{ fontSize: 11, color: T.green, marginTop: 2 }}>+{fmt(interest)} interest earned</div>}
-                <div style={{ fontSize: 12, color: T.accent, marginTop: 3 }}>{fmt(Math.max(0, monthly))}/mo · {g.monthsLeft || 12} months left</div>
+                {monthlyContrib > 0 && (
+                  <div style={{ fontSize: 12, color: T.accent, marginTop: 2 }}>
+                    {fmt(monthlyContrib)}/mo
+                    {monthsToTarget !== null && monthsToTarget > 0 && ` · ~${monthsToTarget < 12 ? `${monthsToTarget}mo` : `${(monthsToTarget/12).toFixed(1)}yr`} to go`}
+                    {monthsToTarget !== null && monthsToTarget <= 0 && ' · 🎉 target reached!'}
+                  </div>
+                )}
+                {interest > 0 && <div style={{ fontSize: 11, color: T.green, marginTop: 2 }}>+{fmt(interest)} interest</div>}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
-                <button onClick={() => setGoals(p => p.filter(x => x.id !== g.id))} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.dim, padding: "3px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                <button onClick={() => setGoals(goals.filter(x => x.id !== g.id))} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.dim, padding: "3px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
                 <button onClick={() => setExpandedId(isExpanded ? null : g.id)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "3px 8px", cursor: "pointer", fontSize: 11 }}>{isExpanded ? "▲" : "▼"}</button>
               </div>
             </div>
 
-            {/* Quick deposit */}
+            {/* Quick deposit + custom */}
             <div style={{ marginTop: 12, display: "flex", gap: 6 }}>
               {[50, 100, 200].map(amt => (
-                <button key={amt} onClick={() => setGoals(p => p.map(x => x.id === g.id ? { ...x, saved: Math.min(x.target, x.saved + amt) } : x))}
+                <button key={amt} onClick={() => setGoals(goals.map(x => x.id === g.id ? { ...x, saved: Math.min(x.target, x.saved + amt) } : x))}
                   style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, padding: "7px", cursor: "pointer", fontSize: 13 }}>+{fmt(amt)}</button>
               ))}
+              <button onClick={() => { setCustomDeposit(g.id); setDepositAmount(""); }}
+                style={{ flex: 1, background: T.card2, border: `1px solid ${T.primary}44`, borderRadius: 8, color: T.primary, padding: "7px", cursor: "pointer", fontSize: 13 }}>+£?</button>
             </div>
 
-            {/* Expanded interest section */}
+            {/* Custom deposit input */}
+            {customDeposit === g.id && (
+              <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
+                <input autoFocus type="number" placeholder="Amount" value={depositAmount} onChange={e => setDepositAmount(e.target.value)}
+                  style={{ flex: 1, background: T.card2, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                <PrimaryBtn style={{ padding: "8px 14px" }} onClick={() => {
+                  const v = parseFloat(depositAmount);
+                  if (!isNaN(v) && v > 0) setGoals(goals.map(x => x.id === g.id ? { ...x, saved: Math.min(x.target, x.saved + v) } : x));
+                  setCustomDeposit(null);
+                }}>Add</PrimaryBtn>
+                <GhostBtn style={{ padding: "8px 10px" }} onClick={() => setCustomDeposit(null)}>✕</GhostBtn>
+              </div>
+            )}
+
+            {/* Expanded section */}
             {isExpanded && (
               <div style={{ marginTop: 14, borderTop: `1px solid ${T.border}`, paddingTop: 14 }}>
 
-                {/* Interest rate settings */}
+                {/* Regular contributions */}
                 <div style={{ background: T.card2, borderRadius: 12, padding: 14, marginBottom: 10 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>Interest Settings</div>
-                    {!isEditingInterest
-                      ? <button onClick={() => { setEditingInterest(g.id); setInterestDraft({ aer: String(g.aer || ""), interestFreq: g.interestFreq }); }}
-                          style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12 }}>✏️ Edit</button>
-                      : null}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>Regular Contributions</div>
+                    {addingContrib !== g.id && (
+                      <button onClick={() => { setAddingContrib(g.id); setContribForm({ amount: "", frequency: "Monthly", startDate: today }); }}
+                        style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12 }}>+ Add</button>
+                    )}
                   </div>
 
-                  {isEditingInterest ? (
-                    <div>
-                      <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 11, color: T.muted, marginBottom: 5 }}>AER / Interest Rate %</div>
-                          <input type="number" step="0.01" placeholder="e.g. 4.5" value={interestDraft.aer}
-                            onChange={e => setInterestDraft(p => ({ ...p, aer: e.target.value }))}
-                            style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "'Outfit',sans-serif", outline: "none", boxSizing: "border-box" }} />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 11, color: T.muted, marginBottom: 5 }}>Paid</div>
-                          <select value={interestDraft.interestFreq} onChange={e => setInterestDraft(p => ({ ...p, interestFreq: e.target.value }))}
-                            style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}>
-                            {INTEREST_FREQS.map(f => <option key={f}>{f}</option>)}
-                          </select>
-                        </div>
+                  {(g.contributions || []).length === 0 && addingContrib !== g.id && (
+                    <div style={{ fontSize: 12, color: T.dim, textAlign: "center", padding: "8px 0" }}>No regular contributions set</div>
+                  )}
+
+                  {(g.contributions || []).map(c => (
+                    <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "8px 10px", background: T.card, borderRadius: 10 }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{fmt(c.amount)} <span style={{ fontSize: 11, color: T.muted, fontWeight: 400 }}>{c.frequency}</span></div>
+                        <div style={{ fontSize: 11, color: T.muted }}>from {c.startDate} · {fmt(toMonthly(c.amount, c.frequency))}/mo equiv</div>
                       </div>
-                      {interestDraft.aer && (
-                        <div style={{ fontSize: 12, color: T.green, padding: "7px 10px", background: T.partnerBg, borderRadius: 8, marginBottom: 10 }}>
-                          → At {interestDraft.aer}% AER you'd earn ~{fmt(calcInterestEarned(g.saved, parseFloat(interestDraft.aer), interestDraft.interestFreq, 12))} over 12 months on your current balance
+                      <button onClick={() => setGoals(goals.map(x => x.id === g.id ? { ...x, contributions: x.contributions.filter(c2 => c2.id !== c.id) } : x))}
+                        style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                    </div>
+                  ))}
+
+                  {addingContrib === g.id && (
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                        <input type="number" placeholder="Amount £" value={contribForm.amount} onChange={e => setContribForm(p => ({ ...p, amount: e.target.value }))}
+                          style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                        <select value={contribForm.frequency} onChange={e => setContribForm(p => ({ ...p, frequency: e.target.value }))}
+                          style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
+                          {CONTRIB_FREQS.map(f => <option key={f}>{f}</option>)}
+                        </select>
+                      </div>
+                      <div style={{ marginBottom: 8 }}>
+                        <div style={{ fontSize: 11, color: T.muted, marginBottom: 4 }}>Start date</div>
+                        <input type="date" value={contribForm.startDate} onChange={e => setContribForm(p => ({ ...p, startDate: e.target.value }))}
+                          style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                      </div>
+                      {contribForm.amount && (
+                        <div style={{ fontSize: 12, color: T.accent, padding: "6px 10px", background: T.bg, borderRadius: 8, marginBottom: 8 }}>
+                          → {fmt(toMonthly(Number(contribForm.amount), contribForm.frequency))}/mo · target in ~{Math.ceil((g.target - effectiveSaved) / toMonthly(Number(contribForm.amount), contribForm.frequency))}mo
                         </div>
                       )}
                       <div style={{ display: "flex", gap: 8 }}>
                         <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={() => {
-                          setGoals(p => p.map(x => x.id === g.id ? { ...x, aer: parseFloat(interestDraft.aer) || 0, interestFreq: interestDraft.interestFreq, startDate: x.startDate || today } : x));
+                          if (!contribForm.amount) return;
+                          const newContrib = { id: Date.now(), amount: Number(contribForm.amount), frequency: contribForm.frequency, startDate: contribForm.startDate };
+                          setGoals(goals.map(x => x.id === g.id ? { ...x, contributions: [...(x.contributions || []), newContrib] } : x));
+                          setAddingContrib(null);
+                        }}>Save</PrimaryBtn>
+                        <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setAddingContrib(null)}>Cancel</GhostBtn>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Interest settings */}
+                <div style={{ background: T.card2, borderRadius: 12, padding: 14, marginBottom: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>Interest / AER</div>
+                    {editingInterest !== g.id && (
+                      <button onClick={() => { setEditingInterest(g.id); setInterestDraft({ aer: String(g.aer || ""), interestFreq: g.interestFreq }); }}
+                        style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12 }}>✏️ Edit</button>
+                    )}
+                  </div>
+                  {editingInterest === g.id ? (
+                    <div>
+                      <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                        <input type="number" step="0.01" placeholder="AER %" value={interestDraft.aer} onChange={e => setInterestDraft(p => ({ ...p, aer: e.target.value }))}
+                          style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                        <select value={interestDraft.interestFreq} onChange={e => setInterestDraft(p => ({ ...p, interestFreq: e.target.value }))}
+                          style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
+                          {INTEREST_FREQS.map(f => <option key={f}>{f}</option>)}
+                        </select>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={() => {
+                          setGoals(goals.map(x => x.id === g.id ? { ...x, aer: parseFloat(interestDraft.aer) || 0, interestFreq: interestDraft.interestFreq, startDate: x.startDate || today } : x));
                           setEditingInterest(null);
                         }}>Save</PrimaryBtn>
                         <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingInterest(null)}>Cancel</GhostBtn>
                       </div>
                     </div>
                   ) : (
-                    <div>
+                    <div style={{ display: "flex", gap: 10 }}>
                       {g.aer > 0 ? (
-                        <div style={{ display: "flex", gap: 10 }}>
-                          <div style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-                            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>AER</div>
-                            <div style={{ fontSize: 20, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.green }}>{g.aer}%</div>
+                        <>
+                          <div style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
+                            <div style={{ fontSize: 9, color: T.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>AER</div>
+                            <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.green }}>{g.aer}%</div>
                           </div>
-                          <div style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-                            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Paid</div>
-                            <div style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.text }}>{g.interestFreq}</div>
+                          <div style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
+                            <div style={{ fontSize: 9, color: T.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Paid</div>
+                            <div style={{ fontSize: 13, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.text }}>{g.interestFreq}</div>
                           </div>
-                          <div style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-                            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Next in</div>
-                            <div style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: daysLeft < 7 ? T.green : T.text }}>{daysLeft}d</div>
+                          <div style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
+                            <div style={{ fontSize: 9, color: T.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Next in</div>
+                            <div style={{ fontSize: 13, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: daysLeft < 7 ? T.green : T.text }}>{daysLeft}d</div>
                           </div>
-                        </div>
+                        </>
                       ) : (
-                        <div style={{ textAlign: "center", padding: "8px 0", color: T.dim, fontSize: 13 }}>No interest set — tap Edit to add your account's rate</div>
+                        <div style={{ fontSize: 12, color: T.dim }}>No interest set — tap Edit to add your rate</div>
                       )}
                     </div>
                   )}
                 </div>
 
                 {/* 12-month projection */}
-                {g.aer > 0 && (
-                  <div style={{ background: T.card2, borderRadius: 12, padding: 14 }}>
-                    <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>12-Month Projection</div>
-                    <div style={{ display: "flex", gap: 10 }}>
-                      {[
-                        { label: "Current Balance", value: effectiveSaved, color: T.text },
-                        { label: "In 12 Months", value: projectedSaved + (totalGoalMonthly * 12), color: T.green },
-                        { label: "Interest (12mo)", value: calcInterestEarned(effectiveSaved, g.aer, g.interestFreq, 12), color: T.primary },
-                      ].map(s => (
-                        <div key={s.label} style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
-                          <div style={{ fontSize: 9, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, lineHeight: 1.3 }}>{s.label}</div>
-                          <div style={{ fontSize: 13, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.color }}>{fmt(s.value)}</div>
-                        </div>
-                      ))}
-                    </div>
+                <div style={{ background: T.card2, borderRadius: 12, padding: 14 }}>
+                  <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>12-Month Projection</div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[
+                      { label: "Now", value: effectiveSaved, color: T.text },
+                      { label: "In 12mo", value: proj12, color: T.green },
+                      { label: "Contributions", value: monthlyContrib * 12, color: T.accent },
+                      ...(g.aer > 0 ? [{ label: "Interest", value: proj12 - effectiveSaved - monthlyContrib * 12, color: T.primary }] : []),
+                    ].map(s => (
+                      <div key={s.label} style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 6px", textAlign: "center" }}>
+                        <div style={{ fontSize: 9, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, lineHeight: 1.3 }}>{s.label}</div>
+                        <div style={{ fontSize: 12, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.color }}>{fmt(Math.max(0, s.value))}</div>
+                      </div>
+                    ))}
                   </div>
-                )}
+                  {/* Progress bar to target */}
+                  {proj12 < g.target && (
+                    <div style={{ marginTop: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: T.muted, marginBottom: 4 }}>
+                        <span>Progress in 12mo</span>
+                        <span>{Math.round((proj12 / g.target) * 100)}% of {fmt(g.target)}</span>
+                      </div>
+                      <div style={{ height: 6, background: T.card, borderRadius: 3 }}>
+                        <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(100, (proj12 / g.target) * 100)}%`, background: `linear-gradient(90deg,${T.gradA},${T.gradB})`, transition: "width .5s" }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </Card>
@@ -1270,43 +1385,31 @@ function SavingsTab({ income, transactions, splits }) {
       })}
 
       {/* Add goal */}
-      {!adding ? (
-        <button onClick={() => setAdding(true)} style={{ width: "100%", padding: "14px", background: "transparent", border: `1px dashed ${T.primary}`, borderRadius: 16, color: T.primary, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>+ New Savings Goal</button>
+      {!addingGoal ? (
+        <button onClick={() => setAddingGoal(true)} style={{ width: "100%", padding: "14px", background: "transparent", border: `1px dashed ${T.primary}`, borderRadius: 16, color: T.primary, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>+ New Savings Goal</button>
       ) : (
         <Card>
           <Label>New Goal</Label>
-          {[
-            { key: "name",   ph: "Goal name (e.g. New Car)",  type: "text"   },
-            { key: "target", ph: "Target amount £",            type: "number" },
-            { key: "months", ph: "Months to reach it",         type: "number" },
-          ].map(f => (
-            <input key={f.key} type={f.type} placeholder={f.ph} value={form[f.key]}
-              onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-              style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "11px 14px", color: T.text, fontSize: 14, marginBottom: 10, boxSizing: "border-box", fontFamily: "inherit", outline: "none" }} />
-          ))}
+          <input placeholder="Goal name (e.g. New Car, Holiday)" value={goalForm.name} onChange={e => setGoalForm(p => ({ ...p, name: e.target.value }))}
+            style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "11px 14px", color: T.text, fontSize: 14, marginBottom: 10, boxSizing: "border-box", fontFamily: "inherit", outline: "none" }} />
+          <input type="number" placeholder="Target amount £" value={goalForm.target} onChange={e => setGoalForm(p => ({ ...p, target: e.target.value }))}
+            style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "11px 14px", color: T.text, fontSize: 14, marginBottom: 10, boxSizing: "border-box", fontFamily: "inherit", outline: "none" }} />
           <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-            <input type="number" step="0.01" placeholder="AER % (optional)" value={form.aer}
-              onChange={e => setForm(p => ({ ...p, aer: e.target.value }))}
+            <input type="number" step="0.01" placeholder="AER % (optional)" value={goalForm.aer} onChange={e => setGoalForm(p => ({ ...p, aer: e.target.value }))}
               style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "11px 14px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
-            <select value={form.interestFreq} onChange={e => setForm(p => ({ ...p, interestFreq: e.target.value }))}
+            <select value={goalForm.interestFreq} onChange={e => setGoalForm(p => ({ ...p, interestFreq: e.target.value }))}
               style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "11px 14px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
               {INTEREST_FREQS.map(f => <option key={f}>{f}</option>)}
             </select>
           </div>
-          {form.target && form.months && (
-            <div style={{ fontSize: 13, color: T.accent, marginBottom: 10, padding: "8px 12px", background: T.card2, borderRadius: 8 }}>
-              → Save {fmt(form.target / form.months)}/month
-              {form.aer && ` · +${fmt(calcInterestEarned(0, parseFloat(form.aer), form.interestFreq, parseFloat(form.months)))} projected interest`}
-            </div>
-          )}
           <div style={{ display: "flex", gap: 8 }}>
             <PrimaryBtn style={{ flex: 2 }} onClick={() => {
-              if (!form.name || !form.target || !form.months) return;
-              setGoals(p => [...p, { id: Date.now(), name: form.name, target: Number(form.target), saved: 0, monthsLeft: Number(form.months), aer: parseFloat(form.aer) || 0, interestFreq: form.interestFreq, startDate: today, monthsHeld: 0 }]);
-              setForm({ name: "", target: "", months: "", aer: "", interestFreq: "Monthly" });
-              setAdding(false);
+              if (!goalForm.name || !goalForm.target) return;
+              setGoals([...goals, { id: Date.now(), name: goalForm.name, target: Number(goalForm.target), saved: 0, aer: parseFloat(goalForm.aer) || 0, interestFreq: goalForm.interestFreq, startDate: today, monthsHeld: 0, contributions: [] }]);
+              setGoalForm({ name: "", target: "", aer: "", interestFreq: "Monthly" });
+              setAddingGoal(false);
             }}>Add Goal</PrimaryBtn>
-            <GhostBtn style={{ flex: 1 }} onClick={() => setAdding(false)}>Cancel</GhostBtn>
+            <GhostBtn style={{ flex: 1 }} onClick={() => setAddingGoal(false)}>Cancel</GhostBtn>
           </div>
         </Card>
       )}
