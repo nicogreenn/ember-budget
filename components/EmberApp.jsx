@@ -735,13 +735,17 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
     setLoading(true); setAiText("");
     const summary = `UK user. Income: £${income}. My share of spend: £${total.toFixed(2)} (split bills with partner). Categories: ${byCat.filter(d => d.curr > 0).map(d => `${d.cat} £${d.curr.toFixed(0)}`).join(", ")}. Savings rate: ${savingsRate}%.`;
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: "You are a sharp UK personal finance coach. Be direct, no fluff. Use £. Give 3-4 specific actionable insights with emoji bullets. End with one 'this week' action.", messages: [{ role: "user", content: `Analyse my budget: ${summary}` }] })
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary }),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setAiText(data.content?.[0]?.text || "No response.");
-    } catch { setAiText("Error — please try again."); }
+      setAiText(data.text || "No response.");
+    } catch (e) {
+      setAiText("Error — please try again. " + e.message);
+    }
     setLoading(false);
   };
 
@@ -1096,6 +1100,7 @@ function SavingsTab({ income, transactions, splits }) {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [settingBalance, setSettingBalance] = useState(null);
   const [balanceAmount, setBalanceAmount] = useState("");
+  const [projMonths, setProjMonths] = useState({}); // goalId -> months
 
   const CONTRIB_FREQS = ["Weekly", "Fortnightly", "Monthly", "Quarterly", "Annually"];
 
@@ -1182,6 +1187,7 @@ function SavingsTab({ income, transactions, splits }) {
         const nextPay = g.aer > 0 ? nextPaymentDate(g.startDate || today, g.interestFreq) : null;
         const daysLeft = nextPay ? daysUntil(nextPay) : null;
         const isExpanded = expandedId === g.id;
+        const goalProjMonths = projMonths[g.id] || 12;
 
         return (
           <Card key={g.id} style={{ marginBottom: 12 }}>
@@ -1389,15 +1395,39 @@ function SavingsTab({ income, transactions, splits }) {
                   )}
                 </div>
 
-                {/* 12-month projection */}
+                {/* Projection with slider */}
                 <div style={{ background: T.card2, borderRadius: 12, padding: 14 }}>
-                  <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>12-Month Projection</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>Projection</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: T.primary, fontFamily: "'Outfit',sans-serif" }}>
+                      {goalProjMonths < 12 ? `${goalProjMonths}mo` : goalProjMonths % 12 === 0 ? `${goalProjMonths/12}yr` : `${Math.floor(goalProjMonths/12)}yr ${goalProjMonths%12}mo`}
+                    </div>
+                  </div>
+                  {/* Slider */}
+                  <div style={{ marginBottom: 12 }}>
+                    <input type="range" min={1} max={240} value={goalProjMonths}
+                      onChange={e => setProjMonths(p => ({ ...p, [g.id]: Number(e.target.value) }))}
+                      style={{ width: "100%", accentColor: T.primary, cursor: "pointer" }} />
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: T.dim, marginTop: 2 }}>
+                      <span>1mo</span><span>1yr</span><span>5yr</span><span>10yr</span><span>20yr</span>
+                    </div>
+                  </div>
+                  {/* Quick presets */}
+                  <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+                    {[[1,"1mo"],[3,"3mo"],[6,"6mo"],[12,"1yr"],[24,"2yr"],[60,"5yr"],[120,"10yr"],[240,"20yr"]].map(([m, label]) => (
+                      <button key={m} onClick={() => setProjMonths(p => ({ ...p, [g.id]: m }))}
+                        style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${goalProjMonths === m ? T.primary : T.border}`, background: goalProjMonths === m ? `${T.primary}22` : T.card, color: goalProjMonths === m ? T.primary : T.muted, fontWeight: goalProjMonths === m ? 700 : 400 }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Stats */}
                   <div style={{ display: "flex", gap: 8 }}>
                     {[
                       { label: "Now", value: effectiveSaved, color: T.text },
-                      { label: "In 12mo", value: proj12, color: T.green },
-                      { label: "Contributions", value: monthlyContrib * 12, color: T.accent },
-                      ...(g.aer > 0 ? [{ label: "Interest", value: proj12 - effectiveSaved - monthlyContrib * 12, color: T.primary }] : []),
+                      { label: `In ${goalProjMonths < 12 ? goalProjMonths + 'mo' : goalProjMonths % 12 === 0 ? goalProjMonths/12 + 'yr' : Math.floor(goalProjMonths/12) + 'yr'}`, value: projectBalance(g, goalProjMonths), color: T.green },
+                      { label: "Contributions", value: monthlyContrib * goalProjMonths, color: T.accent },
+                      ...(g.aer > 0 ? [{ label: "Interest", value: projectBalance(g, goalProjMonths) - effectiveSaved - monthlyContrib * goalProjMonths, color: T.primary }] : []),
                     ].map(s => (
                       <div key={s.label} style={{ flex: 1, background: T.card, borderRadius: 10, padding: "10px 6px", textAlign: "center" }}>
                         <div style={{ fontSize: 9, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4, lineHeight: 1.3 }}>{s.label}</div>
@@ -1405,18 +1435,16 @@ function SavingsTab({ income, transactions, splits }) {
                       </div>
                     ))}
                   </div>
-                  {/* Progress bar to target */}
-                  {proj12 < g.target && (
-                    <div style={{ marginTop: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: T.muted, marginBottom: 4 }}>
-                        <span>Progress in 12mo</span>
-                        <span>{Math.round((proj12 / g.target) * 100)}% of {fmt(g.target)}</span>
-                      </div>
-                      <div style={{ height: 6, background: T.card, borderRadius: 3 }}>
-                        <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(100, (proj12 / g.target) * 100)}%`, background: `linear-gradient(90deg,${T.gradA},${T.gradB})`, transition: "width .5s" }} />
-                      </div>
+                  {/* Progress bar */}
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: T.muted, marginBottom: 4 }}>
+                      <span>Progress at end of period</span>
+                      <span>{Math.min(100, Math.round((projectBalance(g, goalProjMonths) / g.target) * 100))}% of {fmt(g.target)}</span>
                     </div>
-                  )}
+                    <div style={{ height: 6, background: T.card, borderRadius: 3 }}>
+                      <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(100, (projectBalance(g, goalProjMonths) / g.target) * 100)}%`, background: `linear-gradient(90deg,${T.gradA},${T.gradB})`, transition: "width .3s" }} />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
