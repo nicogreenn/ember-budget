@@ -1697,7 +1697,6 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
   };
 
   const deleteCat = (key) => {
-    if (Object.keys(DEFAULT_CAT_META).includes(key)) return; // protect defaults
     const updated = { ...catMeta };
     delete updated[key];
     setCatMeta(updated);
@@ -1869,10 +1868,8 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
                 {isDefault(key) && <span style={{ fontSize: 10, color: T.dim, background: T.card, borderRadius: 10, padding: "2px 7px" }}>default</span>}
                 <button onClick={() => { setEditingCat(key); setEditCatDraft({ name: key, icon: meta.icon }); }}
                   style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button>
-                {!isDefault(key) && (
-                  <button onClick={() => deleteCat(key)}
-                    style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
-                )}
+                <button onClick={() => deleteCat(key)}
+                  style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
               </div>
             )}
           </div>
@@ -1964,6 +1961,7 @@ export default function EmberApp({ user, onSignOut }) {
   const [oneOff, setOneOff] = useState({});
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   // Default to current month
   const now = new Date();
@@ -2032,6 +2030,7 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.one_off) setOneOff(s.one_off);
         if (s.cat_meta) setCatMeta(s.cat_meta);
       }
+      setSettingsLoaded(true);
 
       // Load transactions
       const { data: txns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
@@ -2051,11 +2050,11 @@ export default function EmberApp({ user, onSignOut }) {
     load();
   }, [user]);
 
-  // Save settings to Supabase whenever they change
+  // Save settings to Supabase whenever they change (only after initial load to avoid overwriting on mount)
   useEffect(() => {
-    if (!user) return;
+    if (!user || !settingsLoaded) return;
     supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta }, { onConflict: 'user_id' });
-  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta]);
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, settingsLoaded]);
 
   // Save splits to Supabase whenever they change
   useEffect(() => {
