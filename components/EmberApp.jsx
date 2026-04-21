@@ -1,6 +1,6 @@
 'use client'
 // Ember Budget App v1.1 — Fire / Water / Nature / Earth / Floral
-import { useState, createContext, useContext, useEffect, useRef } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import { supabase } from '@/lib/supabase'
 
 // ── THEMES ──────────────────────────────────────────────────────────────────
@@ -1949,7 +1949,6 @@ export default function EmberApp({ user, onSignOut }) {
   const [oneOff, setOneOff] = useState({});
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
-  const settingsLoaded = useRef(false);
 
   // Default to current month
   const now = new Date();
@@ -1976,7 +1975,6 @@ export default function EmberApp({ user, onSignOut }) {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      // Check if returning from bank connection
       const urlParams = new URLSearchParams(window.location.search);
       const tempToken = urlParams.get('token');
 
@@ -1995,7 +1993,6 @@ export default function EmberApp({ user, onSignOut }) {
             category: 'Other',
             date: t.timestamp ? t.timestamp.slice(0, 10) : new Date().toISOString().slice(0, 10),
           }));
-
           await supabase.from('transactions').delete().eq('user_id', user.id);
           await supabase.from('transactions').insert(txns);
           await supabase.from('pending_transactions').delete().eq('temp_token', tempToken);
@@ -2018,7 +2015,6 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.one_off) setOneOff(s.one_off);
         if (s.cat_meta) setCatMeta(s.cat_meta);
       }
-      settingsLoaded.current = true;
 
       // Load transactions
       const { data: txns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
@@ -2037,12 +2033,6 @@ export default function EmberApp({ user, onSignOut }) {
     };
     load();
   }, [user]);
-
-  // Save settings to Supabase whenever they change (guard with ref to avoid overwriting on mount before load)
-  useEffect(() => {
-    if (!user || !settingsLoaded.current) return;
-    supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta }, { onConflict: 'user_id' });
-  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta]);
 
   // Save splits to Supabase whenever they change
   useEffect(() => {
@@ -2081,9 +2071,23 @@ export default function EmberApp({ user, onSignOut }) {
     } catch (err) { console.error('Reset error:', err); }
   };
 
-  const onIncomeDetected = (amount) => {
-    setIncome(amount);
+  const saveSettings = (patch) => {
+    if (!user) return;
+    supabase.from('settings').upsert({ user_id: user.id, ...patch }, { onConflict: 'user_id' })
+      .then(({ error }) => { if (error) console.error('Settings save error:', error); });
   };
+
+  const handleSetIncome = (v) => { setIncome(v); saveSettings({ income: v }); };
+  const handleSetPartnerName = (v) => { setPartnerName(v); saveSettings({ partner_name: v }); };
+  const handleSetThemeKey = (v) => { setThemeKey(v); saveSettings({ theme: v }); };
+  const handleSetLightMode = (v) => { setLightMode(v); saveSettings({ light_mode: v }); };
+  const handleSetCatNames = (v) => { setCatNames(v); saveSettings({ cat_names: v }); };
+  const handleSetBudgets = (v) => { setBudgets(v); saveSettings({ budgets: v }); };
+  const handleSetSideHustles = (v) => { setSideHustles(v); saveSettings({ side_hustles: v }); };
+  const handleSetOneOff = (v) => { setOneOff(v); saveSettings({ one_off: v }); };
+  const handleSetCatMeta = (v) => { setCatMeta(v); saveSettings({ cat_meta: v }); };
+
+  const onIncomeDetected = (amount) => handleSetIncome(amount);
 
   const onEditTransaction = async (updated) => {
     setTransactions(p => p.map(t => t.id === updated.id ? updated : t));
@@ -2191,9 +2195,9 @@ export default function EmberApp({ user, onSignOut }) {
         {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
-        {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={setOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} />}
-        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={setCatMeta} />}
+        {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
+        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} />}
+        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
 
         <BottomNav tab={tab} setTab={setTab} />
       </div>
