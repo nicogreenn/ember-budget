@@ -1082,21 +1082,20 @@ function SavingsTab({ income, transactions, splits }) {
   const T = useT();
   const today = new Date().toISOString().slice(0, 10);
 
-  const [goals, setGoals] = useState([
-    { id: 1, name: "Emergency Fund", target: 3000, saved: 850, aer: 4.5, interestFreq: "Monthly", startDate: "2025-01-01", monthsHeld: 3,
-      contributions: [{ id: 1, amount: 100, frequency: "Monthly", startDate: "2025-01-01" }] },
-    { id: 2, name: "Holiday", target: 1200, saved: 320, aer: 0, interestFreq: "Monthly", startDate: "2025-02-01", monthsHeld: 2,
-      contributions: [] },
-  ]);
+  const [goals, setGoals] = useState([]);
   const [addingGoal, setAddingGoal] = useState(false);
   const [goalForm, setGoalForm] = useState({ name: "", target: "", aer: "", interestFreq: "Monthly" });
   const [expandedId, setExpandedId] = useState(null);
   const [editingInterest, setEditingInterest] = useState(null);
   const [interestDraft, setInterestDraft] = useState({ aer: "", interestFreq: "Monthly" });
-  const [addingContrib, setAddingContrib] = useState(null); // goal id
+  const [addingContrib, setAddingContrib] = useState(null);
   const [contribForm, setContribForm] = useState({ amount: "", frequency: "Monthly", startDate: today });
-  const [customDeposit, setCustomDeposit] = useState(null); // goal id
+  const [customDeposit, setCustomDeposit] = useState(null);
   const [depositAmount, setDepositAmount] = useState("");
+  const [withdrawing, setWithdrawing] = useState(null);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [settingBalance, setSettingBalance] = useState(null);
+  const [balanceAmount, setBalanceAmount] = useState("");
 
   const CONTRIB_FREQS = ["Weekly", "Fortnightly", "Monthly", "Quarterly", "Annually"];
 
@@ -1212,20 +1211,25 @@ function SavingsTab({ income, transactions, splits }) {
               </div>
             </div>
 
-            {/* Quick deposit + custom */}
-            <div style={{ marginTop: 12, display: "flex", gap: 6 }}>
+            {/* Quick deposit + custom + withdraw + set */}
+            <div style={{ marginTop: 12, display: "flex", gap: 5 }}>
               {[50, 100, 200].map(amt => (
                 <button key={amt} onClick={() => setGoals(goals.map(x => x.id === g.id ? { ...x, saved: Math.min(x.target, x.saved + amt) } : x))}
-                  style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, padding: "7px", cursor: "pointer", fontSize: 13 }}>+{fmt(amt)}</button>
+                  style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, padding: "7px", cursor: "pointer", fontSize: 12 }}>+{fmt(amt)}</button>
               ))}
-              <button onClick={() => { setCustomDeposit(g.id); setDepositAmount(""); }}
-                style={{ flex: 1, background: T.card2, border: `1px solid ${T.primary}44`, borderRadius: 8, color: T.primary, padding: "7px", cursor: "pointer", fontSize: 13 }}>+£?</button>
+              <button onClick={() => { setCustomDeposit(customDeposit === g.id ? null : g.id); setWithdrawing(null); setSettingBalance(null); setDepositAmount(""); }}
+                style={{ flex: 1, background: customDeposit === g.id ? `${T.primary}22` : T.card2, border: `1px solid ${T.primary}44`, borderRadius: 8, color: T.primary, padding: "7px", cursor: "pointer", fontSize: 12 }}>+£?</button>
+              <button onClick={() => { setWithdrawing(withdrawing === g.id ? null : g.id); setCustomDeposit(null); setSettingBalance(null); setWithdrawAmount(""); }}
+                style={{ flex: 1, background: withdrawing === g.id ? `${T.red}22` : T.card2, border: `1px solid ${T.red}44`, borderRadius: 8, color: T.red, padding: "7px", cursor: "pointer", fontSize: 12 }}>−£</button>
+              <button onClick={() => { setSettingBalance(settingBalance === g.id ? null : g.id); setCustomDeposit(null); setWithdrawing(null); setBalanceAmount(String(g.saved)); }}
+                style={{ flex: 1, background: settingBalance === g.id ? `${T.accent}22` : T.card2, border: `1px solid ${T.accent}44`, borderRadius: 8, color: T.accent, padding: "7px", cursor: "pointer", fontSize: 12 }}>Set</button>
             </div>
 
-            {/* Custom deposit input */}
+            {/* Custom deposit */}
             {customDeposit === g.id && (
               <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
-                <input autoFocus type="number" placeholder="Amount" value={depositAmount} onChange={e => setDepositAmount(e.target.value)}
+                <input autoFocus type="number" placeholder="Amount to add" value={depositAmount} onChange={e => setDepositAmount(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") { const v = parseFloat(depositAmount); if (!isNaN(v) && v > 0) { setGoals(goals.map(x => x.id === g.id ? { ...x, saved: Math.min(x.target, x.saved + v) } : x)); setCustomDeposit(null); } } }}
                   style={{ flex: 1, background: T.card2, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
                 <PrimaryBtn style={{ padding: "8px 14px" }} onClick={() => {
                   const v = parseFloat(depositAmount);
@@ -1233,6 +1237,42 @@ function SavingsTab({ income, transactions, splits }) {
                   setCustomDeposit(null);
                 }}>Add</PrimaryBtn>
                 <GhostBtn style={{ padding: "8px 10px" }} onClick={() => setCustomDeposit(null)}>✕</GhostBtn>
+              </div>
+            )}
+
+            {/* Withdraw */}
+            {withdrawing === g.id && (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ fontSize: 11, color: T.red, marginBottom: 6 }}>Withdraw from {g.name} · current balance {fmt(g.saved)}</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input autoFocus type="number" placeholder="Amount to withdraw" value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { const v = parseFloat(withdrawAmount); if (!isNaN(v) && v > 0) { setGoals(goals.map(x => x.id === g.id ? { ...x, saved: Math.max(0, x.saved - v) } : x)); setWithdrawing(null); } } }}
+                    style={{ flex: 1, background: T.card2, border: `1px solid ${T.red}`, borderRadius: 8, padding: "8px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                  <button onClick={() => {
+                    const v = parseFloat(withdrawAmount);
+                    if (!isNaN(v) && v > 0) setGoals(goals.map(x => x.id === g.id ? { ...x, saved: Math.max(0, x.saved - v) } : x));
+                    setWithdrawing(null);
+                  }} style={{ padding: "8px 14px", background: T.red, border: "none", borderRadius: 8, color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Withdraw</button>
+                  <GhostBtn style={{ padding: "8px 10px" }} onClick={() => setWithdrawing(null)}>✕</GhostBtn>
+                </div>
+              </div>
+            )}
+
+            {/* Set balance */}
+            {settingBalance === g.id && (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ fontSize: 11, color: T.accent, marginBottom: 6 }}>Set exact balance for {g.name}</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input autoFocus type="number" placeholder="New balance £" value={balanceAmount} onChange={e => setBalanceAmount(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { const v = parseFloat(balanceAmount); if (!isNaN(v) && v >= 0) { setGoals(goals.map(x => x.id === g.id ? { ...x, saved: v } : x)); setSettingBalance(null); } } }}
+                    style={{ flex: 1, background: T.card2, border: `1px solid ${T.accent}`, borderRadius: 8, padding: "8px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                  <button onClick={() => {
+                    const v = parseFloat(balanceAmount);
+                    if (!isNaN(v) && v >= 0) setGoals(goals.map(x => x.id === g.id ? { ...x, saved: v } : x));
+                    setSettingBalance(null);
+                  }} style={{ padding: "8px 14px", background: T.accent, border: "none", borderRadius: 8, color: "#000", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Set</button>
+                  <GhostBtn style={{ padding: "8px 10px" }} onClick={() => setSettingBalance(null)}>✕</GhostBtn>
+                </div>
               </div>
             )}
 
