@@ -1,6 +1,6 @@
 'use client'
 // Ember Budget App v1.1 — Fire / Water / Nature / Earth / Floral
-import { useState, createContext, useContext, useEffect } from "react";
+import { useState, createContext, useContext, useEffect, useRef } from "react";
 import { supabase } from '@/lib/supabase'
 
 // ── THEMES ──────────────────────────────────────────────────────────────────
@@ -1949,7 +1949,7 @@ export default function EmberApp({ user, onSignOut }) {
   const [oneOff, setOneOff] = useState({});
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
-  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const settingsLoaded = useRef(false);
 
   // Default to current month
   const now = new Date();
@@ -2018,7 +2018,7 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.one_off) setOneOff(s.one_off);
         if (s.cat_meta) setCatMeta(s.cat_meta);
       }
-      setSettingsLoaded(true);
+      settingsLoaded.current = true;
 
       // Load transactions
       const { data: txns } = await supabase.from('transactions').select('*').eq('user_id', user.id);
@@ -2038,11 +2038,11 @@ export default function EmberApp({ user, onSignOut }) {
     load();
   }, [user]);
 
-  // Save settings to Supabase whenever they change (only after initial load to avoid overwriting on mount)
+  // Save settings to Supabase whenever they change (guard with ref to avoid overwriting on mount before load)
   useEffect(() => {
-    if (!user || !settingsLoaded) return;
+    if (!user || !settingsLoaded.current) return;
     supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta }, { onConflict: 'user_id' });
-  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, settingsLoaded]);
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta]);
 
   // Save splits to Supabase whenever they change
   useEffect(() => {
