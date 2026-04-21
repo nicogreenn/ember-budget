@@ -183,7 +183,7 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, setIncome, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected }) {
+function HomeTab({ income, setIncome, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual }) {
   const T = useT();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(income));
@@ -317,9 +317,14 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
                 </div>
               </div>
               {reassignTxn === t.id && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
                   {CATS.map(c => (
-                    <button key={c} onClick={() => { setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x)); setReassignTxn(null); }}
+                    <button key={c} onClick={async () => {
+                      setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x));
+                      setReassignTxn(null);
+                      // sync to Supabase
+                      try { await supabase.from('transactions').update({ category: c }).eq('id', t.id); } catch (e) {}
+                    }}
                       style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${t.category === c ? T.primary : T.border}`, background: t.category === c ? `${T.primary}22` : T.card, color: t.category === c ? T.primary : T.muted, fontWeight: t.category === c ? 700 : 400 }}>
                       {CAT_META[c]?.icon} {c}
                     </button>
@@ -332,7 +337,7 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
       </Card>
 
       {/* Manual Payment */}
-      <ManualPayment onAdd={(txn) => setTransactions(p => [...p, txn])} splits={splits} setSplits={setSplits} />
+      <ManualPayment onAdd={onAddManual} splits={splits} setSplits={setSplits} />
 
       {/* CSV Import */}
       <CSVImporter onImport={onImport} onIncomeDetected={onIncomeDetected} />
@@ -774,7 +779,7 @@ function InsightsTab({ income, transactions, splits }) {
 }
 
 // ── BILLS / CATEGORIES ───────────────────────────────────────────────────────
-function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName }) {
+function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user }) {
   const T = useT();
   const [selectedCat, setSelectedCat] = useState(null);
   const [reassigning, setReassigning] = useState(null);
@@ -789,7 +794,28 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
   const SPLIT_OPTS = [100, 75, 50, 25];
 
   const toggleOneOff = (id) => setOneOff(p => ({ ...p, [id]: !p[id] }));
-  const deleteTxn = (id) => setTransactions(p => p.filter(t => t.id !== id));
+
+  const deleteTxn = async (id) => {
+    setTransactions(p => p.filter(t => t.id !== id));
+    if (!user) return;
+    try {
+      await supabase.from('transactions').delete().eq('id', id).eq('user_id', user.id);
+      await supabase.from('splits').delete().eq('transaction_id', id).eq('user_id', user.id);
+    } catch (err) {
+      console.error('Delete txn error:', err);
+    }
+  };
+
+  const reassignTxn = async (id, newCategory) => {
+    setTransactions(p => p.map(x => x.id === id ? { ...x, category: newCategory } : x));
+    setReassigning(null);
+    if (!user) return;
+    try {
+      await supabase.from('transactions').update({ category: newCategory }).eq('id', id).eq('user_id', user.id);
+    } catch (err) {
+      console.error('Reassign txn error:', err);
+    }
+  };
 
   const getDuplicates = (txns) => {
     const dupes = new Set();
@@ -917,7 +943,7 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                           <div style={{ fontSize: 12, color: T.muted, marginBottom: 8 }}>Move "{t.name}" to:</div>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                             {CATS.filter(c => c !== cat).map(c => (
-                              <button key={c} onClick={() => { setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x)); setReassigning(null); }}
+                              <button key={c} onClick={() => reassignTxn(t.id, c)}
                                 style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 20, color: T.text, padding: "5px 10px", cursor: "pointer", fontSize: 12 }}>
                                 {safeMeta(c).icon} {displayName(c)}
                               </button>
@@ -1633,6 +1659,25 @@ export default function EmberApp({ user, onSignOut }) {
     supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames }, { onConflict: 'user_id' });
   }, [income, partnerName, themeKey, lightMode, catNames]);
 
+  // Save splits to Supabase whenever they change
+  useEffect(() => {
+    if (!user || Object.keys(splits).length === 0) return;
+    const saveSplits = async () => {
+      try {
+        const rows = Object.entries(splits).map(([txnId, myShare]) => ({
+          user_id: user.id,
+          transaction_id: txnId,
+          my_share: myShare,
+        }));
+        await supabase.from('splits').delete().eq('user_id', user.id);
+        await supabase.from('splits').insert(rows);
+      } catch (err) {
+        console.error('Splits save error:', err);
+      }
+    };
+    saveSplits();
+  }, [splits]);
+
   const onReset = async () => {
     setTransactions(INIT_TXN);
     setSplits({});
@@ -1654,6 +1699,30 @@ export default function EmberApp({ user, onSignOut }) {
     setIncome(amount);
   };
 
+  const onAddManual = async (txn) => {
+    // Update state immediately
+    setTransactions(p => [...p, txn]);
+
+    // Persist to Supabase
+    if (!user) return;
+    try {
+      await supabase.from('profiles').upsert({ id: user.id, email: user.email }, { onConflict: 'id' });
+      const { data, error } = await supabase.from('transactions').insert({
+        user_id: user.id,
+        name: txn.name,
+        amount: Number(txn.amount),
+        category: txn.category || 'Other',
+        date: txn.date,
+      }).select().single();
+      if (!error && data) {
+        // Update the local transaction id to match Supabase id so splits save correctly
+        setTransactions(p => p.map(t => t.id === txn.id ? { ...t, id: data.id } : t));
+      }
+    } catch (err) {
+      console.error('Manual payment save error:', err);
+    }
+  };
+
   const onImport = async (newTxns) => {
     // Update state immediately so UI works regardless of Supabase
     const withIds = newTxns.map((t, i) => ({ ...t, id: Date.now() + i }));
@@ -1668,13 +1737,27 @@ export default function EmberApp({ user, onSignOut }) {
     }
 
     // Try to persist to Supabase in background
+    if (!user) return;
     try {
-      // Ensure profile exists first
       await supabase.from('profiles').upsert({ id: user.id, email: user.email }, { onConflict: 'id' });
+      // Delete existing then insert fresh batch from CSV
       await supabase.from('transactions').delete().eq('user_id', user.id);
-      await supabase.from('transactions').insert(newTxns.map(t => ({
-        user_id: user.id, name: t.name, amount: Number(t.amount), category: t.category || 'Other', date: t.date,
-      })));
+      const { data: inserted } = await supabase.from('transactions').insert(
+        newTxns.map(t => ({
+          user_id: user.id,
+          name: t.name,
+          amount: Number(t.amount),
+          category: t.category || 'Other',
+          date: t.date,
+        }))
+      ).select();
+      // Remap local ids to real Supabase ids
+      if (inserted && inserted.length === newTxns.length) {
+        const remapped = inserted.map((row, i) => ({
+          id: row.id, name: row.name, amount: row.amount, category: row.category, date: row.date,
+        }));
+        setTransactions(remapped);
+      }
     } catch (err) {
       console.error('Supabase sync error (non-fatal):', err);
     }
@@ -1706,11 +1789,11 @@ export default function EmberApp({ user, onSignOut }) {
           <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} selectedMonth={selectedMonth} />}
+        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} selectedMonth={selectedMonth} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} />}
+        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} />}
         {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} onReset={onReset} user={user} />}
 
         <BottomNav tab={tab} setTab={setTab} />
