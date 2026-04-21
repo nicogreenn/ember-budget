@@ -187,7 +187,7 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta, starred, setStarred, spendingBudget, setSpendingBudget }) {
+function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta, starred, setStarred, spendingBudget, setSpendingBudget, savingsMonthly }) {
   const T = useT();
   const [showAll, setShowAll] = useState(false);
   const [txnSearch, setTxnSearch] = useState("");
@@ -201,7 +201,9 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
-  const remaining = income - myTotal;
+  // Remaining = income - bills spent - spending budget (if set) - savings contributions
+  const committed = (spendingBudget > 0 ? spendingBudget : 0) + (savingsMonthly || 0);
+  const remaining = income - myTotal - committed;
 
   // Starred = essential bills. Unstarred = spending money.
   const starredTotal = transactions.filter(t => starred[t.id]).reduce((s, t) => s + myShare(t, splits), 0);
@@ -230,12 +232,23 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
         <DonutChart data={chartData} total={myTotal} income={income} />
         <div style={{ display: "flex", gap: 10, marginTop: 16, width: "100%" }}>
-          {[{ label: "My Spend", value: myTotal, color: T.primary }, { label: "Remaining", value: remaining, color: remaining < 0 ? T.red : T.green }].map(s => (
-            <div key={s.label} style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
-              <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.color }}>{fmt(s.value)}</div>
+          <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>My Spend</div>
+            <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(myTotal)}</div>
+          </div>
+          {committed > 0 && (
+            <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Committed</div>
+              <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.accent }}>{fmt(committed)}</div>
+              <div style={{ fontSize: 9, color: T.dim, marginTop: 2 }}>
+                {spendingBudget > 0 && savingsMonthly > 0 ? `${fmt(spendingBudget)} spend + ${fmt(savingsMonthly)} savings` : spendingBudget > 0 ? `${fmt(spendingBudget)} spending` : `${fmt(savingsMonthly)} savings`}
+              </div>
             </div>
-          ))}
+          )}
+          <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Remaining</div>
+            <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: remaining < 0 ? T.red : T.green }}>{fmt(remaining)}</div>
+          </div>
         </div>
         {partnerTotal > 0 && (
           <div style={{ marginTop: 10, width: "100%", background: T.partnerBg, border: `1px solid ${T.partnerBorder}`, borderRadius: 12, padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1212,11 +1225,10 @@ function daysUntil(date) {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-function SavingsTab({ income, transactions, splits }) {
+function SavingsTab({ income, transactions, splits, goals, setGoals }) {
   const T = useT();
   const today = new Date().toISOString().slice(0, 10);
 
-  const [goals, setGoals] = useState([]);
   const [addingGoal, setAddingGoal] = useState(false);
   const [goalForm, setGoalForm] = useState({ name: "", target: "", aer: "", interestFreq: "Monthly" });
   const [expandedId, setExpandedId] = useState(null);
@@ -2250,6 +2262,7 @@ export default function EmberApp({ user, onSignOut }) {
   const [oneOff, setOneOff] = useState({});
   const [starred, setStarred] = useState({}); // txnId -> true
   const [spendingBudget, setSpendingBudget] = useState(0);
+  const [savingsGoals, setSavingsGoals] = useState([]);
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
 
@@ -2319,6 +2332,7 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.cat_meta) setCatMeta(s.cat_meta);
         if (s.starred) setStarred(s.starred);
         if (s.spending_budget) setSpendingBudget(s.spending_budget);
+        if (s.savings_goals) setSavingsGoals(s.savings_goals);
       }
 
       // Load transactions
@@ -2366,6 +2380,7 @@ export default function EmberApp({ user, onSignOut }) {
     setBudgets(INIT_BUDGETS);
     setStarred({});
     setSpendingBudget(0);
+    setSavingsGoals([]);
     setIncome(2800);
     setSideHustles([]);
     setBankConnected(false);
@@ -2381,8 +2396,8 @@ export default function EmberApp({ user, onSignOut }) {
   // Keep a ref of all saveable settings so saveSettings always has latest values without stale closure
   const settingsRef = useRef({});
   useEffect(() => {
-    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta, starred, spending_budget: spendingBudget };
-  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, starred, spendingBudget]);
+    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta, starred, spending_budget: spendingBudget, savings_goals: savingsGoals };
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, starred, spendingBudget, savingsGoals]);
 
   const saveSettings = (patch) => {
     if (!user) return;
@@ -2402,6 +2417,7 @@ export default function EmberApp({ user, onSignOut }) {
   const handleSetCatMeta = (v) => { setCatMeta(v); saveSettings({ cat_meta: v }); };
   const handleSetStarred = (v) => { setStarred(v); saveSettings({ starred: v }); };
   const handleSetSpendingBudget = (v) => { setSpendingBudget(v); saveSettings({ spending_budget: v }); };
+  const handleSetSavingsGoals = (v) => { setSavingsGoals(v); saveSettings({ savings_goals: v }); };
 
   const onIncomeDetected = (amount) => handleSetIncome(amount);
 
@@ -2496,6 +2512,8 @@ export default function EmberApp({ user, onSignOut }) {
   const T = applyMode(THEMES[themeKey], lightMode);
   const toM = (a, f) => f === "Weekly" ? a*52/12 : f === "Fortnightly" ? a*26/12 : f === "One-off" ? a/12 : a;
   const totalIncome = income + sideHustles.reduce((s, h) => s + toM(h.amount, h.frequency), 0);
+  const savingsMonthly = savingsGoals.reduce((s, g) =>
+    s + (g.contributions || []).reduce((cs, c) => cs + toM(c.amount, c.frequency), 0), 0);
 
   return (
     <ThemeCtx.Provider value={T}>
@@ -2508,9 +2526,9 @@ export default function EmberApp({ user, onSignOut }) {
           <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} />}
+        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
-        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
+        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
         {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} />}
         {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
