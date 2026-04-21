@@ -63,7 +63,7 @@ const ThemeCtx = createContext(THEMES.fire);
 const useT = () => useContext(ThemeCtx);
 
 // ── DATA ────────────────────────────────────────────────────────────────────
-const CAT_META = {
+const DEFAULT_CAT_META = {
   Housing:       { icon: "🏠", idx: 0 },
   Transport:     { icon: "🚗", idx: 1 },
   Groceries:     { icon: "🛒", idx: 2 },
@@ -75,8 +75,12 @@ const CAT_META = {
   Savings:       { icon: "💰", idx: 8 },
   Other:         { icon: "📦", idx: 9 },
 };
-const CATS = Object.keys(CAT_META);
-const cc = (cat, T) => T.catColors[CAT_META[cat]?.idx ?? 9];
+const getCats = (catMeta) => Object.keys(catMeta);
+const getCatMeta = (cat, catMeta) => catMeta[cat] || { icon: "📦", idx: 9 };
+const cc = (cat, T, catMeta) => T.catColors[getCatMeta(cat, catMeta || DEFAULT_CAT_META).idx ?? 9];
+// Keep CATS/CAT_META as fallbacks for components not yet receiving catMeta prop
+const CAT_META = DEFAULT_CAT_META;
+const CATS = Object.keys(DEFAULT_CAT_META);
 
 const INIT_TXN = [
   { id: 1,  name: "Rent",           amount: 950,  category: "Housing",       date: "2025-04-01" },
@@ -183,7 +187,7 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, setIncome, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual }) {
+function HomeTab({ income, setIncome, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta }) {
   const T = useT();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(income));
@@ -192,12 +196,14 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
   const [txnCatFilter, setTxnCatFilter] = useState("All");
   const [txnSort, setTxnSort] = useState("date-desc");
   const [reassignTxn, setReassignTxn] = useState(null);
+  const [editingTxn, setEditingTxn] = useState(null); // {id, name, amount, category, date}
+  const [editTxnDraft, setEditTxnDraft] = useState({});
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
   const remaining = income - myTotal;
 
-  const chartData = CATS.map(c => ({ label: c, value: transactions.filter(t => t.category === c).reduce((s, t) => s + myShare(t, splits), 0), color: cc(c, T) })).filter(d => d.value > 0);
+  const chartData = getCats(catMeta).map(c => ({ label: c, value: transactions.filter(t => t.category === c).reduce((s, t) => s + myShare(t, splits), 0), color: cc(c, T, catMeta) })).filter(d => d.value > 0);
   const recent = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
 
   return (
@@ -244,7 +250,7 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
           {chartData.map(d => (
             <div key={d.label} style={{ display: "flex", alignItems: "center", gap: 5, background: T.card2, borderRadius: 20, padding: "5px 10px" }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: T.muted }}>{CAT_META[d.label].icon} {d.label}</span>
+              <span style={{ fontSize: 12, color: T.muted }}>{getCatMeta(d.label, catMeta).icon} {d.label}</span>
               <span style={{ fontSize: 12, color: T.text, fontWeight: 600 }}>{fmt(d.value)}</span>
             </div>
           ))}
@@ -270,10 +276,10 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
             />
             {/* Category filter pills */}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-              {["All", ...CATS.filter(c => transactions.some(t => t.category === c))].map(c => (
+              {["All", ...getCats(catMeta).filter(c => transactions.some(t => t.category === c))].map(c => (
                 <button key={c} onClick={() => setTxnCatFilter(c)}
                   style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${txnCatFilter === c ? T.primary : T.border}`, background: txnCatFilter === c ? `${T.primary}22` : T.card2, color: txnCatFilter === c ? T.primary : T.muted, fontWeight: txnCatFilter === c ? 700 : 400 }}>
-                  {c === "All" ? "All" : `${CAT_META[c]?.icon} ${c}`}
+                  {c === "All" ? "All" : `${getCatMeta(c, catMeta).icon} ${c}`}
                 </button>
               ))}
             </div>
@@ -302,34 +308,61 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
           if (list.length === 0) return <div style={{ fontSize: 13, color: T.dim, textAlign: "center", padding: "16px 0" }}>No transactions found</div>;
           return list.map((t, i, arr) => (
             <div key={t.id} style={{ paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{CAT_META[t.category]?.icon || "📦"}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
-                  <button onClick={() => setReassignTxn(reassignTxn === t.id ? null : t.id)}
-                    style={{ background: `${T.primary}18`, border: `1px solid ${T.primary}44`, borderRadius: 10, color: T.primary, padding: "2px 8px", fontSize: 10, cursor: "pointer", marginTop: 3, fontFamily: "inherit" }}>
-                    {CAT_META[t.category]?.icon} {t.category} ▾
-                  </button>
+              {editingTxn === t.id ? (
+                <div style={{ background: T.card2, borderRadius: 12, padding: 12 }}>
+                  <input value={editTxnDraft.name} onChange={e => setEditTxnDraft(p => ({ ...p, name: e.target.value }))}
+                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
+                  <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                    <input type="number" value={editTxnDraft.amount} onChange={e => setEditTxnDraft(p => ({ ...p, amount: e.target.value }))}
+                      style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                    <input type="date" value={editTxnDraft.date} onChange={e => setEditTxnDraft(p => ({ ...p, date: e.target.value }))}
+                      style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                  </div>
+                  <select value={editTxnDraft.category} onChange={e => setEditTxnDraft(p => ({ ...p, category: e.target.value }))}
+                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", marginBottom: 10 }}>
+                    {getCats(catMeta).map(c => <option key={c}>{c}</option>)}
+                  </select>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={() => {
+                      onEditTransaction({ ...t, ...editTxnDraft, amount: Number(editTxnDraft.amount) });
+                      setEditingTxn(null);
+                    }}>Save</PrimaryBtn>
+                    <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingTxn(null)}>Cancel</GhostBtn>
+                  </div>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: T.primary }}>−{fmt(myShare(t, splits))}</div>
-                  <div style={{ fontSize: 10, color: T.muted }}>{t.date}</div>
-                </div>
-              </div>
-              {reassignTxn === t.id && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
-                  {CATS.map(c => (
-                    <button key={c} onClick={async () => {
-                      setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x));
-                      setReassignTxn(null);
-                      // sync to Supabase
-                      try { await supabase.from('transactions').update({ category: c }).eq('id', t.id); } catch (e) {}
-                    }}
-                      style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${t.category === c ? T.primary : T.border}`, background: t.category === c ? `${T.primary}22` : T.card, color: t.category === c ? T.primary : T.muted, fontWeight: t.category === c ? 700 : 400 }}>
-                      {CAT_META[c]?.icon} {c}
-                    </button>
-                  ))}
-                </div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{getCatMeta(t.category, catMeta).icon}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
+                      <button onClick={() => setReassignTxn(reassignTxn === t.id ? null : t.id)}
+                        style={{ background: `${T.primary}18`, border: `1px solid ${T.primary}44`, borderRadius: 10, color: T.primary, padding: "2px 8px", fontSize: 10, cursor: "pointer", marginTop: 3, fontFamily: "inherit" }}>
+                        {getCatMeta(t.category, catMeta).icon} {t.category} ▾
+                      </button>
+                    </div>
+                    <div style={{ textAlign: "right", marginRight: 4 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: T.primary }}>−{fmt(myShare(t, splits))}</div>
+                      <div style={{ fontSize: 10, color: T.muted }}>{t.date}</div>
+                    </div>
+                    <button onClick={() => { setEditingTxn(t.id); setEditTxnDraft({ name: t.name, amount: t.amount, category: t.category, date: t.date }); setReassignTxn(null); }}
+                      style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 8px", cursor: "pointer", fontSize: 11, flexShrink: 0 }}>✏️</button>
+                  </div>
+                  {reassignTxn === t.id && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
+                      {getCats(catMeta).map(c => (
+                        <button key={c} onClick={async () => {
+                          setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x));
+                          setReassignTxn(null);
+                          try { await supabase.from('transactions').update({ category: c }).eq('id', t.id); } catch (e) {}
+                        }}
+                          style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${t.category === c ? T.primary : T.border}`, background: t.category === c ? `${T.primary}22` : T.card, color: t.category === c ? T.primary : T.muted, fontWeight: t.category === c ? 700 : 400 }}>
+                          {getCatMeta(c, catMeta).icon} {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           ));
@@ -337,7 +370,7 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
       </Card>
 
       {/* Manual Payment */}
-      <ManualPayment onAdd={onAddManual} splits={splits} setSplits={setSplits} />
+      <ManualPayment onAdd={onAddManual} splits={splits} setSplits={setSplits} catMeta={catMeta} />
 
       {/* CSV Import */}
       <CSVImporter onImport={onImport} onIncomeDetected={onIncomeDetected} />
@@ -348,7 +381,7 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
 // ── MANUAL PAYMENT ────────────────────────────────────────────────────────────
 const PAYMENT_FREQS = ["One-off", "Weekly", "Fortnightly", "Monthly", "Quarterly", "Annually"];
 
-function ManualPayment({ onAdd, splits, setSplits }) {
+function ManualPayment({ onAdd, splits, setSplits, catMeta }) {
   const T = useT();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
@@ -438,7 +471,7 @@ function ManualPayment({ onAdd, splits, setSplits }) {
           <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
             <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
               style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
-              {CATS.map(c => <option key={c}>{c}</option>)}
+              {getCats(catMeta || DEFAULT_CAT_META).map(c => <option key={c}>{c}</option>)}
             </select>
             <select value={form.frequency} onChange={e => setForm(p => ({ ...p, frequency: e.target.value }))}
               style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }}>
@@ -693,7 +726,7 @@ function CSVImporter({ onImport, onIncomeDetected }) {
 }
 
 // ── INSIGHTS ─────────────────────────────────────────────────────────────────
-function InsightsTab({ income, transactions, splits }) {
+function InsightsTab({ income, transactions, splits, catMeta }) {
   const T = useT();
   const [aiText, setAiText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -703,7 +736,7 @@ function InsightsTab({ income, transactions, splits }) {
   const healthScore = Math.min(100, Math.max(0, Math.round((parseFloat(savingsRate) > 20 ? 40 : parseFloat(savingsRate) > 10 ? 25 : 10) + (total < income * 0.8 ? 30 : total < income ? 15 : 0) + 30)));
   const scoreColor = healthScore >= 70 ? T.green : healthScore >= 45 ? T.accent : T.red;
 
-  const byCat = CATS.map(c => ({
+  const byCat = getCats(catMeta).map(c => ({
     cat: c,
     curr: transactions.filter(t => t.category === c).reduce((s, t) => s + myShare(t, splits), 0),
     prev: PREV_MONTH[c] || 0,
@@ -743,7 +776,7 @@ function InsightsTab({ income, transactions, splits }) {
         {byCat.map(d => (
           <div key={d.cat} style={{ marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-              <span style={{ fontSize: 13, color: T.text }}>{CAT_META[d.cat].icon} {d.cat}</span>
+              <span style={{ fontSize: 13, color: T.text }}>{getCatMeta(d.cat, catMeta).icon} {d.cat}</span>
               <span style={{ fontSize: 12, color: d.curr > d.prev ? T.red : T.green }}>{d.curr > d.prev ? "▲" : d.curr < d.prev ? "▼" : "–"} {fmt(d.curr)}</span>
             </div>
             {[{ v: d.curr, c: T.primary, label: "This" }, { v: d.prev, c: T.dim, label: "Last" }].map(b => (
@@ -779,7 +812,7 @@ function InsightsTab({ income, transactions, splits }) {
 }
 
 // ── BILLS / CATEGORIES ───────────────────────────────────────────────────────
-function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user }) {
+function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user, oneOff, setOneOff, onEditTransaction, catMeta }) {
   const T = useT();
   const [selectedCat, setSelectedCat] = useState(null);
   const [reassigning, setReassigning] = useState(null);
@@ -787,10 +820,11 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
   const [budgetDraft, setBudgetDraft] = useState("");
   const [renamingCat, setRenamingCat] = useState(null);
   const [nameDraft, setNameDraft] = useState("");
-  const [oneOff, setOneOff] = useState({});
+  const [editingTxnId, setEditingTxnId] = useState(null);
+  const [editTxnDraft, setEditTxnDraft] = useState({});
 
   const displayName = (key) => catNames[key] || key;
-  const safeMeta = (cat) => CAT_META[cat] || { icon: "📦", idx: 9 };
+  const safeMeta = (cat) => getCatMeta(cat, catMeta);
   const SPLIT_OPTS = [100, 75, 50, 25];
 
   const toggleOneOff = (id) => setOneOff(p => ({ ...p, [id]: !p[id] }));
@@ -831,7 +865,7 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
     return dupes;
   };
 
-  const catTotals = CATS.map(c => {
+  const catTotals = getCats(catMeta).map(c => {
     const txns = transactions.filter(t => t.category === c);
     const activeTxns = txns.filter(t => !oneOff[t.id]);
     return {
@@ -936,19 +970,38 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                   const share = splits[t.id] ?? 100;
                   const isOneOff = oneOff[t.id];
                   const isDupe = dupes.has(t.id);
+                  const isEditingThis = editingTxnId === t.id;
                   return (
-                    <div key={t.id} style={{ marginBottom: 10, opacity: isOneOff ? 0.45 : 1, transition: "opacity .2s" }}>
+                    <div key={t.id} style={{ marginBottom: 10, opacity: isOneOff && !isEditingThis ? 0.45 : 1, transition: "opacity .2s" }}>
                       {reassigning === t.id ? (
                         <div style={{ background: T.card, borderRadius: 10, padding: 12 }}>
                           <div style={{ fontSize: 12, color: T.muted, marginBottom: 8 }}>Move "{t.name}" to:</div>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                            {CATS.filter(c => c !== cat).map(c => (
+                            {getCats(catMeta).filter(c => c !== cat).map(c => (
                               <button key={c} onClick={() => reassignTxn(t.id, c)}
                                 style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 20, color: T.text, padding: "5px 10px", cursor: "pointer", fontSize: 12 }}>
                                 {safeMeta(c).icon} {displayName(c)}
                               </button>
                             ))}
                             <button onClick={() => setReassigning(null)} style={{ background: "none", border: `1px solid ${T.dim}`, borderRadius: 20, color: T.muted, padding: "5px 10px", cursor: "pointer", fontSize: 12 }}>Cancel</button>
+                          </div>
+                        </div>
+                      ) : isEditingThis ? (
+                        <div style={{ background: T.card, borderRadius: 12, padding: 12 }}>
+                          <input value={editTxnDraft.name} onChange={e => setEditTxnDraft(p => ({ ...p, name: e.target.value }))}
+                            style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
+                          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                            <input type="number" value={editTxnDraft.amount} onChange={e => setEditTxnDraft(p => ({ ...p, amount: e.target.value }))}
+                              style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                            <input type="date" value={editTxnDraft.date} onChange={e => setEditTxnDraft(p => ({ ...p, date: e.target.value }))}
+                              style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                          </div>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={() => {
+                              onEditTransaction({ ...t, ...editTxnDraft, amount: Number(editTxnDraft.amount) });
+                              setEditingTxnId(null);
+                            }}>Save</PrimaryBtn>
+                            <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingTxnId(null)}>Cancel</GhostBtn>
                           </div>
                         </div>
                       ) : (
@@ -970,6 +1023,8 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                             <div style={{ display: "flex", gap: 4 }}>
                               <button onClick={() => toggleOneOff(t.id)} title="Mark as one-off"
                                 style={{ background: isOneOff ? `${T.amber}33` : T.card2, border: `1px solid ${isOneOff ? T.amber : T.border}`, borderRadius: 8, color: isOneOff ? T.amber : T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11, fontWeight: isOneOff ? 700 : 400 }}>1×</button>
+                              <button onClick={() => { setEditingTxnId(t.id); setEditTxnDraft({ name: t.name, amount: t.amount, date: t.date }); setReassigning(null); }}
+                                style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11 }}>✏️</button>
                               <button onClick={() => setReassigning(t.id)}
                                 style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 7px", cursor: "pointer", fontSize: 11 }}>↕</button>
                               <button onClick={() => deleteTxn(t.id)}
@@ -1618,11 +1673,53 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
 }
 
 // ── SETTINGS ─────────────────────────────────────────────────────────────────
-function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, onReset, user }) {
+function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, onReset, user, catMeta, setCatMeta }) {
   const T = useT();
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(partnerName);
   const [confirmReset, setConfirmReset] = useState(false);
+
+  // Category manager state
+  const [catForm, setCatForm] = useState({ name: "", icon: "📦" });
+  const [addingCat, setAddingCat] = useState(false);
+  const [editingCat, setEditingCat] = useState(null); // key being edited
+  const [editCatDraft, setEditCatDraft] = useState({ name: "", icon: "" });
+
+  const EMOJI_SUGGESTIONS = ["🏠","🚗","🛒","⚡","📱","🍽️","💊","🎮","💰","📦","✈️","🐾","👶","🎓","💇","🏋️","🍺","🎁","🔧","💻","🎵","🌿","🐕","📚","🏖️","🚿","💈","🛠️","🎯","🏥"];
+
+  const addCat = () => {
+    const name = catForm.name.trim();
+    if (!name || catMeta[name]) return;
+    const maxIdx = Math.max(...Object.values(catMeta).map(m => m.idx), 9);
+    setCatMeta(p => ({ ...p, [name]: { icon: catForm.icon, idx: maxIdx + 1 } }));
+    setCatForm({ name: "", icon: "📦" });
+    setAddingCat(false);
+  };
+
+  const deleteCat = (key) => {
+    if (Object.keys(DEFAULT_CAT_META).includes(key)) return; // protect defaults
+    const updated = { ...catMeta };
+    delete updated[key];
+    setCatMeta(updated);
+  };
+
+  const saveEditCat = () => {
+    if (!editingCat) return;
+    const newName = editCatDraft.name.trim();
+    if (!newName) return;
+    const updated = { ...catMeta };
+    const meta = updated[editingCat];
+    if (newName !== editingCat) {
+      delete updated[editingCat];
+      updated[newName] = { ...meta, icon: editCatDraft.icon };
+    } else {
+      updated[editingCat] = { ...meta, icon: editCatDraft.icon };
+    }
+    setCatMeta(updated);
+    setEditingCat(null);
+  };
+
+  const isDefault = (key) => Object.keys(DEFAULT_CAT_META).includes(key);
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
@@ -1719,6 +1816,69 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
         </button>
       </Card>
 
+      <Card style={{ marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <Label>Categories</Label>
+          {!addingCat && <GhostBtn onClick={() => setAddingCat(true)} style={{ fontSize: 12, padding: "4px 12px", marginTop: -8 }}>+ Add</GhostBtn>}
+        </div>
+
+        {addingCat && (
+          <div style={{ background: T.card2, borderRadius: 12, padding: 14, marginBottom: 12 }}>
+            <div style={{ fontSize: 11, color: T.muted, marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 }}>New Category</div>
+            <input placeholder="Category name" value={catForm.name} onChange={e => setCatForm(p => ({ ...p, name: e.target.value }))}
+              style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "9px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+            <div style={{ fontSize: 11, color: T.muted, marginBottom: 6 }}>Pick an emoji</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+              {EMOJI_SUGGESTIONS.map(e => (
+                <button key={e} onClick={() => setCatForm(p => ({ ...p, icon: e }))}
+                  style={{ fontSize: 18, padding: "4px 6px", borderRadius: 8, cursor: "pointer", border: `2px solid ${catForm.icon === e ? T.primary : T.border}`, background: catForm.icon === e ? `${T.primary}22` : T.card }}>
+                  {e}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <PrimaryBtn style={{ flex: 2 }} onClick={addCat}>Add Category</PrimaryBtn>
+              <GhostBtn style={{ flex: 1 }} onClick={() => { setAddingCat(false); setCatForm({ name: "", icon: "📦" }); }}>Cancel</GhostBtn>
+            </div>
+          </div>
+        )}
+
+        {Object.entries(catMeta).map(([key, meta]) => (
+          <div key={key} style={{ marginBottom: 8 }}>
+            {editingCat === key ? (
+              <div style={{ background: T.card2, borderRadius: 12, padding: 12 }}>
+                <input value={editCatDraft.name} onChange={e => setEditCatDraft(p => ({ ...p, name: e.target.value }))}
+                  style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                  {EMOJI_SUGGESTIONS.map(e => (
+                    <button key={e} onClick={() => setEditCatDraft(p => ({ ...p, icon: e }))}
+                      style={{ fontSize: 18, padding: "4px 6px", borderRadius: 8, cursor: "pointer", border: `2px solid ${editCatDraft.icon === e ? T.primary : T.border}`, background: editCatDraft.icon === e ? `${T.primary}22` : T.card }}>
+                      {e}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={saveEditCat}>Save</PrimaryBtn>
+                  <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingCat(null)}>Cancel</GhostBtn>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: T.card2, borderRadius: 12 }}>
+                <span style={{ fontSize: 20 }}>{meta.icon}</span>
+                <span style={{ flex: 1, fontSize: 14, color: T.text }}>{key}</span>
+                {isDefault(key) && <span style={{ fontSize: 10, color: T.dim, background: T.card, borderRadius: 10, padding: "2px 7px" }}>default</span>}
+                <button onClick={() => { setEditingCat(key); setEditCatDraft({ name: key, icon: meta.icon }); }}
+                  style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button>
+                {!isDefault(key) && (
+                  <button onClick={() => deleteCat(key)}
+                    style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </Card>
+
       <Card>
         <Label>Danger Zone</Label>
         <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, lineHeight: 1.6 }}>
@@ -1747,8 +1907,6 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
     </div>
   );
 }
-
-// ── MONTH PICKER ─────────────────────────────────────────────────────────────
 function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths }) {
   const T = useT();
   const now = new Date();
@@ -1801,7 +1959,9 @@ export default function EmberApp({ user, onSignOut }) {
   const [transactions, setTransactions] = useState(INIT_TXN);
   const [budgets, setBudgets] = useState(INIT_BUDGETS);
   const [catNames, setCatNames] = useState({});
+  const [catMeta, setCatMeta] = useState(DEFAULT_CAT_META);
   const [splits, setSplits] = useState({});
+  const [oneOff, setOneOff] = useState({});
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
 
@@ -1867,6 +2027,10 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.theme) setThemeKey(s.theme);
         if (s.light_mode !== undefined) setLightMode(s.light_mode);
         if (s.cat_names) setCatNames(s.cat_names);
+        if (s.budgets) setBudgets(s.budgets);
+        if (s.side_hustles) setSideHustles(s.side_hustles);
+        if (s.one_off) setOneOff(s.one_off);
+        if (s.cat_meta) setCatMeta(s.cat_meta);
       }
 
       // Load transactions
@@ -1890,8 +2054,8 @@ export default function EmberApp({ user, onSignOut }) {
   // Save settings to Supabase whenever they change
   useEffect(() => {
     if (!user) return;
-    supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames }, { onConflict: 'user_id' });
-  }, [income, partnerName, themeKey, lightMode, catNames]);
+    supabase.from('settings').upsert({ user_id: user.id, income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta }, { onConflict: 'user_id' });
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta]);
 
   // Save splits to Supabase whenever they change
   useEffect(() => {
@@ -1916,6 +2080,7 @@ export default function EmberApp({ user, onSignOut }) {
     setTransactions(INIT_TXN);
     setSplits({});
     setCatNames({});
+    setCatMeta(DEFAULT_CAT_META);
     setBudgets(INIT_BUDGETS);
     setIncome(2800);
     setSideHustles([]);
@@ -1933,6 +2098,21 @@ export default function EmberApp({ user, onSignOut }) {
     setIncome(amount);
   };
 
+  const onEditTransaction = async (updated) => {
+    setTransactions(p => p.map(t => t.id === updated.id ? updated : t));
+    if (!user) return;
+    try {
+      await supabase.from('transactions').update({
+        name: updated.name,
+        amount: Number(updated.amount),
+        category: updated.category,
+        date: updated.date,
+      }).eq('id', updated.id).eq('user_id', user.id);
+    } catch (err) {
+      console.error('Edit transaction error:', err);
+    }
+  };
+
   const onAddManual = async (txn) => {
     // Update state immediately
     setTransactions(p => [...p, txn]);
@@ -1940,7 +2120,6 @@ export default function EmberApp({ user, onSignOut }) {
     // Persist to Supabase
     if (!user) return;
     try {
-      await supabase.from('profiles').upsert({ id: user.id, email: user.email }, { onConflict: 'id' });
       const { data, error } = await supabase.from('transactions').insert({
         user_id: user.id,
         name: txn.name,
@@ -1973,7 +2152,6 @@ export default function EmberApp({ user, onSignOut }) {
     // Try to persist to Supabase in background
     if (!user) return;
     try {
-      await supabase.from('profiles').upsert({ id: user.id, email: user.email }, { onConflict: 'id' });
       // Delete existing then insert fresh batch from CSV
       await supabase.from('transactions').delete().eq('user_id', user.id);
       const { data: inserted } = await supabase.from('transactions').insert(
@@ -2023,12 +2201,12 @@ export default function EmberApp({ user, onSignOut }) {
           <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} selectedMonth={selectedMonth} />}
-        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} />}
+        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} />}
+        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} />}
-        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} onReset={onReset} user={user} />}
+        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={setBudgets} catNames={catNames} setCatNames={setCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={setOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} />}
+        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={setThemeKey} partnerName={partnerName} setPartnerName={setPartnerName} lightMode={lightMode} setLightMode={setLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={setCatMeta} />}
 
         <BottomNav tab={tab} setTab={setTab} />
       </div>
