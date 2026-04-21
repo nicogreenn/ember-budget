@@ -716,12 +716,14 @@ function CSVImporter({ onImport, onIncomeDetected }) {
 // ── INSIGHTS ─────────────────────────────────────────────────────────────────
 function InsightsTab({ income, transactions, splits, catMeta }) {
   const T = useT();
-  const [aiText, setAiText] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const total = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const savingsRate = income > 0 ? (((income - total) / income) * 100).toFixed(1) : 0;
-  const healthScore = Math.min(100, Math.max(0, Math.round((parseFloat(savingsRate) > 20 ? 40 : parseFloat(savingsRate) > 10 ? 25 : 10) + (total < income * 0.8 ? 30 : total < income ? 15 : 0) + 30)));
+  const savingsRateNum = parseFloat(savingsRate);
+  const healthScore = Math.min(100, Math.max(0, Math.round(
+    (savingsRateNum > 20 ? 40 : savingsRateNum > 10 ? 25 : 10) +
+    (total < income * 0.8 ? 30 : total < income ? 15 : 0) + 30
+  )));
   const scoreColor = healthScore >= 70 ? T.green : healthScore >= 45 ? T.accent : T.red;
 
   const byCat = getCats(catMeta).map(c => ({
@@ -731,31 +733,86 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
   })).filter(d => d.curr > 0 || d.prev > 0);
   const maxBar = Math.max(...byCat.map(d => Math.max(d.curr, d.prev)), 1);
 
-  const getAI = async () => {
-    setLoading(true); setAiText("");
-    const summary = `UK user. Income: £${income}. My share of spend: £${total.toFixed(2)} (split bills with partner). Categories: ${byCat.filter(d => d.curr > 0).map(d => `${d.cat} £${d.curr.toFixed(0)}`).join(", ")}. Savings rate: ${savingsRate}%.`;
-    try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ summary }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setAiText(data.text || "No response.");
-    } catch (e) {
-      setAiText("Error — please try again. " + e.message);
+  // Generate insights from real data
+  const insights = (() => {
+    const tips = [];
+    const remaining = income - total;
+
+    // Savings rate insight
+    if (savingsRateNum < 0) {
+      tips.push({ icon: "🚨", color: T.red, title: "Overspending", body: `You're spending ${fmt(Math.abs(remaining))} more than you earn this month. Review your biggest categories immediately.` });
+    } else if (savingsRateNum < 10) {
+      tips.push({ icon: "⚠️", color: T.accent, title: "Low savings rate", body: `You're saving ${savingsRate}% of income. The 50/30/20 rule suggests aiming for at least 20%. You have ${fmt(remaining)} left — even saving half would help.` });
+    } else if (savingsRateNum >= 20) {
+      tips.push({ icon: "✅", color: T.green, title: "Strong savings rate", body: `${savingsRate}% savings rate — well above the 20% benchmark. Keep it up and consider investing any surplus.` });
+    } else {
+      tips.push({ icon: "👍", color: T.primary, title: "Decent savings rate", body: `You're saving ${savingsRate}% this month. Try to nudge it above 20% — that's just ${fmt((income * 0.2) - remaining)} more saved per month.` });
     }
-    setLoading(false);
-  };
+
+    // Biggest spender
+    const biggest = [...byCat].sort((a, b) => b.curr - a.curr)[0];
+    if (biggest && biggest.curr > income * 0.3) {
+      tips.push({ icon: "💡", color: T.accent, title: `${biggest.cat} is your biggest spend`, body: `${fmt(biggest.curr)} this month — ${((biggest.curr / income) * 100).toFixed(0)}% of your income. See if there's anything to cut or split differently.` });
+    }
+
+    // Biggest month-on-month increase
+    const biggestRise = [...byCat]
+      .filter(d => d.prev > 0 && d.curr > d.prev)
+      .sort((a, b) => (b.curr - b.prev) - (a.curr - a.prev))[0];
+    if (biggestRise) {
+      const diff = biggestRise.curr - biggestRise.prev;
+      tips.push({ icon: "📈", color: T.red, title: `${biggestRise.cat} up ${fmt(diff)} vs last month`, body: `${fmt(biggestRise.prev)} → ${fmt(biggestRise.curr)}. Worth checking what drove the increase.` });
+    }
+
+    // Biggest saving vs last month
+    const biggestDrop = [...byCat]
+      .filter(d => d.prev > 0 && d.curr < d.prev)
+      .sort((a, b) => (a.curr - a.prev) - (b.curr - b.prev))[0];
+    if (biggestDrop) {
+      const saved = biggestDrop.prev - biggestDrop.curr;
+      tips.push({ icon: "📉", color: T.green, title: `Saved ${fmt(saved)} on ${biggestDrop.cat}`, body: `Down from ${fmt(biggestDrop.prev)} to ${fmt(biggestDrop.curr)} vs last month. Good progress.` });
+    }
+
+    // Subscriptions check
+    const subs = byCat.find(d => d.cat === "Subscriptions");
+    if (subs && subs.curr > 50) {
+      tips.push({ icon: "📱", color: T.muted, title: "Subscription audit", body: `You're spending ${fmt(subs.curr)}/mo on subscriptions. Review each one — unused services add up fast.` });
+    }
+
+    // Dining out check
+    const dining = byCat.find(d => d.cat === "Dining");
+    if (dining && dining.curr > income * 0.1) {
+      tips.push({ icon: "🍽️", color: T.accent, title: "Dining spend is high", body: `${fmt(dining.curr)} on dining — ${((dining.curr / income) * 100).toFixed(0)}% of income. Cooking more at home even a few times a week could save ${fmt(dining.curr * 0.3)}/mo.` });
+    }
+
+    // No transactions / empty month
+    if (transactions.length === 0) {
+      tips.push({ icon: "📊", color: T.muted, title: "No data yet", body: "Import your bank CSV or add transactions manually to get personalised insights." });
+    }
+
+    // This week action — based on most pressing issue
+    const action = savingsRateNum < 10
+      ? `Set up a standing order for ${fmt(Math.max(50, remaining * 0.5))} into savings on payday so it's gone before you can spend it.`
+      : biggestRise
+      ? `Check your ${biggestRise.cat} transactions and see if any are one-offs you can avoid next month.`
+      : `Review your subscription list and cancel anything you haven't used in 30 days.`;
+
+    tips.push({ icon: "🎯", color: T.primary, title: "This week", body: action });
+
+    return tips;
+  })();
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
       <div style={{ paddingTop: 88, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Insights</div>
       </div>
+
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-        {[{ label: "Health Score", val: healthScore, suffix: "/100", col: scoreColor }, { label: "Savings Rate", val: `${savingsRate}%`, suffix: "of income", col: parseFloat(savingsRate) > 10 ? T.green : T.red }].map(s => (
+        {[
+          { label: "Health Score", val: healthScore, suffix: "/100", col: scoreColor },
+          { label: "Savings Rate", val: `${savingsRate}%`, suffix: "of income", col: savingsRateNum > 10 ? T.green : T.red },
+        ].map(s => (
           <Card key={s.label} style={{ flex: 1, textAlign: "center" }}>
             <Label>{s.label}</Label>
             <div style={{ fontSize: 34, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.col }}>{s.val}</div>
@@ -763,8 +820,10 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
           </Card>
         ))}
       </div>
+
       <Card style={{ marginBottom: 16 }}>
         <Label>This Month vs Last (My Share)</Label>
+        {byCat.length === 0 && <div style={{ fontSize: 13, color: T.dim, textAlign: "center", padding: "12px 0" }}>No transactions this month</div>}
         {byCat.map(d => (
           <div key={d.cat} style={{ marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
@@ -782,22 +841,20 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
           </div>
         ))}
       </Card>
+
       <Card>
-        <Label>AI Analysis</Label>
-        {!aiText && !loading && <OutlineBtn onClick={getAI} style={{ width: "100%" }}>{T.emoji} Analyse My Spending</OutlineBtn>}
-        {loading && (
-          <div style={{ textAlign: "center", padding: "30px 0", color: T.muted }}>
-            <div style={{ fontSize: 28, animation: "pulse 1.5s ease-in-out infinite", display: "inline-block" }}>{T.emoji}</div>
-            <div style={{ marginTop: 10, fontSize: 13 }}>Crunching your numbers...</div>
-            <style>{`@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}`}</style>
-          </div>
-        )}
-        {aiText && (
-          <div>
-            <div style={{ fontSize: 13, lineHeight: 1.8, color: T.muted, whiteSpace: "pre-wrap" }}>{aiText}</div>
-            <GhostBtn onClick={getAI} style={{ marginTop: 12 }}>Refresh</GhostBtn>
-          </div>
-        )}
+        <Label>Spending Analysis</Label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {insights.map((tip, i) => (
+            <div key={i} style={{ display: "flex", gap: 12, padding: "12px 14px", background: T.card2, borderRadius: 12, borderLeft: `3px solid ${tip.color}` }}>
+              <span style={{ fontSize: 20, flexShrink: 0 }}>{tip.icon}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 3 }}>{tip.title}</div>
+                <div style={{ fontSize: 12, color: T.muted, lineHeight: 1.6 }}>{tip.body}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </Card>
     </div>
   );
