@@ -258,19 +258,6 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
         )}
       </div>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Label>Breakdown</Label>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {chartData.map(d => (
-            <div key={d.label} style={{ display: "flex", alignItems: "center", gap: 5, background: T.card2, borderRadius: 20, padding: "5px 10px" }}>
-              <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: T.muted }}>{getCatMeta(d.label, catMeta).icon} {d.label}</span>
-              <span style={{ fontSize: 12, color: T.text, fontWeight: 600 }}>{fmt(d.value)}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
       {/* Spending Money Card */}
       <Card style={{ marginBottom: 16, border: `1px solid ${spendingBudget > 0 && spendingRemaining < 0 ? T.red : T.primary}44` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
@@ -324,6 +311,19 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
             </div>
           </div>
         )}
+      </Card>
+
+      <Card style={{ marginBottom: 16 }}>
+        <Label>Breakdown</Label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {chartData.map(d => (
+            <div key={d.label} style={{ display: "flex", alignItems: "center", gap: 5, background: T.card2, borderRadius: 20, padding: "5px 10px" }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 12, color: T.muted }}>{getCatMeta(d.label, catMeta).icon} {d.label}</span>
+              <span style={{ fontSize: 12, color: T.text, fontWeight: 600 }}>{fmt(d.value)}</span>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <Card>
@@ -441,7 +441,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       </Card>
 
       {/* Manual Payment */}
-      <ManualPayment onAdd={onAddManual} splits={splits} setSplits={setSplits} catMeta={catMeta} />
+      <ManualPayment onAdd={onAddManual} catMeta={catMeta} />
 
       {/* CSV Import */}
       <CSVImporter onImport={onImport} onIncomeDetected={onIncomeDetected} />
@@ -452,7 +452,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
 // ── MANUAL PAYMENT ────────────────────────────────────────────────────────────
 const PAYMENT_FREQS = ["One-off", "Weekly", "Fortnightly", "Monthly", "Quarterly", "Annually"];
 
-function ManualPayment({ onAdd, splits, setSplits, catMeta }) {
+function ManualPayment({ onAdd, catMeta }) {
   const T = useT();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
@@ -491,14 +491,9 @@ function ManualPayment({ onAdd, splits, setSplits, catMeta }) {
       }
     }
 
-    txns.forEach(t => onAdd(t));
+    txns.forEach(t => onAdd(t, form.mySharePct));
 
-    // Set splits for all added transactions
-    if (form.mySharePct !== 100) {
-      const newSplits = {};
-      txns.forEach(t => { newSplits[t.id] = form.mySharePct; });
-      setSplits(p => ({ ...p, ...newSplits }));
-    }
+    // Note: split saving is handled in onAdd (onAddManual) after Supabase returns the real id
 
     setForm({ name: "", amount: "", category: "Other", frequency: "One-off", date: new Date().toISOString().slice(0, 10), mySharePct: 100 });
     setOpen(false);
@@ -944,7 +939,7 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
 }
 
 // ── BILLS / CATEGORIES ───────────────────────────────────────────────────────
-function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user, oneOff, setOneOff, onEditTransaction, catMeta, starred, setStarred }) {
+function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, catNames, setCatNames, splits, setSplits, partnerName, user, oneOff, setOneOff, onEditTransaction, catMeta, starred, setStarred, onAddManual }) {
   const T = useT();
   const [selectedCat, setSelectedCat] = useState(null);
   const [reassigning, setReassigning] = useState(null);
@@ -1187,11 +1182,10 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
           </div>
         );
       })}
+      <ManualPayment onAdd={onAddManual} catMeta={catMeta} />
     </div>
   );
 }
-
-// ── SAVINGS ──────────────────────────────────────────────────────────────────
 const INTEREST_FREQS = ["Monthly", "Quarterly", "Annually"];
 
 function calcInterestEarned(saved, aer, freqLabel, monthsHeld) {
@@ -2395,6 +2389,8 @@ export default function EmberApp({ user, onSignOut }) {
 
   // Keep a ref of all saveable settings so saveSettings always has latest values without stale closure
   const settingsRef = useRef({});
+  const splitsRef = useRef({});
+  useEffect(() => { splitsRef.current = splits; }, [splits]);
   useEffect(() => {
     settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta, starred, spending_budget: spendingBudget, savings_goals: savingsGoals };
   }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, starred, spendingBudget, savingsGoals]);
@@ -2436,7 +2432,7 @@ export default function EmberApp({ user, onSignOut }) {
     }
   };
 
-  const onAddManual = async (txn) => {
+  const onAddManual = async (txn, mySharePct) => {
     // Update state immediately
     setTransactions(p => [...p, txn]);
 
@@ -2451,8 +2447,14 @@ export default function EmberApp({ user, onSignOut }) {
         date: txn.date,
       }).select().single();
       if (!error && data) {
-        // Update the local transaction id to match Supabase id so splits save correctly
+        // Remap local temp id to real Supabase id
         setTransactions(p => p.map(t => t.id === txn.id ? { ...t, id: data.id } : t));
+        // Save split against real id if not 100%
+        if (mySharePct && mySharePct !== 100) {
+          const updated = { ...splitsRef.current, [data.id]: mySharePct };
+          setSplits(updated);
+          saveSettings({ ...settingsRef.current }); // splits saved via splits useEffect
+        }
       }
     } catch (err) {
       console.error('Manual payment save error:', err);
@@ -2530,7 +2532,7 @@ export default function EmberApp({ user, onSignOut }) {
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} />}
+        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
         {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
 
         <BottomNav tab={tab} setTab={setTab} />
