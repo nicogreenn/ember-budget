@@ -1271,9 +1271,228 @@ function SavingsTab({ income, transactions, splits }) {
   );
 }
 
+// ── TAKE HOME CALCULATOR ─────────────────────────────────────────────────────
+function TakeHomeCalculator({ onUseAsIncome }) {
+  const T = useT();
+  const [gross, setGross] = useState("");
+  const [period, setPeriod] = useState("annual"); // annual | monthly
+  const [pension, setPension] = useState("5");
+  const [pensionType, setPensionType] = useState("sacrifice"); // sacrifice | relief
+  const [studentLoan, setStudentLoan] = useState("none"); // none | plan1 | plan2 | plan4 | plan5 | postgrad
+  const [taxCode, setTaxCode] = useState("1257L");
+  const [scotland, setScotland] = useState(false);
+  const [result, setResult] = useState(null);
+
+  // 2025/26 rates
+  const calc = () => {
+    const grossAnnual = period === "monthly" ? Number(gross) * 12 : Number(gross);
+    if (!grossAnnual || grossAnnual <= 0) return;
+
+    const pensionPct = parseFloat(pension) || 0;
+
+    // Salary sacrifice reduces gross before tax & NI
+    const pensionAmount = pensionType === "sacrifice"
+      ? grossAnnual * (pensionPct / 100)
+      : 0;
+    const taxableGross = grossAnnual - pensionAmount;
+
+    // Personal allowance (tapers above £100k)
+    let personalAllowance = 12570;
+    if (taxableGross > 100000) {
+      personalAllowance = Math.max(0, 12570 - Math.floor((taxableGross - 100000) / 2));
+    }
+
+    // Income tax
+    let incomeTax = 0;
+    const taxable = Math.max(0, taxableGross - personalAllowance);
+
+    if (scotland) {
+      // Scottish bands 2025/26
+      const bands = [
+        { limit: 2827,  rate: 0.19 },
+        { limit: 14921, rate: 0.20 },
+        { limit: 17973, rate: 0.21 },
+        { limit: 31092, rate: 0.42 },
+        { limit: 62430, rate: 0.45 },
+        { limit: Infinity, rate: 0.48 },
+      ];
+      let remaining = taxable;
+      let prev = 0;
+      for (const band of bands) {
+        const slice = Math.min(remaining, band.limit - prev);
+        if (slice <= 0) break;
+        incomeTax += slice * band.rate;
+        remaining -= slice;
+        prev = band.limit;
+        if (remaining <= 0) break;
+      }
+    } else {
+      // England/Wales/NI 2025/26
+      if (taxable > 0) {
+        const basic  = Math.min(taxable, 37700);          // 20%
+        const higher = Math.min(Math.max(taxable - 37700, 0), 87430); // 40% up to £125,140
+        const add    = Math.max(taxable - 125140, 0);     // 45%
+        incomeTax = basic * 0.20 + higher * 0.40 + add * 0.45;
+      }
+    }
+
+    // Relief-at-source pension: basic-rate relief added by provider, so just deduct net contribution
+    const pensionDeductFromPay = pensionType === "sacrifice"
+      ? pensionAmount
+      : grossAnnual * (pensionPct / 100) * 0.80; // employee pays 80%, govt tops up 20%
+
+    // National Insurance (Class 1 employee) 2025/26
+    // PT = £12,570/yr, UEL = £50,270/yr → 8% between, 2% above
+    const niLower = 12570;
+    const niUpper = 50270;
+    const niBase = pensionType === "sacrifice" ? taxableGross : grossAnnual;
+    let ni = 0;
+    if (niBase > niLower) {
+      const band1 = Math.min(niBase, niUpper) - niLower;
+      const band2 = Math.max(niBase - niUpper, 0);
+      ni = band1 * 0.08 + band2 * 0.02;
+    }
+
+    // Student loan
+    const slThresholds = { plan1: 24990, plan2: 28470, plan4: 31395, plan5: 25000, postgrad: 21000 };
+    const slRates = { plan1: 0.09, plan2: 0.09, plan4: 0.09, plan5: 0.09, postgrad: 0.06 };
+    let studentLoanDeduction = 0;
+    if (studentLoan !== "none" && slThresholds[studentLoan]) {
+      studentLoanDeduction = Math.max(0, grossAnnual - slThresholds[studentLoan]) * slRates[studentLoan];
+    }
+
+    const totalDeductions = incomeTax + ni + pensionDeductFromPay + studentLoanDeduction;
+    const netAnnual = grossAnnual - totalDeductions;
+    const netMonthly = netAnnual / 12;
+
+    setResult({
+      grossAnnual, netAnnual, netMonthly,
+      incomeTax, ni, pensionDeductFromPay, studentLoanDeduction,
+      effectiveRate: (totalDeductions / grossAnnual * 100).toFixed(1),
+    });
+  };
+
+  const Row = ({ label, value, color, bold }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: `1px solid ${T.border}` }}>
+      <span style={{ fontSize: 13, color: T.muted }}>{label}</span>
+      <span style={{ fontSize: 13, color: color || T.text, fontWeight: bold ? 700 : 400, fontFamily: "'Outfit',sans-serif" }}>{value}</span>
+    </div>
+  );
+
+  return (
+    <div>
+      <Card style={{ marginBottom: 12 }}>
+        <Label>Gross Salary</Label>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <input
+            type="number" placeholder="e.g. 35000" value={gross}
+            onChange={e => setGross(e.target.value)}
+            style={{ flex: 1, background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "11px 14px", color: T.text, fontSize: 16, fontFamily: "'Outfit',sans-serif", fontWeight: 600, outline: "none" }}
+          />
+          <div style={{ display: "flex", background: T.card2, borderRadius: 10, border: `1px solid ${T.border}`, overflow: "hidden" }}>
+            {[["annual","Annual"],["monthly","Monthly"]].map(([val, label]) => (
+              <button key={val} onClick={() => setPeriod(val)}
+                style={{ padding: "0 14px", background: period === val ? `${T.primary}22` : "transparent", border: "none", borderLeft: val === "monthly" ? `1px solid ${T.border}` : "none", color: period === val ? T.primary : T.muted, cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: period === val ? 700 : 400 }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Label>Pension Contribution</Label>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <div style={{ position: "relative", flex: 1 }}>
+            <input type="number" step="0.5" placeholder="5" value={pension}
+              onChange={e => setPension(e.target.value)}
+              style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 32px 10px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+            <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: T.muted, fontSize: 14 }}>%</span>
+          </div>
+          <div style={{ display: "flex", background: T.card2, borderRadius: 10, border: `1px solid ${T.border}`, overflow: "hidden" }}>
+            {[["sacrifice","Sacrifice"],["relief","Relief at Source"]].map(([val, label]) => (
+              <button key={val} onClick={() => setPensionType(val)}
+                style={{ padding: "0 10px", background: pensionType === val ? `${T.primary}22` : "transparent", border: "none", borderLeft: val === "relief" ? `1px solid ${T.border}` : "none", color: pensionType === val ? T.primary : T.muted, cursor: "pointer", fontSize: 11, fontFamily: "inherit", fontWeight: pensionType === val ? 700 : 400 }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Label>Student Loan</Label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+          {[["none","None"],["plan1","Plan 1"],["plan2","Plan 2"],["plan4","Plan 4"],["plan5","Plan 5"],["postgrad","Postgrad"]].map(([val, label]) => (
+            <button key={val} onClick={() => setStudentLoan(val)}
+              style={{ padding: "6px 12px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: `1px solid ${studentLoan === val ? T.primary : T.border}`, background: studentLoan === val ? `${T.primary}22` : T.card2, color: studentLoan === val ? T.primary : T.muted, fontWeight: studentLoan === val ? 700 : 400 }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 14, alignItems: "center" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, color: T.muted, marginBottom: 5 }}>Tax Code</div>
+            <input value={taxCode} onChange={e => setTaxCode(e.target.value.toUpperCase())}
+              style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "9px 12px", color: T.text, fontSize: 14, fontFamily: "'Outfit',sans-serif", outline: "none", boxSizing: "border-box" }} />
+          </div>
+          <div onClick={() => setScotland(p => !p)}
+            style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 18, padding: "9px 14px", background: scotland ? `${T.primary}22` : T.card2, border: `1px solid ${scotland ? T.primary : T.border}`, borderRadius: 10, cursor: "pointer" }}>
+            <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${scotland ? T.primary : T.dim}`, background: scotland ? T.primary : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {scotland && <span style={{ color: "#000", fontSize: 11, fontWeight: 700 }}>✓</span>}
+            </div>
+            <span style={{ fontSize: 13, color: scotland ? T.primary : T.muted, whiteSpace: "nowrap" }}>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</span>
+          </div>
+        </div>
+
+        <PrimaryBtn onClick={calc} style={{ width: "100%" }}>Calculate Take-Home</PrimaryBtn>
+      </Card>
+
+      {result && (
+        <Card style={{ marginBottom: 12 }}>
+          {/* Hero */}
+          <div style={{ textAlign: "center", padding: "12px 0 16px" }}>
+            <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
+            <div style={{ fontSize: 44, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(result.netMonthly)}</div>
+            <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>{fmt(result.netAnnual)} per year · {result.effectiveRate}% effective deduction rate</div>
+          </div>
+
+          {/* Breakdown */}
+          <div style={{ background: T.card2, borderRadius: 12, padding: "4px 14px 4px" }}>
+            <Row label="Gross salary" value={fmt(result.grossAnnual)} />
+            <Row label="Income tax" value={`−${fmt(result.incomeTax)}`} color={T.red} />
+            <Row label="National Insurance" value={`−${fmt(result.ni)}`} color={T.red} />
+            {result.pensionDeductFromPay > 0 && <Row label={`Pension (${pension}% ${pensionType === "sacrifice" ? "salary sacrifice" : "relief at source"})`} value={`−${fmt(result.pensionDeductFromPay)}`} color={T.accent} />}
+            {result.studentLoanDeduction > 0 && <Row label={`Student loan (${studentLoan.replace("plan","Plan ")})`} value={`−${fmt(result.studentLoanDeduction)}`} color={T.accent} />}
+            <Row label="Net annual" value={fmt(result.netAnnual)} bold color={T.green} />
+          </div>
+
+          {/* Monthly bar */}
+          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            {[
+              { label: "Take-home", value: result.netMonthly, color: T.green },
+              { label: "Tax + NI", value: (result.incomeTax + result.ni) / 12, color: T.red },
+              { label: "Pension", value: result.pensionDeductFromPay / 12, color: T.accent },
+            ].map(s => (
+              <div key={s.label} style={{ background: T.card2, borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 9, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{s.label}/mo</div>
+                <div style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.color }}>{fmt(s.value)}</div>
+              </div>
+            ))}
+          </div>
+
+          {onUseAsIncome && (
+            <OutlineBtn onClick={() => onUseAsIncome(result.netMonthly)} style={{ width: "100%", marginTop: 12 }}>
+              Use {fmt(result.netMonthly)}/mo as my income →
+            </OutlineBtn>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+}
+
 // ── INCOME ───────────────────────────────────────────────────────────────────
 function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
   const T = useT();
+  const [subTab, setSubTab] = useState("income"); // income | calculator
   const [incomeDraft, setIncomeDraft] = useState(String(income));
   const [editingIncome, setEditingIncome] = useState(false);
   const [form, setForm] = useState({ name: "", amount: "", frequency: "Monthly" });
@@ -1287,9 +1506,23 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
-        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Income</div>
+      <div style={{ paddingTop: 88, paddingBottom: 16 }}>
+        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text, marginBottom: 14 }}>Income</div>
+        {/* Sub-tab pills */}
+        <div style={{ display: "flex", background: T.card2, borderRadius: 12, padding: 4, gap: 4 }}>
+          {[["income","💼 My Income"],["calculator","🧮 Take-Home Calc"]].map(([val, label]) => (
+            <button key={val} onClick={() => setSubTab(val)}
+              style={{ flex: 1, padding: "9px 8px", borderRadius: 9, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: subTab === val ? 700 : 400, background: subTab === val ? `linear-gradient(135deg,${T.gradA}55,${T.gradB}33)` : "transparent", color: subTab === val ? T.primary : T.muted, transition: "all .2s", boxShadow: subTab === val ? `0 0 10px ${T.glow}` : "none" }}>
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
+      {subTab === "calculator" && (
+        <TakeHomeCalculator onUseAsIncome={(monthly) => { setIncome(monthly); setSubTab("income"); }} />
+      )}
+
+      {subTab === "income" && (<>
       <Card style={{ marginBottom: 16, background: `${T.primary}11`, border: `1px solid ${T.primary}`, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Total Monthly Income</div>
         <div style={{ fontSize: 44, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(totalIncome)}</div>
@@ -1379,6 +1612,7 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
           </div>
         )}
       </Card>
+      </>)}
     </div>
   );
 }
