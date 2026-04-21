@@ -1,6 +1,6 @@
 'use client'
 // Ember Budget App v1.1 — Fire / Water / Nature / Earth / Floral
-import { useState, createContext, useContext, useEffect } from "react";
+import { useState, createContext, useContext, useEffect, useRef } from "react";
 import { supabase } from '@/lib/supabase'
 
 // ── THEMES ──────────────────────────────────────────────────────────────────
@@ -815,7 +815,7 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
   const safeMeta = (cat) => getCatMeta(cat, catMeta);
   const SPLIT_OPTS = [100, 75, 50, 25];
 
-  const toggleOneOff = (id) => setOneOff(p => ({ ...p, [id]: !p[id] }));
+  const toggleOneOff = (id) => { const updated = { ...oneOff, [id]: !oneOff[id] }; setOneOff(updated); };
 
   const deleteTxn = async (id) => {
     setTransactions(p => p.filter(t => t.id !== id));
@@ -923,9 +923,9 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                   {renamingCat === cat ? (
                     <div style={{ display: "flex", gap: 8 }}>
                       <input autoFocus value={nameDraft} onChange={e => setNameDraft(e.target.value)} maxLength={30}
-                        onKeyDown={e => { if (e.key === "Enter") { if (nameDraft.trim()) setCatNames(p => ({ ...p, [cat]: nameDraft.trim() })); setRenamingCat(null); }}}
+                        onKeyDown={e => { if (e.key === "Enter") { if (nameDraft.trim()) setCatNames({ ...catNames, [cat]: nameDraft.trim() }); setRenamingCat(null); }}}
                         style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "7px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
-                      <PrimaryBtn onClick={() => { if (nameDraft.trim()) setCatNames(p => ({ ...p, [cat]: nameDraft.trim() })); setRenamingCat(null); }} style={{ padding: "7px 14px", fontSize: 13 }}>Save</PrimaryBtn>
+                      <PrimaryBtn onClick={() => { if (nameDraft.trim()) setCatNames({ ...catNames, [cat]: nameDraft.trim() }); setRenamingCat(null); }} style={{ padding: "7px 14px", fontSize: 13 }}>Save</PrimaryBtn>
                       <GhostBtn onClick={() => setRenamingCat(null)} style={{ padding: "7px 10px", fontSize: 13 }}>✕</GhostBtn>
                     </div>
                   ) : (
@@ -943,9 +943,9 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
                   {editingBudget === cat ? (
                     <>
                       <input autoFocus value={budgetDraft} onChange={e => setBudgetDraft(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Enter") { const v = parseFloat(budgetDraft); if (!isNaN(v)) setBudgets(p => ({ ...p, [cat]: v })); setEditingBudget(null); }}}
+                        onKeyDown={e => { if (e.key === "Enter") { const v = parseFloat(budgetDraft); if (!isNaN(v)) { const updated = { ...budgets, [cat]: v }; setBudgets(updated); } setEditingBudget(null); }}}
                         style={{ width: 80, background: "transparent", border: `1px solid ${T.primary}`, borderRadius: 6, padding: "4px 8px", color: T.text, fontSize: 13, fontFamily: "'Outfit',sans-serif", textAlign: "right", outline: "none" }} />
-                      <PrimaryBtn onClick={() => { const v = parseFloat(budgetDraft); if (!isNaN(v)) setBudgets(p => ({ ...p, [cat]: v })); setEditingBudget(null); }} style={{ padding: "4px 10px", fontSize: 12 }}>Set</PrimaryBtn>
+                      <PrimaryBtn onClick={() => { const v = parseFloat(budgetDraft); if (!isNaN(v)) { const updated = { ...budgets, [cat]: v }; setBudgets(updated); } setEditingBudget(null); }} style={{ padding: "4px 10px", fontSize: 12 }}>Set</PrimaryBtn>
                     </>
                   ) : (
                     <GhostBtn onClick={() => { setEditingBudget(cat); setBudgetDraft(String(budget || "")); }} style={{ fontSize: 12, padding: "4px 10px" }}>{budget > 0 ? fmt(budget) : "Set"} ✏️</GhostBtn>
@@ -1611,7 +1611,7 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
                   </select>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <PrimaryBtn style={{ flex: 2 }} onClick={() => { setSideHustles(p => p.map(x => x.id === h.id ? { ...editDraft, amount: Number(editDraft.amount) } : x)); setEditingId(null); }}>Save</PrimaryBtn>
+                  <PrimaryBtn style={{ flex: 2 }} onClick={() => { const updated = sideHustles.map(x => x.id === h.id ? { ...editDraft, amount: Number(editDraft.amount) } : x); setSideHustles(updated); setEditingId(null); }}>Save</PrimaryBtn>
                   <GhostBtn style={{ flex: 1 }} onClick={() => setEditingId(null)}>Cancel</GhostBtn>
                 </div>
               </div>
@@ -1628,7 +1628,7 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <button onClick={() => { setEditingId(h.id); setEditDraft({ ...h }); }} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 6, color: T.muted, padding: "3px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button>
-                  <button onClick={() => setSideHustles(p => p.filter(x => x.id !== h.id))} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 6, color: T.muted, padding: "3px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                  <button onClick={() => setSideHustles(sideHustles.filter(x => x.id !== h.id))} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 6, color: T.muted, padding: "3px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
                 </div>
               </div>
             )}
@@ -1649,7 +1649,7 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
             </div>
             {form.amount && <div style={{ fontSize: 12, color: T.accent, marginBottom: 10, padding: "7px 10px", background: T.card, borderRadius: 8 }}>→ {fmt(toM(Number(form.amount), form.frequency))}/month equivalent</div>}
             <div style={{ display: "flex", gap: 8 }}>
-              <PrimaryBtn style={{ flex: 2 }} onClick={() => { if (!form.name || !form.amount) return; setSideHustles(p => [...p, { ...form, id: Date.now(), amount: Number(form.amount) }]); setForm({ name: "", amount: "", frequency: "Monthly" }); setAdding(false); }}>Add</PrimaryBtn>
+              <PrimaryBtn style={{ flex: 2 }} onClick={() => { if (!form.name || !form.amount) return; const updated = [...sideHustles, { ...form, id: Date.now(), amount: Number(form.amount) }]; setSideHustles(updated); setForm({ name: "", amount: "", frequency: "Monthly" }); setAdding(false); }}>Add</PrimaryBtn>
               <GhostBtn style={{ flex: 1 }} onClick={() => setAdding(false)}>Cancel</GhostBtn>
             </div>
           </div>
@@ -1679,7 +1679,7 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
     const name = catForm.name.trim();
     if (!name || catMeta[name]) return;
     const maxIdx = Math.max(...Object.values(catMeta).map(m => m.idx), 9);
-    setCatMeta(p => ({ ...p, [name]: { icon: catForm.icon, idx: maxIdx + 1 } }));
+    setCatMeta({ ...catMeta, [name]: { icon: catForm.icon, idx: maxIdx + 1 } });
     setCatForm({ name: "", icon: "📦" });
     setAddingCat(false);
   };
@@ -2071,9 +2071,16 @@ export default function EmberApp({ user, onSignOut }) {
     } catch (err) { console.error('Reset error:', err); }
   };
 
+  // Keep a ref of all saveable settings so saveSettings always has latest values without stale closure
+  const settingsRef = useRef({});
+  useEffect(() => {
+    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta };
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta]);
+
   const saveSettings = (patch) => {
     if (!user) return;
-    supabase.from('settings').upsert({ user_id: user.id, ...patch }, { onConflict: 'user_id' })
+    const full = { ...settingsRef.current, ...patch };
+    supabase.from('settings').upsert({ user_id: user.id, ...full }, { onConflict: 'user_id' })
       .then(({ error }) => { if (error) console.error('Settings save error:', error); });
   };
 
