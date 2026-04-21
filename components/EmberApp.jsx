@@ -133,7 +133,7 @@ function OutlineBtn({ children, onClick, style = {} }) {
 }
 
 // ── DONUT ────────────────────────────────────────────────────────────────────
-function DonutChart({ data, total, income }) {
+function DonutChart({ data, total }) {
   const T = useT();
   const size = 220, cx = 110, cy = 110, R = 88, r = 60;
   let cum = -Math.PI / 2;
@@ -142,7 +142,7 @@ function DonutChart({ data, total, income }) {
     const s = cum; cum += angle; const e = cum; const large = angle > Math.PI ? 1 : 0;
     return { ...d, path: `M ${cx+R*Math.cos(s)} ${cy+R*Math.sin(s)} A ${R} ${R} 0 ${large} 1 ${cx+R*Math.cos(e)} ${cy+R*Math.sin(e)} L ${cx+r*Math.cos(e)} ${cy+r*Math.sin(e)} A ${r} ${r} 0 ${large} 0 ${cx+r*Math.cos(s)} ${cy+r*Math.sin(s)} Z` };
   });
-  const pct = income > 0 ? Math.round((total / income) * 100) : 0;
+  const biggest = data.filter(d => d.value > 0).sort((a, b) => b.value - a.value)[0];
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
       <svg width={size} height={size} style={{ filter: `drop-shadow(0 0 18px ${T.glow})` }}>
@@ -151,9 +151,9 @@ function DonutChart({ data, total, income }) {
         <circle cx={cx} cy={cy} r={r-2} fill={T.bg} />
       </svg>
       <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", textAlign: "center", pointerEvents: "none" }}>
-        <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>my share</div>
-        <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, lineHeight: 1.1 }}>{pct}%</div>
-        <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{fmt(total)}</div>
+        <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>total spend</div>
+        <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, lineHeight: 1.1 }}>{fmt(total)}</div>
+        {biggest && <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{biggest.label}</div>}
       </div>
     </div>
   );
@@ -230,7 +230,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
-        <DonutChart data={chartData} total={myTotal} income={income} />
+        <DonutChart data={chartData} total={myTotal} />
         <div style={{ display: "flex", gap: 10, marginTop: 16, width: "100%" }}>
           <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
             <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>My Spend</div>
