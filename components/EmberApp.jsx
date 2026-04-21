@@ -187,10 +187,8 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, setIncome, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta }) {
+function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta }) {
   const T = useT();
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(String(income));
   const [showAll, setShowAll] = useState(false);
   const [txnSearch, setTxnSearch] = useState("");
   const [txnCatFilter, setTxnCatFilter] = useState("All");
@@ -210,20 +208,10 @@ function HomeTab({ income, setIncome, transactions, setTransactions, splits, set
     <div style={{ padding: "0 16px 110px" }}>
       <div style={{ paddingTop: 88, paddingBottom: 20, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
-        {editing ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            <span style={{ fontSize: 28, color: T.primary }}>£</span>
-            <input autoFocus value={draft} onChange={e => setDraft(e.target.value)}
-              onBlur={() => { const v = parseFloat(draft); if (!isNaN(v)) setIncome(v); setEditing(false); }}
-              onKeyDown={e => e.key === "Enter" && e.target.blur()}
-              style={{ background: "transparent", border: "none", borderBottom: `2px solid ${T.primary}`, color: T.text, fontSize: 38, fontFamily: "'Outfit',sans-serif", fontWeight: 700, width: 150, textAlign: "center", outline: "none" }} />
-          </div>
-        ) : (
-          <div onClick={() => { setDraft(String(income)); setEditing(true); }} style={{ cursor: "pointer" }}>
-            <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(income)}</span>
-            <span style={{ fontSize: 11, color: T.dim, marginLeft: 8 }}>tap to edit</span>
-          </div>
-        )}
+        <div style={{ cursor: "default" }}>
+          <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(income)}</span>
+          <div style={{ fontSize: 11, color: T.dim, marginTop: 4 }}>edit in Income tab</div>
+        </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
@@ -2200,7 +2188,7 @@ export default function EmberApp({ user, onSignOut }) {
           <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {tab === "home"       && <HomeTab income={totalIncome} setIncome={setIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} />}
+        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={setIncome} sideHustles={sideHustles} setSideHustles={setSideHustles} />}
