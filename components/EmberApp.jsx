@@ -153,7 +153,6 @@ function DonutChart({ data, total }) {
       <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", textAlign: "center", pointerEvents: "none" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase" }}>total spend</div>
         <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, lineHeight: 1.1 }}>{fmt(total)}</div>
-        {biggest && <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{biggest.label}</div>}
       </div>
     </div>
   );
