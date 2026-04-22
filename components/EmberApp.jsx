@@ -2398,7 +2398,7 @@ export default function EmberApp({ user, onSignOut }) {
     if (!user) return;
     const full = { ...settingsRef.current, ...patch };
     supabase.from('settings').upsert({ user_id: user.id, ...full }, { onConflict: 'user_id' })
-      .then(({ error }) => { if (error) console.error('Settings save error:', error); });
+      .then(({ error }) => { if (error) console.error('Settings save error:', JSON.stringify(error)); });
   };
 
   const handleSetIncome = (v) => { setIncome(v); saveSettings({ income: v }); };
