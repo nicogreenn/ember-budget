@@ -7,9 +7,9 @@ import { supabase } from '@/lib/supabase'
 const THEMES = {
   fire: {
     name: "Fire", emoji: "🔥",
-    bg: "#111111", card: "#1c1c1c", card2: "#242424", border: "#2a2a2a", navBg: "#161616",
+    bg: "#1a1111", card: "#2a1c1c", card2: "#342424", border: "#4a3030", navBg: "#161010",
     primary: "#f97316", secondary: "#facc15", accent: "#fb923c",
-    red: "#ef4444", green: "#4ade80", text: "#f5f5f5", muted: "#9ca3af", dim: "#4b5563",
+    red: "#ef4444", green: "#4ade80", text: "#faf0f0", muted: "#b09090", dim: "#6a4a4a",
     gradA: "#f97316", gradB: "#facc15", glow: "rgba(249,115,22,0.25)",
     partnerBg: "#0f1a0f", partnerBorder: "#2a4a2a", partnerText: "#4ade80",
     catColors: ["#f97316","#fb923c","#facc15","#fbbf24","#f59e0b","#ea580c","#fdba74","#fed7aa","#4ade80","#6b7280"],
@@ -17,9 +17,9 @@ const THEMES = {
   },
   water: {
     name: "Water", emoji: "🌊",
-    bg: "#080f1a", card: "#0d1929", card2: "#112236", border: "#1a3a5c", navBg: "#060d16",
+    bg: "#0e1620", card: "#162030", card2: "#1c2a3e", border: "#284860", navBg: "#0a1018",
     primary: "#38bdf8", secondary: "#7dd3fc", accent: "#0ea5e9",
-    red: "#f87171", green: "#34d399", text: "#e0f2fe", muted: "#7ea8c9", dim: "#2d5a7a",
+    red: "#f87171", green: "#34d399", text: "#e8f4fe", muted: "#8ab8d8", dim: "#3a6888",
     gradA: "#38bdf8", gradB: "#818cf8", glow: "rgba(56,189,248,0.25)",
     partnerBg: "#0a1420", partnerBorder: "#1a3a5c", partnerText: "#34d399",
     catColors: ["#38bdf8","#0ea5e9","#7dd3fc","#818cf8","#a78bfa","#60a5fa","#93c5fd","#bae6fd","#34d399","#64748b"],
@@ -27,9 +27,9 @@ const THEMES = {
   },
   nature: {
     name: "Nature", emoji: "🌿",
-    bg: "#0a110a", card: "#121a12", card2: "#182018", border: "#243824", navBg: "#080e08",
+    bg: "#101810", card: "#1a2418", card2: "#202e1e", border: "#304830", navBg: "#0c140c",
     primary: "#4ade80", secondary: "#a3e635", accent: "#22c55e",
-    red: "#f87171", green: "#86efac", text: "#ecfdf0", muted: "#86a886", dim: "#3a5a3a",
+    red: "#f87171", green: "#86efac", text: "#f0fdf0", muted: "#90b890", dim: "#487048",
     gradA: "#4ade80", gradB: "#a3e635", glow: "rgba(74,222,128,0.25)",
     partnerBg: "#0a1a14", partnerBorder: "#1a4a2a", partnerText: "#86efac",
     catColors: ["#4ade80","#22c55e","#a3e635","#84cc16","#65a30d","#16a34a","#86efac","#bbf7d0","#34d399","#6b7280"],
@@ -37,19 +37,19 @@ const THEMES = {
   },
   earth: {
     name: "Earth", emoji: "🪨",
-    bg: "#0f0b08", card: "#1c1510", card2: "#241c14", border: "#3a2d1f", navBg: "#0c0906",
-    primary: "#c8854a", secondary: "#e8b87a", accent: "#a0622a",
-    red: "#e05a5a", green: "#7abf7a", text: "#f5ede3", muted: "#a08060", dim: "#5a3f28",
-    gradA: "#c8854a", gradB: "#e8b87a", glow: "rgba(200,133,74,0.25)",
+    bg: "#1a1208", card: "#2a1f14", card2: "#342618", border: "#4a3828", navBg: "#161008",
+    primary: "#d4924f", secondary: "#ecc47a", accent: "#b8722a",
+    red: "#e05a5a", green: "#7abf7a", text: "#f8f0e6", muted: "#b89878", dim: "#6a5040",
+    gradA: "#d4924f", gradB: "#ecc47a", glow: "rgba(212,146,79,0.25)",
     partnerBg: "#0f1a0a", partnerBorder: "#2a4a1a", partnerText: "#7abf7a",
-    catColors: ["#c8854a","#a0622a","#e8b87a","#d4955a","#b87040","#8b4513","#deb887","#f5deb3","#7abf7a","#6b5a4a"],
+    catColors: ["#d4924f","#b8722a","#ecc47a","#d4955a","#b87040","#8b4513","#deb887","#f5deb3","#7abf7a","#6b5a4a"],
     light: { bg: "#fdf8f2", card: "#ffffff", card2: "#faf0e6", border: "#e8d5bc", navBg: "#ffffff", text: "#2c1a0a", muted: "#8b6040", dim: "#d4b896", partnerBg: "#f0fdf4", partnerBorder: "#bbf7d0", partnerText: "#15803d" },
   },
   floral: {
     name: "Floral", emoji: "🌸",
-    bg: "#120a12", card: "#1c1020", card2: "#231428", border: "#3a1f42", navBg: "#0e080f",
+    bg: "#1a1020", card: "#281828", card2: "#321e34", border: "#4a2e52", navBg: "#140c18",
     primary: "#e879f9", secondary: "#f9a8d4", accent: "#c026d3",
-    red: "#fb7185", green: "#4ade80", text: "#fdf4ff", muted: "#c4a8cc", dim: "#5a3a62",
+    red: "#fb7185", green: "#4ade80", text: "#fef0ff", muted: "#d0a8d8", dim: "#6a4870",
     gradA: "#e879f9", gradB: "#f9a8d4", glow: "rgba(232,121,249,0.25)",
     partnerBg: "#0a100a", partnerBorder: "#1a3a20", partnerText: "#4ade80",
     catColors: ["#e879f9","#c026d3","#f9a8d4","#f0abfc","#a855f7","#db2777","#fda4af","#fbcfe8","#4ade80","#6b7280"],
@@ -167,7 +167,6 @@ function BottomNav({ tab, setTab }) {
     { id: "savings",    label: "Savings",  icon: "◎" },
     { id: "income",     label: "Income",   icon: "◐" },
     { id: "categories", label: "Bills",    icon: "⊞" },
-    { id: "settings",   label: "Settings", icon: "◬" },
   ];
   return (
     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
@@ -2198,7 +2197,207 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
     </div>
   );
 }
-function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths }) {
+// ── SETTINGS DRAWER ──────────────────────────────────────────────────────────
+function SettingsDrawer({ open, onClose, themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, onReset, user, catMeta, setCatMeta }) {
+  const T = useT();
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState(partnerName);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [catForm, setCatForm] = useState({ name: "", icon: "📦" });
+  const [addingCat, setAddingCat] = useState(false);
+  const [editingCat, setEditingCat] = useState(null);
+  const [editCatDraft, setEditCatDraft] = useState({ name: "", icon: "" });
+  const EMOJI_SUGGESTIONS = ["🏠","🚗","🛒","⚡","📱","🍽️","💊","🎮","💰","📦","✈️","🐾","👶","🎓","💇","🏋️","🍺","🎁","🔧","💻","🎵","🌿","🐕","📚","🏖️","🚿","💈","🛠️","🎯","🏥"];
+
+  const addCat = () => {
+    const name = catForm.name.trim();
+    if (!name || catMeta[name]) return;
+    const maxIdx = Math.max(...Object.values(catMeta).map(m => m.idx), 9);
+    setCatMeta({ ...catMeta, [name]: { icon: catForm.icon, idx: maxIdx + 1 } });
+    setCatForm({ name: "", icon: "📦" });
+    setAddingCat(false);
+  };
+  const deleteCat = (key) => { const u = { ...catMeta }; delete u[key]; setCatMeta(u); };
+  const saveEditCat = () => {
+    if (!editingCat) return;
+    const newName = editCatDraft.name.trim();
+    if (!newName) return;
+    const updated = { ...catMeta };
+    const meta = updated[editingCat];
+    if (newName !== editingCat) { delete updated[editingCat]; updated[newName] = { ...meta, icon: editCatDraft.icon }; }
+    else { updated[editingCat] = { ...meta, icon: editCatDraft.icon }; }
+    setCatMeta(updated);
+    setEditingCat(null);
+  };
+  const isDefault = (key) => Object.keys(DEFAULT_CAT_META).includes(key);
+
+  if (!open) return null;
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 200 }} />
+      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "88%", maxWidth: 380, background: T.card, zIndex: 201, overflowY: "auto", padding: "24px 20px 60px", borderLeft: `1px solid ${T.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+          <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Settings</div>
+          <button onClick={onClose} style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, cursor: "pointer", fontSize: 14, padding: "6px 12px" }}>✕</button>
+        </div>
+
+        {/* Appearance */}
+        <Card style={{ marginBottom: 16 }}>
+          <Label>Appearance</Label>
+          <div style={{ display: "flex", gap: 10 }}>
+            {[{ val: false, label: "Dark", icon: "🌑" }, { val: true, label: "Light", icon: "☀️" }].map(opt => {
+              const active = lightMode === opt.val;
+              return (
+                <button key={String(opt.val)} onClick={() => setLightMode(opt.val)} style={{ flex: 1, padding: "14px 10px", borderRadius: 14, cursor: "pointer", border: `2px solid ${active ? T.primary : T.border}`, background: active ? `${T.primary}18` : T.card2, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 24 }}>{opt.icon}</span>
+                  <span style={{ fontSize: 13, fontWeight: active ? 700 : 400, color: active ? T.primary : T.muted }}>{opt.label}</span>
+                  {active && <div style={{ width: 18, height: 18, borderRadius: "50%", background: T.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#000", fontWeight: 700 }}>✓</div>}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Theme */}
+        <Card style={{ marginBottom: 16 }}>
+          <Label>Theme</Label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {Object.entries(THEMES).map(([key, theme]) => {
+              const active = themeKey === key;
+              const previewT = applyMode(theme, lightMode);
+              return (
+                <button key={key} onClick={() => setThemeKey(key)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", width: "100%", background: active ? `${theme.primary}18` : T.card2, border: `2px solid ${active ? theme.primary : T.border}`, borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ display: "flex", gap: 3, flexShrink: 0 }}>
+                    {[previewT.bg, theme.primary, theme.secondary, previewT.card].map((col, i) => (
+                      <div key={i} style={{ width: 12, height: 34, borderRadius: 4, background: col, border: `1px solid ${previewT.border}` }} />
+                    ))}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 16, color: active ? theme.primary : T.text, fontWeight: active ? 700 : 400 }}>{theme.emoji} {theme.name}</div>
+                    <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                      {key === "fire" && "Warm oranges & yellows"}{key === "water" && "Cool blues & purples"}
+                      {key === "nature" && "Fresh greens & lime"}{key === "floral" && "Soft pinks & lilac"}
+                      {key === "earth" && "Rich browns & terracotta"}
+                    </div>
+                  </div>
+                  {active && <div style={{ width: 22, height: 22, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#000", fontWeight: 700, flexShrink: 0 }}>✓</div>}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Partner Name */}
+        <Card style={{ marginBottom: 16 }}>
+          <Label>Partner Name</Label>
+          <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 20 }}>💑</span>
+            {editingName ? (
+              <div style={{ flex: 1, display: "flex", gap: 8 }}>
+                <input autoFocus value={nameDraft} onChange={e => setNameDraft(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") { setPartnerName(nameDraft); setEditingName(false); }}}
+                  style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "7px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                <PrimaryBtn onClick={() => { setPartnerName(nameDraft); setEditingName(false); }} style={{ padding: "7px 14px", fontSize: 13 }}>Save</PrimaryBtn>
+              </div>
+            ) : (
+              <>
+                <span style={{ flex: 1, fontSize: 15, color: T.text }}>{partnerName || "Your partner"}</span>
+                <GhostBtn onClick={() => { setNameDraft(partnerName); setEditingName(true); }} style={{ fontSize: 12, padding: "5px 12px" }}>Edit</GhostBtn>
+              </>
+            )}
+          </div>
+        </Card>
+
+        {/* Account */}
+        <Card style={{ marginBottom: 16 }}>
+          <Label>Account</Label>
+          <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: T.muted, marginBottom: 4 }}>Signed in as</div>
+            <div style={{ fontSize: 14, color: T.text }}>{user?.email}</div>
+          </div>
+          <button onClick={onSignOut} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>Sign Out</button>
+        </Card>
+
+        {/* Categories */}
+        <Card style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <Label>Categories</Label>
+            {!addingCat && <GhostBtn onClick={() => setAddingCat(true)} style={{ fontSize: 12, padding: "4px 12px", marginTop: -8 }}>+ Add</GhostBtn>}
+          </div>
+          {addingCat && (
+            <div style={{ background: T.card2, borderRadius: 12, padding: 14, marginBottom: 12 }}>
+              <input placeholder="Category name" value={catForm.name} onChange={e => setCatForm(p => ({ ...p, name: e.target.value }))}
+                style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "9px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                {EMOJI_SUGGESTIONS.map(e => (
+                  <button key={e} onClick={() => setCatForm(p => ({ ...p, icon: e }))}
+                    style={{ fontSize: 18, padding: "4px 6px", borderRadius: 8, cursor: "pointer", border: `2px solid ${catForm.icon === e ? T.primary : T.border}`, background: catForm.icon === e ? `${T.primary}22` : T.card }}>
+                    {e}
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <PrimaryBtn style={{ flex: 2 }} onClick={addCat}>Add Category</PrimaryBtn>
+                <GhostBtn style={{ flex: 1 }} onClick={() => { setAddingCat(false); setCatForm({ name: "", icon: "📦" }); }}>Cancel</GhostBtn>
+              </div>
+            </div>
+          )}
+          {Object.entries(catMeta).map(([key, meta]) => (
+            <div key={key} style={{ marginBottom: 8 }}>
+              {editingCat === key ? (
+                <div style={{ background: T.card2, borderRadius: 12, padding: 12 }}>
+                  <input value={editCatDraft.name} onChange={e => setEditCatDraft(p => ({ ...p, name: e.target.value }))}
+                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                    {EMOJI_SUGGESTIONS.map(e => (
+                      <button key={e} onClick={() => setEditCatDraft(p => ({ ...p, icon: e }))}
+                        style={{ fontSize: 18, padding: "4px 6px", borderRadius: 8, cursor: "pointer", border: `2px solid ${editCatDraft.icon === e ? T.primary : T.border}`, background: editCatDraft.icon === e ? `${T.primary}22` : T.card }}>
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={saveEditCat}>Save</PrimaryBtn>
+                    <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingCat(null)}>Cancel</GhostBtn>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: T.card2, borderRadius: 12 }}>
+                  <span style={{ fontSize: 20 }}>{meta.icon}</span>
+                  <span style={{ flex: 1, fontSize: 14, color: T.text }}>{key}</span>
+                  {isDefault(key) && <span style={{ fontSize: 10, color: T.dim, background: T.card, borderRadius: 10, padding: "2px 7px" }}>default</span>}
+                  <button onClick={() => { setEditingCat(key); setEditCatDraft({ name: key, icon: meta.icon }); }}
+                    style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button>
+                  <button onClick={() => deleteCat(key)}
+                    style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </Card>
+
+        {/* Danger Zone */}
+        <Card>
+          <Label>Danger Zone</Label>
+          <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, lineHeight: 1.6 }}>Reset clears all transactions, splits, category names, budgets and income. Your account stays. This cannot be undone.</div>
+          {!confirmReset ? (
+            <button onClick={() => setConfirmReset(true)} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>🗑 Reset App Data</button>
+          ) : (
+            <div>
+              <div style={{ fontSize: 13, color: T.red, marginBottom: 12, padding: "10px 14px", background: `${T.red}18`, borderRadius: 10, textAlign: "center" }}>Are you sure? This will wipe everything.</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => { onReset(); setConfirmReset(false); onClose(); }} style={{ flex: 2, padding: "12px", background: T.red, border: "none", borderRadius: 10, color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Yes, reset everything</button>
+                <button onClick={() => setConfirmReset(false)} style={{ flex: 1, padding: "12px", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.muted, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              </div>
+            </div>
+          )}
+        </Card>
+      </div>
+    </>
+  );
+}
+
+function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths, onSettingsOpen }) {
   const T = useT();
   const now = new Date();
 
@@ -2233,7 +2432,10 @@ function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths }) {
         </div>
         {isCurrentMonth && <div style={{ fontSize: 10, color: T.primary, letterSpacing: 1, textTransform: "uppercase" }}>Current Month</div>}
       </div>
-      <button onClick={nextMonth} style={{ background: "none", border: "none", color: canGoNext ? T.primary : T.dim, fontSize: 20, cursor: canGoNext ? "pointer" : "default", padding: "4px 8px" }}>›</button>
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <button onClick={nextMonth} style={{ background: "none", border: "none", color: canGoNext ? T.primary : T.dim, fontSize: 20, cursor: canGoNext ? "pointer" : "default", padding: "4px 8px" }}>›</button>
+        <button onClick={onSettingsOpen} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", color: T.muted, fontSize: 18, lineHeight: 1 }}>⚙</button>
+      </div>
     </div>
   );
 }
@@ -2245,6 +2447,7 @@ export default function EmberApp({ user, onSignOut }) {
   const [tab, setTab] = useState("home");
   const [themeKey, setThemeKey] = useState("fire");
   const [lightMode, setLightMode] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [income, setIncome] = useState(2800);
   const [sideHustles, setSideHustles] = useState([]);
   const [transactions, setTransactions] = useState(INIT_TXN);
@@ -2524,7 +2727,14 @@ export default function EmberApp({ user, onSignOut }) {
 
         {/* Month Picker — shown on all main tabs */}
         {["home","insights","categories"].includes(tab) && (
-          <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
+          <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} onSettingsOpen={() => setSettingsOpen(true)} />
+        )}
+
+        {/* Gear icon for tabs without MonthPicker */}
+        {["savings","income"].includes(tab) && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", zIndex: 99, background: T.navBg, borderBottom: `1px solid ${T.border}`, padding: "10px 16px", display: "flex", justifyContent: "flex-end" }}>
+            <button onClick={() => setSettingsOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", color: T.muted, fontSize: 18, lineHeight: 1 }}>⚙</button>
+          </div>
         )}
 
         {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
@@ -2532,7 +2742,15 @@ export default function EmberApp({ user, onSignOut }) {
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
         {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
-        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
+
+        <SettingsDrawer
+          open={settingsOpen} onClose={() => setSettingsOpen(false)}
+          themeKey={themeKey} setThemeKey={handleSetThemeKey}
+          partnerName={partnerName} setPartnerName={handleSetPartnerName}
+          lightMode={lightMode} setLightMode={handleSetLightMode}
+          onSignOut={onSignOut} onReset={onReset}
+          user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta}
+        />
 
         <BottomNav tab={tab} setTab={setTab} />
       </div>
