@@ -7,9 +7,9 @@ import { supabase } from '@/lib/supabase'
 const THEMES = {
   fire: {
     name: "Fire", emoji: "🔥",
-    bg: "#1a1111", card: "#2a1c1c", card2: "#342424", border: "#4a3030", navBg: "#161010",
+    bg: "#111111", card: "#1c1c1c", card2: "#242424", border: "#2a2a2a", navBg: "#161616",
     primary: "#f97316", secondary: "#facc15", accent: "#fb923c",
-    red: "#ef4444", green: "#4ade80", text: "#faf0f0", muted: "#b09090", dim: "#6a4a4a",
+    red: "#ef4444", green: "#4ade80", text: "#f5f5f5", muted: "#9ca3af", dim: "#4b5563",
     gradA: "#f97316", gradB: "#facc15", glow: "rgba(249,115,22,0.25)",
     partnerBg: "#0f1a0f", partnerBorder: "#2a4a2a", partnerText: "#4ade80",
     catColors: ["#f97316","#fb923c","#facc15","#fbbf24","#f59e0b","#ea580c","#fdba74","#fed7aa","#4ade80","#6b7280"],
@@ -17,9 +17,9 @@ const THEMES = {
   },
   water: {
     name: "Water", emoji: "🌊",
-    bg: "#0e1620", card: "#162030", card2: "#1c2a3e", border: "#284860", navBg: "#0a1018",
+    bg: "#080f1a", card: "#0d1929", card2: "#112236", border: "#1a3a5c", navBg: "#060d16",
     primary: "#38bdf8", secondary: "#7dd3fc", accent: "#0ea5e9",
-    red: "#f87171", green: "#34d399", text: "#e8f4fe", muted: "#8ab8d8", dim: "#3a6888",
+    red: "#f87171", green: "#34d399", text: "#e0f2fe", muted: "#7ea8c9", dim: "#2d5a7a",
     gradA: "#38bdf8", gradB: "#818cf8", glow: "rgba(56,189,248,0.25)",
     partnerBg: "#0a1420", partnerBorder: "#1a3a5c", partnerText: "#34d399",
     catColors: ["#38bdf8","#0ea5e9","#7dd3fc","#818cf8","#a78bfa","#60a5fa","#93c5fd","#bae6fd","#34d399","#64748b"],
@@ -27,9 +27,9 @@ const THEMES = {
   },
   nature: {
     name: "Nature", emoji: "🌿",
-    bg: "#101810", card: "#1a2418", card2: "#202e1e", border: "#304830", navBg: "#0c140c",
+    bg: "#0a110a", card: "#121a12", card2: "#182018", border: "#243824", navBg: "#080e08",
     primary: "#4ade80", secondary: "#a3e635", accent: "#22c55e",
-    red: "#f87171", green: "#86efac", text: "#f0fdf0", muted: "#90b890", dim: "#487048",
+    red: "#f87171", green: "#86efac", text: "#ecfdf0", muted: "#86a886", dim: "#3a5a3a",
     gradA: "#4ade80", gradB: "#a3e635", glow: "rgba(74,222,128,0.25)",
     partnerBg: "#0a1a14", partnerBorder: "#1a4a2a", partnerText: "#86efac",
     catColors: ["#4ade80","#22c55e","#a3e635","#84cc16","#65a30d","#16a34a","#86efac","#bbf7d0","#34d399","#6b7280"],
@@ -37,19 +37,19 @@ const THEMES = {
   },
   earth: {
     name: "Earth", emoji: "🪨",
-    bg: "#1a1208", card: "#2a1f14", card2: "#342618", border: "#4a3828", navBg: "#161008",
-    primary: "#d4924f", secondary: "#ecc47a", accent: "#b8722a",
-    red: "#e05a5a", green: "#7abf7a", text: "#f8f0e6", muted: "#b89878", dim: "#6a5040",
-    gradA: "#d4924f", gradB: "#ecc47a", glow: "rgba(212,146,79,0.25)",
+    bg: "#0f0b08", card: "#1c1510", card2: "#241c14", border: "#3a2d1f", navBg: "#0c0906",
+    primary: "#c8854a", secondary: "#e8b87a", accent: "#a0622a",
+    red: "#e05a5a", green: "#7abf7a", text: "#f5ede3", muted: "#a08060", dim: "#5a3f28",
+    gradA: "#c8854a", gradB: "#e8b87a", glow: "rgba(200,133,74,0.25)",
     partnerBg: "#0f1a0a", partnerBorder: "#2a4a1a", partnerText: "#7abf7a",
-    catColors: ["#d4924f","#b8722a","#ecc47a","#d4955a","#b87040","#8b4513","#deb887","#f5deb3","#7abf7a","#6b5a4a"],
+    catColors: ["#c8854a","#a0622a","#e8b87a","#d4955a","#b87040","#8b4513","#deb887","#f5deb3","#7abf7a","#6b5a4a"],
     light: { bg: "#fdf8f2", card: "#ffffff", card2: "#faf0e6", border: "#e8d5bc", navBg: "#ffffff", text: "#2c1a0a", muted: "#8b6040", dim: "#d4b896", partnerBg: "#f0fdf4", partnerBorder: "#bbf7d0", partnerText: "#15803d" },
   },
   floral: {
     name: "Floral", emoji: "🌸",
-    bg: "#1a1020", card: "#281828", card2: "#321e34", border: "#4a2e52", navBg: "#140c18",
+    bg: "#120a12", card: "#1c1020", card2: "#231428", border: "#3a1f42", navBg: "#0e080f",
     primary: "#e879f9", secondary: "#f9a8d4", accent: "#c026d3",
-    red: "#fb7185", green: "#4ade80", text: "#fef0ff", muted: "#d0a8d8", dim: "#6a4870",
+    red: "#fb7185", green: "#4ade80", text: "#fdf4ff", muted: "#c4a8cc", dim: "#5a3a62",
     gradA: "#e879f9", gradB: "#f9a8d4", glow: "rgba(232,121,249,0.25)",
     partnerBg: "#0a100a", partnerBorder: "#1a3a20", partnerText: "#4ade80",
     catColors: ["#e879f9","#c026d3","#f9a8d4","#f0abfc","#a855f7","#db2777","#fda4af","#fbcfe8","#4ade80","#6b7280"],
@@ -167,6 +167,8 @@ function BottomNav({ tab, setTab }) {
     { id: "savings",    label: "Savings",  icon: "◎" },
     { id: "income",     label: "Income",   icon: "◐" },
     { id: "categories", label: "Bills",    icon: "⊞" },
+    { id: "meals",      label: "Meals",    icon: "🥗" },
+    { id: "settings",   label: "Settings", icon: "◬" },
   ];
   return (
     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
@@ -185,7 +187,7 @@ function BottomNav({ tab, setTab }) {
 }
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
-function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta, starred, setStarred, spendingBudget, setSpendingBudget, savingsMonthly }) {
+function HomeTab({ income, transactions, setTransactions, splits, setSplits, partnerName, bankConnected, connectBank, onImport, onIncomeDetected, onAddManual, onEditTransaction, catMeta, starred, setStarred, spendingBudget, setSpendingBudget, savingsMonthly, heightCm, setHeightCm, weightKg, setWeightKg }) {
   const T = useT();
   const [showAll, setShowAll] = useState(false);
   const [txnSearch, setTxnSearch] = useState("");
@@ -196,6 +198,17 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
   const [editTxnDraft, setEditTxnDraft] = useState({});
   const [editingSpendBudget, setEditingSpendBudget] = useState(false);
   const [spendBudgetDraft, setSpendBudgetDraft] = useState("");
+  const [editingHeight, setEditingHeight] = useState(false);
+  const [editingWeight, setEditingWeight] = useState(false);
+  const [heightDraft, setHeightDraft] = useState("");
+  const [weightDraft, setWeightDraft] = useState("");
+
+  // Protein: 1.6–2.2g/kg body weight for active person, use 2g as default
+  const dailyProtein = weightKg > 0 ? Math.round(weightKg * 2) : null;
+  // BMI
+  const bmi = heightCm > 0 && weightKg > 0 ? (weightKg / Math.pow(heightCm / 100, 2)).toFixed(1) : null;
+  const bmiLabel = bmi ? (bmi < 18.5 ? "Underweight" : bmi < 25 ? "Healthy" : bmi < 30 ? "Overweight" : "Obese") : null;
+  const bmiColor = bmi ? (bmi < 18.5 ? T.accent : bmi < 25 ? T.green : bmi < 30 ? T.accent : T.red) : T.muted;
 
   const myTotal = transactions.reduce((s, t) => s + myShare(t, splits), 0);
   const partnerTotal = transactions.reduce((s, t) => s + (t.amount - myShare(t, splits)), 0);
@@ -255,6 +268,57 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
           </div>
         )}
       </div>
+
+      {/* Body Stats Card */}
+      <Card style={{ marginBottom: 16 }}>
+        <Label>Body Stats</Label>
+        <div style={{ display: "flex", gap: 10 }}>
+          {/* Height */}
+          <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Height</div>
+            {editingHeight ? (
+              <input autoFocus type="number" placeholder="cm" value={heightDraft} onChange={e => setHeightDraft(e.target.value)}
+                onBlur={() => { const v = parseFloat(heightDraft); if (!isNaN(v) && v > 0) setHeightCm(v); setEditingHeight(false); }}
+                onKeyDown={e => e.key === "Enter" && e.target.blur()}
+                style={{ width: "100%", background: "transparent", border: "none", borderBottom: `1px solid ${T.primary}`, color: T.text, fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, textAlign: "center", outline: "none" }} />
+            ) : (
+              <div onClick={() => { setHeightDraft(String(heightCm || "")); setEditingHeight(true); }} style={{ cursor: "pointer" }}>
+                <div style={{ fontSize: 20, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: heightCm ? T.text : T.dim }}>{heightCm ? `${heightCm}cm` : "—"}</div>
+                <div style={{ fontSize: 10, color: T.primary, marginTop: 3 }}>tap to edit</div>
+              </div>
+            )}
+          </div>
+          {/* Weight */}
+          <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Weight</div>
+            {editingWeight ? (
+              <input autoFocus type="number" placeholder="kg" value={weightDraft} onChange={e => setWeightDraft(e.target.value)}
+                onBlur={() => { const v = parseFloat(weightDraft); if (!isNaN(v) && v > 0) setWeightKg(v); setEditingWeight(false); }}
+                onKeyDown={e => e.key === "Enter" && e.target.blur()}
+                style={{ width: "100%", background: "transparent", border: "none", borderBottom: `1px solid ${T.primary}`, color: T.text, fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, textAlign: "center", outline: "none" }} />
+            ) : (
+              <div onClick={() => { setWeightDraft(String(weightKg || "")); setEditingWeight(true); }} style={{ cursor: "pointer" }}>
+                <div style={{ fontSize: 20, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: weightKg ? T.text : T.dim }}>{weightKg ? `${weightKg}kg` : "—"}</div>
+                <div style={{ fontSize: 10, color: T.primary, marginTop: 3 }}>tap to edit</div>
+              </div>
+            )}
+          </div>
+          {/* Daily Protein */}
+          <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Protein/day</div>
+            <div style={{ fontSize: 20, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: dailyProtein ? T.green : T.dim }}>{dailyProtein ? `${dailyProtein}g` : "—"}</div>
+            <div style={{ fontSize: 10, color: T.muted, marginTop: 3 }}>2g per kg</div>
+          </div>
+          {/* BMI */}
+          {bmi && (
+            <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>BMI</div>
+              <div style={{ fontSize: 20, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: bmiColor }}>{bmi}</div>
+              <div style={{ fontSize: 10, color: bmiColor, marginTop: 3 }}>{bmiLabel}</div>
+            </div>
+          )}
+        </div>
+      </Card>
 
       {/* Spending Money Card */}
       <Card style={{ marginBottom: 16, border: `1px solid ${spendingBudget > 0 && spendingRemaining < 0 ? T.red : T.primary}44` }}>
@@ -1965,6 +2029,344 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
   );
 }
 
+// ── MEALS ────────────────────────────────────────────────────────────────────
+const MUSCLE_GROUPS = ["Chest","Back","Shoulders","Biceps","Triceps","Legs","Core","Cardio","Full Body"];
+
+function parseRecipeText(text) {
+  // Parse pasted recipe text into structured data
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const name = lines[0] || "Untitled Recipe";
+
+  // Extract macros from summary line (e.g. "~422 cal | ~34.5g protein")
+  let calories = 0, protein = 0, carbs = 0, fat = 0;
+  const macroLine = lines.find(l => l.includes('cal') || l.includes('protein'));
+  if (macroLine) {
+    const calMatch = macroLine.match(/[\d.]+\s*cal/i);
+    const protMatch = macroLine.match(/[\d.]+\s*g\s*protein/i);
+    const carbMatch = macroLine.match(/[\d.]+\s*g\s*carb/i);
+    const fatMatch = macroLine.match(/[\d.]+\s*g\s*fat/i);
+    if (calMatch) calories = parseFloat(calMatch[0]);
+    if (protMatch) protein = parseFloat(protMatch[0]);
+    if (carbMatch) carbs = parseFloat(carbMatch[0]);
+    if (fatMatch) fat = parseFloat(fatMatch[0]);
+  }
+
+  // Extract ingredients (lines containing quantities/units)
+  const unitPattern = /(\d+\.?\d*)\s*(g|kg|ml|l|tsp|tbsp|cup|cups|oz|lb|lbs|grams|gram|milliliters|millilitres|teaspoon|tablespoon)\b/i;
+  const ingredients = lines.filter(l => unitPattern.test(l) || /^\d/.test(l)).map(l => l);
+
+  // Extract servings
+  const servingLine = lines.find(l => /serving/i.test(l));
+  const servings = servingLine ? (parseInt(servingLine.match(/\d+/)?.[0]) || 1) : 1;
+
+  return { name, calories, protein, carbs, fat, ingredients, servings };
+}
+
+function MealsTab({ recipes, setRecipes, mealLog, setMealLog, weightKg, heightCm }) {
+  const T = useT();
+  const today = new Date().toISOString().slice(0, 10);
+  const [subTab, setSubTab] = useState("log"); // log | recipes
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [addingRecipe, setAddingRecipe] = useState(false);
+  const [pasteText, setPasteText] = useState("");
+  const [parsedPreview, setParsedPreview] = useState(null);
+  const [editingMacros, setEditingMacros] = useState(false);
+  const [macroDraft, setMacroDraft] = useState({});
+  const [addingMeal, setAddingMeal] = useState(false);
+  const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+  const [mealServings, setMealServings] = useState(1);
+  const [viewingRecipe, setViewingRecipe] = useState(null);
+
+  const dailyProteinTarget = weightKg > 0 ? Math.round(weightKg * 2) : null;
+
+  // Navigate dates
+  const shiftDate = (days) => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + days);
+    setSelectedDate(d.toISOString().slice(0, 10));
+  };
+  const fmt2 = (d) => {
+    const date = new Date(d + 'T00:00:00');
+    const diff = Math.round((new Date(today) - date) / 86400000);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    if (diff === -1) return "Tomorrow";
+    return date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  };
+
+  // Get meals for selected date
+  const dayMeals = (mealLog[selectedDate] || []).map(entry => {
+    const recipe = recipes.find(r => r.id === entry.recipeId);
+    if (!recipe) return null;
+    const mult = entry.servings / recipe.servings;
+    return { ...entry, recipe, calories: Math.round(recipe.calories * mult), protein: Math.round(recipe.protein * mult), carbs: Math.round(recipe.carbs * mult), fat: Math.round(recipe.fat * mult) };
+  }).filter(Boolean);
+
+  const dayTotals = dayMeals.reduce((s, m) => ({ calories: s.calories + m.calories, protein: s.protein + m.protein, carbs: s.carbs + m.carbs, fat: s.fat + m.fat }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+  const handleParse = () => {
+    if (!pasteText.trim()) return;
+    const parsed = parseRecipeText(pasteText);
+    setParsedPreview(parsed);
+    setMacroDraft({ calories: parsed.calories, protein: parsed.protein, carbs: parsed.carbs, fat: parsed.fat, name: parsed.name, servings: parsed.servings });
+  };
+
+  const handleSaveRecipe = () => {
+    if (!parsedPreview) return;
+    const recipe = {
+      id: Date.now(),
+      name: macroDraft.name || parsedPreview.name,
+      calories: Number(macroDraft.calories) || 0,
+      protein: Number(macroDraft.protein) || 0,
+      carbs: Number(macroDraft.carbs) || 0,
+      fat: Number(macroDraft.fat) || 0,
+      servings: Number(macroDraft.servings) || 1,
+      ingredients: parsedPreview.ingredients,
+    };
+    setRecipes([...recipes, recipe]);
+    setPasteText(""); setParsedPreview(null); setAddingRecipe(false);
+  };
+
+  const handleLogMeal = () => {
+    if (!selectedRecipeId) return;
+    const updated = { ...mealLog, [selectedDate]: [...(mealLog[selectedDate] || []), { recipeId: selectedRecipeId, servings: mealServings, loggedAt: Date.now() }] };
+    setMealLog(updated);
+    setAddingMeal(false); setSelectedRecipeId(null); setMealServings(1);
+  };
+
+  const removeMeal = (idx) => {
+    const updated = { ...mealLog, [selectedDate]: (mealLog[selectedDate] || []).filter((_, i) => i !== idx) };
+    setMealLog(updated);
+  };
+
+  const MacroBar = ({ label, value, target, color }) => (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
+        <span style={{ color: T.muted }}>{label}</span>
+        <span style={{ color: T.text, fontWeight: 600 }}>{value}g {target ? <span style={{ color: T.dim }}>/ {target}g</span> : ""}</span>
+      </div>
+      <div style={{ height: 5, background: T.card2, borderRadius: 3 }}>
+        <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(100, target ? (value/target)*100 : 50)}%`, background: color, transition: "width .4s" }} />
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ padding: "0 16px 110px" }}>
+      <div style={{ paddingTop: 88, paddingBottom: 16 }}>
+        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text, marginBottom: 14 }}>Meals</div>
+        <div style={{ display: "flex", background: T.card2, borderRadius: 12, padding: 4, gap: 4 }}>
+          {[["log","📅 Daily Log"],["recipes","📖 Recipes"]].map(([val, label]) => (
+            <button key={val} onClick={() => setSubTab(val)}
+              style={{ flex: 1, padding: "9px 8px", borderRadius: 9, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: subTab === val ? 700 : 400, background: subTab === val ? `linear-gradient(135deg,${T.gradA}55,${T.gradB}33)` : "transparent", color: subTab === val ? T.primary : T.muted, transition: "all .2s" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {subTab === "log" && (
+        <>
+          {/* Date nav */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <button onClick={() => shiftDate(-1)} style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.primary, padding: "8px 14px", cursor: "pointer", fontSize: 18 }}>‹</button>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{fmt2(selectedDate)}</div>
+              <div style={{ fontSize: 11, color: T.muted }}>{selectedDate}</div>
+            </div>
+            <button onClick={() => shiftDate(1)} style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: selectedDate >= today ? T.dim : T.primary, padding: "8px 14px", cursor: "pointer", fontSize: 18 }} disabled={selectedDate >= today}>›</button>
+          </div>
+
+          {/* Daily totals */}
+          <Card style={{ marginBottom: 16 }}>
+            <Label>Today's Totals</Label>
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              {[
+                { label: "Calories", value: dayTotals.calories, unit: "kcal", color: T.primary },
+                { label: "Protein", value: dayTotals.protein, unit: "g", color: T.green },
+              ].map(s => (
+                <div key={s.label} style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+                  <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{s.label}</div>
+                  <div style={{ fontSize: 26, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.color }}>{s.value}</div>
+                  <div style={{ fontSize: 10, color: T.dim }}>{s.unit}</div>
+                </div>
+              ))}
+              <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Carbs</div>
+                <div style={{ fontSize: 26, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.accent }}>{dayTotals.carbs}g</div>
+              </div>
+              <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Fat</div>
+                <div style={{ fontSize: 26, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.muted }}>{dayTotals.fat}g</div>
+              </div>
+            </div>
+            {dailyProteinTarget && (
+              <MacroBar label="Protein target" value={dayTotals.protein} target={dailyProteinTarget} color={dayTotals.protein >= dailyProteinTarget ? T.green : T.accent} />
+            )}
+          </Card>
+
+          {/* Meals logged */}
+          {dayMeals.length > 0 && (
+            <Card style={{ marginBottom: 16 }}>
+              <Label>Logged Meals</Label>
+              {dayMeals.map((m, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < dayMeals.length - 1 ? `1px solid ${T.border}` : "none" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, color: T.text, fontWeight: 500 }}>{m.recipe.name}</div>
+                    <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{m.servings} serving{m.servings !== 1 ? "s" : ""} · {m.protein}g protein · {m.calories} kcal</div>
+                  </div>
+                  <button onClick={() => removeMeal(i)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+                </div>
+              ))}
+            </Card>
+          )}
+
+          {/* Add meal */}
+          {!addingMeal ? (
+            <button onClick={() => setAddingMeal(true)} style={{ width: "100%", padding: "14px", background: "transparent", border: `1px dashed ${T.primary}`, borderRadius: 16, color: T.primary, fontFamily: "inherit", fontSize: 14, cursor: "pointer", marginBottom: 16 }}>+ Log a Meal</button>
+          ) : (
+            <Card style={{ marginBottom: 16 }}>
+              <Label>Log a Meal</Label>
+              {recipes.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "16px 0", color: T.dim, fontSize: 13 }}>No recipes yet — add some in the Recipes tab first</div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                    {recipes.map(r => (
+                      <div key={r.id} onClick={() => setSelectedRecipeId(r.id)}
+                        style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", background: selectedRecipeId === r.id ? `${T.primary}18` : T.card2, border: `1px solid ${selectedRecipeId === r.id ? T.primary : T.border}`, borderRadius: 12, cursor: "pointer" }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 14, color: T.text, fontWeight: selectedRecipeId === r.id ? 600 : 400 }}>{r.name}</div>
+                          <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{r.protein}g protein · {r.calories} kcal per {r.servings} serving</div>
+                        </div>
+                        {selectedRecipeId === r.id && <span style={{ color: T.primary, fontSize: 16 }}>✓</span>}
+                      </div>
+                    ))}
+                  </div>
+                  {selectedRecipeId && (
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ fontSize: 12, color: T.muted, marginBottom: 6 }}>Servings</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <button onClick={() => setMealServings(Math.max(0.5, mealServings - 0.5))} style={{ width: 36, height: 36, borderRadius: 10, background: T.card2, border: `1px solid ${T.border}`, color: T.text, fontSize: 18, cursor: "pointer" }}>−</button>
+                        <div style={{ fontSize: 20, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.text, minWidth: 40, textAlign: "center" }}>{mealServings}</div>
+                        <button onClick={() => setMealServings(mealServings + 0.5)} style={{ width: 36, height: 36, borderRadius: 10, background: T.card2, border: `1px solid ${T.border}`, color: T.text, fontSize: 18, cursor: "pointer" }}>+</button>
+                        {selectedRecipeId && (() => {
+                          const r = recipes.find(x => x.id === selectedRecipeId);
+                          if (!r) return null;
+                          const mult = mealServings / r.servings;
+                          return <div style={{ fontSize: 12, color: T.muted }}>= {Math.round(r.protein * mult)}g protein · {Math.round(r.calories * mult)} kcal</div>;
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <PrimaryBtn style={{ flex: 2 }} onClick={handleLogMeal}>Log Meal</PrimaryBtn>
+                    <GhostBtn style={{ flex: 1 }} onClick={() => { setAddingMeal(false); setSelectedRecipeId(null); setMealServings(1); }}>Cancel</GhostBtn>
+                  </div>
+                </>
+              )}
+            </Card>
+          )}
+        </>
+      )}
+
+      {subTab === "recipes" && (
+        <>
+          {/* Recipe list */}
+          {recipes.map(r => (
+            <Card key={r.id} style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: T.text, marginBottom: 4 }}>{r.name}</div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {[
+                      { label: `${r.calories} kcal`, color: T.primary },
+                      { label: `${r.protein}g protein`, color: T.green },
+                      { label: `${r.carbs}g carbs`, color: T.accent },
+                      { label: `${r.fat}g fat`, color: T.muted },
+                    ].map(s => (
+                      <span key={s.label} style={{ fontSize: 11, color: s.color, background: T.card2, borderRadius: 20, padding: "3px 8px" }}>{s.label}</span>
+                    ))}
+                  </div>
+                  {r.ingredients?.length > 0 && (
+                    <div style={{ marginTop: 10 }}>
+                      <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Ingredients ({r.servings} serving)</div>
+                      {r.ingredients.map((ing, i) => (
+                        <div key={i} style={{ fontSize: 12, color: T.muted, paddingLeft: 8, marginBottom: 3 }}>· {ing}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => setRecipes(recipes.filter(x => x.id !== r.id))}
+                  style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11, flexShrink: 0 }}>✕</button>
+              </div>
+            </Card>
+          ))}
+
+          {recipes.length === 0 && !addingRecipe && (
+            <div style={{ textAlign: "center", padding: "40px 0", color: T.dim }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>🥗</div>
+              <div style={{ fontSize: 14 }}>No recipes yet</div>
+              <div style={{ fontSize: 12, marginTop: 6 }}>Paste any recipe text and we'll parse the macros</div>
+            </div>
+          )}
+
+          {/* Add recipe */}
+          {!addingRecipe ? (
+            <button onClick={() => setAddingRecipe(true)} style={{ width: "100%", padding: "14px", background: "transparent", border: `1px dashed ${T.primary}`, borderRadius: 16, color: T.primary, fontFamily: "inherit", fontSize: 14, cursor: "pointer", marginTop: 8 }}>+ Add Recipe</button>
+          ) : (
+            <Card style={{ marginTop: 8 }}>
+              <Label>Add Recipe</Label>
+              <div style={{ fontSize: 12, color: T.muted, marginBottom: 10, lineHeight: 1.6 }}>Paste your recipe text below (name, macros, ingredients). We'll extract what we can — you can edit anything after.</div>
+              <textarea value={pasteText} onChange={e => setPasteText(e.target.value)} placeholder={"Vanilla Choc Chip Overnight Oats\n~422 cal | ~34.5g protein\n\n45 grams old fashioned rolled oats\n180 milliliters unsweetened vanilla almond milk\n30 grams vanilla protein powder (1 scoop)\n30 grams Greek yogurt (2 tbsp)..."}
+                style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 14px", color: T.text, fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box", minHeight: 140, resize: "vertical", lineHeight: 1.6, marginBottom: 10 }} />
+              <PrimaryBtn onClick={handleParse} style={{ width: "100%", marginBottom: parsedPreview ? 14 : 0 }}>Parse Recipe</PrimaryBtn>
+
+              {parsedPreview && (
+                <div>
+                  <div style={{ fontSize: 11, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 10, marginTop: 4 }}>Parsed — edit if needed</div>
+                  <input value={macroDraft.name} onChange={e => setMacroDraft(p => ({ ...p, name: e.target.value }))} placeholder="Recipe name"
+                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10, fontWeight: 600 }} />
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+                    {[
+                      { key: "calories", label: "Calories (kcal)" },
+                      { key: "protein",  label: "Protein (g)" },
+                      { key: "carbs",    label: "Carbs (g)" },
+                      { key: "fat",      label: "Fat (g)" },
+                      { key: "servings", label: "Servings" },
+                    ].map(f => (
+                      <div key={f.key}>
+                        <div style={{ fontSize: 10, color: T.muted, marginBottom: 4 }}>{f.label}</div>
+                        <input type="number" value={macroDraft[f.key]} onChange={e => setMacroDraft(p => ({ ...p, [f.key]: e.target.value }))}
+                          style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                      </div>
+                    ))}
+                  </div>
+                  {parsedPreview.ingredients.length > 0 && (
+                    <div style={{ background: T.card2, borderRadius: 10, padding: "10px 12px", marginBottom: 12 }}>
+                      <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Ingredients detected</div>
+                      {parsedPreview.ingredients.map((ing, i) => (
+                        <div key={i} style={{ fontSize: 12, color: T.muted, marginBottom: 3 }}>· {ing}</div>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <PrimaryBtn style={{ flex: 2 }} onClick={handleSaveRecipe}>Save Recipe</PrimaryBtn>
+                    <GhostBtn style={{ flex: 1 }} onClick={() => { setAddingRecipe(false); setPasteText(""); setParsedPreview(null); }}>Cancel</GhostBtn>
+                  </div>
+                </div>
+              )}
+              {!parsedPreview && (
+                <GhostBtn style={{ width: "100%", marginTop: 8 }} onClick={() => { setAddingRecipe(false); setPasteText(""); }}>Cancel</GhostBtn>
+              )}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── SETTINGS ─────────────────────────────────────────────────────────────────
 function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, onReset, user, catMeta, setCatMeta }) {
   const T = useT();
@@ -2197,207 +2599,7 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
     </div>
   );
 }
-// ── SETTINGS DRAWER ──────────────────────────────────────────────────────────
-function SettingsDrawer({ open, onClose, themeKey, setThemeKey, partnerName, setPartnerName, lightMode, setLightMode, onSignOut, onReset, user, catMeta, setCatMeta }) {
-  const T = useT();
-  const [editingName, setEditingName] = useState(false);
-  const [nameDraft, setNameDraft] = useState(partnerName);
-  const [confirmReset, setConfirmReset] = useState(false);
-  const [catForm, setCatForm] = useState({ name: "", icon: "📦" });
-  const [addingCat, setAddingCat] = useState(false);
-  const [editingCat, setEditingCat] = useState(null);
-  const [editCatDraft, setEditCatDraft] = useState({ name: "", icon: "" });
-  const EMOJI_SUGGESTIONS = ["🏠","🚗","🛒","⚡","📱","🍽️","💊","🎮","💰","📦","✈️","🐾","👶","🎓","💇","🏋️","🍺","🎁","🔧","💻","🎵","🌿","🐕","📚","🏖️","🚿","💈","🛠️","🎯","🏥"];
-
-  const addCat = () => {
-    const name = catForm.name.trim();
-    if (!name || catMeta[name]) return;
-    const maxIdx = Math.max(...Object.values(catMeta).map(m => m.idx), 9);
-    setCatMeta({ ...catMeta, [name]: { icon: catForm.icon, idx: maxIdx + 1 } });
-    setCatForm({ name: "", icon: "📦" });
-    setAddingCat(false);
-  };
-  const deleteCat = (key) => { const u = { ...catMeta }; delete u[key]; setCatMeta(u); };
-  const saveEditCat = () => {
-    if (!editingCat) return;
-    const newName = editCatDraft.name.trim();
-    if (!newName) return;
-    const updated = { ...catMeta };
-    const meta = updated[editingCat];
-    if (newName !== editingCat) { delete updated[editingCat]; updated[newName] = { ...meta, icon: editCatDraft.icon }; }
-    else { updated[editingCat] = { ...meta, icon: editCatDraft.icon }; }
-    setCatMeta(updated);
-    setEditingCat(null);
-  };
-  const isDefault = (key) => Object.keys(DEFAULT_CAT_META).includes(key);
-
-  if (!open) return null;
-  return (
-    <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 200 }} />
-      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "88%", maxWidth: 380, background: T.card, zIndex: 201, overflowY: "auto", padding: "24px 20px 60px", borderLeft: `1px solid ${T.border}` }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-          <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Settings</div>
-          <button onClick={onClose} style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, cursor: "pointer", fontSize: 14, padding: "6px 12px" }}>✕</button>
-        </div>
-
-        {/* Appearance */}
-        <Card style={{ marginBottom: 16 }}>
-          <Label>Appearance</Label>
-          <div style={{ display: "flex", gap: 10 }}>
-            {[{ val: false, label: "Dark", icon: "🌑" }, { val: true, label: "Light", icon: "☀️" }].map(opt => {
-              const active = lightMode === opt.val;
-              return (
-                <button key={String(opt.val)} onClick={() => setLightMode(opt.val)} style={{ flex: 1, padding: "14px 10px", borderRadius: 14, cursor: "pointer", border: `2px solid ${active ? T.primary : T.border}`, background: active ? `${T.primary}18` : T.card2, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 24 }}>{opt.icon}</span>
-                  <span style={{ fontSize: 13, fontWeight: active ? 700 : 400, color: active ? T.primary : T.muted }}>{opt.label}</span>
-                  {active && <div style={{ width: 18, height: 18, borderRadius: "50%", background: T.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#000", fontWeight: 700 }}>✓</div>}
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Theme */}
-        <Card style={{ marginBottom: 16 }}>
-          <Label>Theme</Label>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {Object.entries(THEMES).map(([key, theme]) => {
-              const active = themeKey === key;
-              const previewT = applyMode(theme, lightMode);
-              return (
-                <button key={key} onClick={() => setThemeKey(key)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", width: "100%", background: active ? `${theme.primary}18` : T.card2, border: `2px solid ${active ? theme.primary : T.border}`, borderRadius: 14, cursor: "pointer", textAlign: "left" }}>
-                  <div style={{ display: "flex", gap: 3, flexShrink: 0 }}>
-                    {[previewT.bg, theme.primary, theme.secondary, previewT.card].map((col, i) => (
-                      <div key={i} style={{ width: 12, height: 34, borderRadius: 4, background: col, border: `1px solid ${previewT.border}` }} />
-                    ))}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 16, color: active ? theme.primary : T.text, fontWeight: active ? 700 : 400 }}>{theme.emoji} {theme.name}</div>
-                    <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
-                      {key === "fire" && "Warm oranges & yellows"}{key === "water" && "Cool blues & purples"}
-                      {key === "nature" && "Fresh greens & lime"}{key === "floral" && "Soft pinks & lilac"}
-                      {key === "earth" && "Rich browns & terracotta"}
-                    </div>
-                  </div>
-                  {active && <div style={{ width: 22, height: 22, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#000", fontWeight: 700, flexShrink: 0 }}>✓</div>}
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Partner Name */}
-        <Card style={{ marginBottom: 16 }}>
-          <Label>Partner Name</Label>
-          <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 20 }}>💑</span>
-            {editingName ? (
-              <div style={{ flex: 1, display: "flex", gap: 8 }}>
-                <input autoFocus value={nameDraft} onChange={e => setNameDraft(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") { setPartnerName(nameDraft); setEditingName(false); }}}
-                  style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "7px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
-                <PrimaryBtn onClick={() => { setPartnerName(nameDraft); setEditingName(false); }} style={{ padding: "7px 14px", fontSize: 13 }}>Save</PrimaryBtn>
-              </div>
-            ) : (
-              <>
-                <span style={{ flex: 1, fontSize: 15, color: T.text }}>{partnerName || "Your partner"}</span>
-                <GhostBtn onClick={() => { setNameDraft(partnerName); setEditingName(true); }} style={{ fontSize: 12, padding: "5px 12px" }}>Edit</GhostBtn>
-              </>
-            )}
-          </div>
-        </Card>
-
-        {/* Account */}
-        <Card style={{ marginBottom: 16 }}>
-          <Label>Account</Label>
-          <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, marginBottom: 10 }}>
-            <div style={{ fontSize: 11, color: T.muted, marginBottom: 4 }}>Signed in as</div>
-            <div style={{ fontSize: 14, color: T.text }}>{user?.email}</div>
-          </div>
-          <button onClick={onSignOut} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>Sign Out</button>
-        </Card>
-
-        {/* Categories */}
-        <Card style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <Label>Categories</Label>
-            {!addingCat && <GhostBtn onClick={() => setAddingCat(true)} style={{ fontSize: 12, padding: "4px 12px", marginTop: -8 }}>+ Add</GhostBtn>}
-          </div>
-          {addingCat && (
-            <div style={{ background: T.card2, borderRadius: 12, padding: 14, marginBottom: 12 }}>
-              <input placeholder="Category name" value={catForm.name} onChange={e => setCatForm(p => ({ ...p, name: e.target.value }))}
-                style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "9px 12px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-                {EMOJI_SUGGESTIONS.map(e => (
-                  <button key={e} onClick={() => setCatForm(p => ({ ...p, icon: e }))}
-                    style={{ fontSize: 18, padding: "4px 6px", borderRadius: 8, cursor: "pointer", border: `2px solid ${catForm.icon === e ? T.primary : T.border}`, background: catForm.icon === e ? `${T.primary}22` : T.card }}>
-                    {e}
-                  </button>
-                ))}
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <PrimaryBtn style={{ flex: 2 }} onClick={addCat}>Add Category</PrimaryBtn>
-                <GhostBtn style={{ flex: 1 }} onClick={() => { setAddingCat(false); setCatForm({ name: "", icon: "📦" }); }}>Cancel</GhostBtn>
-              </div>
-            </div>
-          )}
-          {Object.entries(catMeta).map(([key, meta]) => (
-            <div key={key} style={{ marginBottom: 8 }}>
-              {editingCat === key ? (
-                <div style={{ background: T.card2, borderRadius: 12, padding: 12 }}>
-                  <input value={editCatDraft.name} onChange={e => setEditCatDraft(p => ({ ...p, name: e.target.value }))}
-                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-                    {EMOJI_SUGGESTIONS.map(e => (
-                      <button key={e} onClick={() => setEditCatDraft(p => ({ ...p, icon: e }))}
-                        style={{ fontSize: 18, padding: "4px 6px", borderRadius: 8, cursor: "pointer", border: `2px solid ${editCatDraft.icon === e ? T.primary : T.border}`, background: editCatDraft.icon === e ? `${T.primary}22` : T.card }}>
-                        {e}
-                      </button>
-                    ))}
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={saveEditCat}>Save</PrimaryBtn>
-                    <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingCat(null)}>Cancel</GhostBtn>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: T.card2, borderRadius: 12 }}>
-                  <span style={{ fontSize: 20 }}>{meta.icon}</span>
-                  <span style={{ flex: 1, fontSize: 14, color: T.text }}>{key}</span>
-                  {isDefault(key) && <span style={{ fontSize: 10, color: T.dim, background: T.card, borderRadius: 10, padding: "2px 7px" }}>default</span>}
-                  <button onClick={() => { setEditingCat(key); setEditCatDraft({ name: key, icon: meta.icon }); }}
-                    style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✏️</button>
-                  <button onClick={() => deleteCat(key)}
-                    style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.red, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
-                </div>
-              )}
-            </div>
-          ))}
-        </Card>
-
-        {/* Danger Zone */}
-        <Card>
-          <Label>Danger Zone</Label>
-          <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, lineHeight: 1.6 }}>Reset clears all transactions, splits, category names, budgets and income. Your account stays. This cannot be undone.</div>
-          {!confirmReset ? (
-            <button onClick={() => setConfirmReset(true)} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>🗑 Reset App Data</button>
-          ) : (
-            <div>
-              <div style={{ fontSize: 13, color: T.red, marginBottom: 12, padding: "10px 14px", background: `${T.red}18`, borderRadius: 10, textAlign: "center" }}>Are you sure? This will wipe everything.</div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => { onReset(); setConfirmReset(false); onClose(); }} style={{ flex: 2, padding: "12px", background: T.red, border: "none", borderRadius: 10, color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Yes, reset everything</button>
-                <button onClick={() => setConfirmReset(false)} style={{ flex: 1, padding: "12px", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.muted, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>Cancel</button>
-              </div>
-            </div>
-          )}
-        </Card>
-      </div>
-    </>
-  );
-}
-
-function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths, onSettingsOpen }) {
+function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths }) {
   const T = useT();
   const now = new Date();
 
@@ -2432,10 +2634,7 @@ function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths, onSetti
         </div>
         {isCurrentMonth && <div style={{ fontSize: 10, color: T.primary, letterSpacing: 1, textTransform: "uppercase" }}>Current Month</div>}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <button onClick={nextMonth} style={{ background: "none", border: "none", color: canGoNext ? T.primary : T.dim, fontSize: 20, cursor: canGoNext ? "pointer" : "default", padding: "4px 8px" }}>›</button>
-        <button onClick={onSettingsOpen} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", color: T.muted, fontSize: 18, lineHeight: 1 }}>⚙</button>
-      </div>
+      <button onClick={nextMonth} style={{ background: "none", border: "none", color: canGoNext ? T.primary : T.dim, fontSize: 20, cursor: canGoNext ? "pointer" : "default", padding: "4px 8px" }}>›</button>
     </div>
   );
 }
@@ -2447,7 +2646,6 @@ export default function EmberApp({ user, onSignOut }) {
   const [tab, setTab] = useState("home");
   const [themeKey, setThemeKey] = useState("fire");
   const [lightMode, setLightMode] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [income, setIncome] = useState(2800);
   const [sideHustles, setSideHustles] = useState([]);
   const [transactions, setTransactions] = useState(INIT_TXN);
@@ -2459,6 +2657,10 @@ export default function EmberApp({ user, onSignOut }) {
   const [starred, setStarred] = useState({}); // txnId -> true
   const [spendingBudget, setSpendingBudget] = useState(0);
   const [savingsGoals, setSavingsGoals] = useState([]);
+  const [heightCm, setHeightCm] = useState(0);
+  const [weightKg, setWeightKg] = useState(0);
+  const [recipes, setRecipes] = useState([]);
+  const [mealLog, setMealLog] = useState({}); // { "2026-04-28": [{recipeId, servings}] }
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
 
@@ -2529,6 +2731,10 @@ export default function EmberApp({ user, onSignOut }) {
         if (s.starred) setStarred(s.starred);
         if (s.spending_budget) setSpendingBudget(s.spending_budget);
         if (s.savings_goals) setSavingsGoals(s.savings_goals);
+        if (s.height_cm) setHeightCm(s.height_cm);
+        if (s.weight_kg) setWeightKg(s.weight_kg);
+        if (s.recipes) setRecipes(s.recipes);
+        if (s.meal_log) setMealLog(s.meal_log);
       }
 
       // Load transactions
@@ -2594,8 +2800,8 @@ export default function EmberApp({ user, onSignOut }) {
   const splitsRef = useRef({});
   useEffect(() => { splitsRef.current = splits; }, [splits]);
   useEffect(() => {
-    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta, starred, spending_budget: spendingBudget, savings_goals: savingsGoals };
-  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, starred, spendingBudget, savingsGoals]);
+    settingsRef.current = { income, partner_name: partnerName, theme: themeKey, light_mode: lightMode, cat_names: catNames, budgets, side_hustles: sideHustles, one_off: oneOff, cat_meta: catMeta, starred, spending_budget: spendingBudget, savings_goals: savingsGoals, height_cm: heightCm, weight_kg: weightKg, recipes, meal_log: mealLog };
+  }, [income, partnerName, themeKey, lightMode, catNames, budgets, sideHustles, oneOff, catMeta, starred, spendingBudget, savingsGoals, heightCm, weightKg, recipes, mealLog]);
 
   const saveSettings = (patch) => {
     if (!user) return;
@@ -2616,6 +2822,10 @@ export default function EmberApp({ user, onSignOut }) {
   const handleSetStarred = (v) => { setStarred(v); saveSettings({ starred: v }); };
   const handleSetSpendingBudget = (v) => { setSpendingBudget(v); saveSettings({ spending_budget: v }); };
   const handleSetSavingsGoals = (v) => { setSavingsGoals(v); saveSettings({ savings_goals: v }); };
+  const handleSetHeightCm = (v) => { setHeightCm(v); saveSettings({ height_cm: v }); };
+  const handleSetWeightKg = (v) => { setWeightKg(v); saveSettings({ weight_kg: v }); };
+  const handleSetRecipes = (v) => { setRecipes(v); saveSettings({ recipes: v }); };
+  const handleSetMealLog = (v) => { setMealLog(v); saveSettings({ meal_log: v }); };
 
   const onIncomeDetected = (amount) => handleSetIncome(amount);
 
@@ -2727,30 +2937,16 @@ export default function EmberApp({ user, onSignOut }) {
 
         {/* Month Picker — shown on all main tabs */}
         {["home","insights","categories"].includes(tab) && (
-          <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} onSettingsOpen={() => setSettingsOpen(true)} />
+          <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
         )}
 
-        {/* Gear icon for tabs without MonthPicker */}
-        {["savings","income"].includes(tab) && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", zIndex: 99, background: T.navBg, borderBottom: `1px solid ${T.border}`, padding: "10px 16px", display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={() => setSettingsOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", color: T.muted, fontSize: 18, lineHeight: 1 }}>⚙</button>
-          </div>
-        )}
-
-        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
+        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} heightCm={heightCm} setHeightCm={handleSetHeightCm} weightKg={weightKg} setWeightKg={handleSetWeightKg} />}
         {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
         {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
         {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
-
-        <SettingsDrawer
-          open={settingsOpen} onClose={() => setSettingsOpen(false)}
-          themeKey={themeKey} setThemeKey={handleSetThemeKey}
-          partnerName={partnerName} setPartnerName={handleSetPartnerName}
-          lightMode={lightMode} setLightMode={handleSetLightMode}
-          onSignOut={onSignOut} onReset={onReset}
-          user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta}
-        />
+        {tab === "meals"      && <MealsTab recipes={recipes} setRecipes={handleSetRecipes} mealLog={mealLog} setMealLog={handleSetMealLog} weightKg={weightKg} heightCm={heightCm} />}
+        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
 
         <BottomNav tab={tab} setTab={setTab} />
       </div>
