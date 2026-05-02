@@ -220,7 +220,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 20, textAlign: "center" }}>
+      <div style={{ paddingTop: 24, paddingBottom: 20, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
         <div style={{ cursor: "default" }}>
           <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(income)}</span>
@@ -881,7 +881,7 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 24, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Insights</div>
       </div>
 
@@ -1006,7 +1006,7 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 4 }}>
+      <div style={{ paddingTop: 24, paddingBottom: 4 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Bills</div>
         <div style={{ fontSize: 13, color: T.muted, marginTop: 4, marginBottom: 16 }}>Tap to manage, rename & set your share</div>
       </div>
@@ -1281,7 +1281,7 @@ function SavingsTab({ income, transactions, splits, goals, setGoals }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 24, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Savings</div>
       </div>
 
@@ -1855,7 +1855,7 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 16 }}>
+      <div style={{ paddingTop: 24, paddingBottom: 16 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text, marginBottom: 14 }}>Income</div>
         {/* Sub-tab pills */}
         <div style={{ display: "flex", background: T.card2, borderRadius: 12, padding: 4, gap: 4 }}>
@@ -2016,7 +2016,7 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
 
   return (
     <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 88, paddingBottom: 20 }}>
+      <div style={{ paddingTop: 24, paddingBottom: 20 }}>
         <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Settings</div>
       </div>
 
@@ -2198,49 +2198,7 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
     </div>
   );
 }
-function MonthPicker({ selectedMonth, setSelectedMonth, availableMonths }) {
-  const T = useT();
-  const now = new Date();
-
-  const prevMonth = () => {
-    const m = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
-    const y = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
-    setSelectedMonth({ year: y, month: m });
-  };
-
-  const nextMonth = () => {
-    const m = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
-    const y = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
-    // Don't go beyond current month
-    if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
-    setSelectedMonth({ year: y, month: m });
-  };
-
-  const isCurrentMonth = selectedMonth.year === now.getFullYear() && selectedMonth.month === now.getMonth();
-  const canGoNext = !isCurrentMonth;
-
-  return (
-    <div style={{
-      position: "fixed", top: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto",
-      background: T.navBg, borderBottom: `1px solid ${T.border}`,
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "10px 16px", zIndex: 99,
-    }}>
-      <button onClick={prevMonth} style={{ background: "none", border: "none", color: T.primary, fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>‹</button>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 16, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>
-          {MONTH_NAMES[selectedMonth.month]} {selectedMonth.year}
-        </div>
-        {isCurrentMonth && <div style={{ fontSize: 10, color: T.primary, letterSpacing: 1, textTransform: "uppercase" }}>Current Month</div>}
-      </div>
-      <button onClick={nextMonth} style={{ background: "none", border: "none", color: canGoNext ? T.primary : T.dim, fontSize: 20, cursor: canGoNext ? "pointer" : "default", padding: "4px 8px" }}>›</button>
-    </div>
-  );
-}
-
 // ── APP ──────────────────────────────────────────────────────────────────────
-const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
 export default function EmberApp({ user, onSignOut }) {
   const [tab, setTab] = useState("home");
   const [themeKey, setThemeKey] = useState("fire");
@@ -2258,27 +2216,6 @@ export default function EmberApp({ user, onSignOut }) {
   const [savingsGoals, setSavingsGoals] = useState([]);
   const [partnerName, setPartnerName] = useState("Partner");
   const [bankConnected, setBankConnected] = useState(false);
-
-  // Default to current month
-  const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
-
-  // Filter transactions to selected month
-  const monthTxns = transactions.filter(t => {
-    if (!t.date) return false;
-    const d = new Date(t.date);
-    return d.getFullYear() === selectedMonth.year && d.getMonth() === selectedMonth.month;
-  });
-
-  // Get list of months that have transactions
-  const availableMonths = [...new Set(transactions.map(t => {
-    if (!t.date) return null;
-    const d = new Date(t.date);
-    return `${d.getFullYear()}-${d.getMonth()}`;
-  }).filter(Boolean))].map(key => {
-    const [y, m] = key.split('-');
-    return { year: parseInt(y), month: parseInt(m), key };
-  }).sort((a, b) => b.year - a.year || b.month - a.month);
 
   // Load data from Supabase on mount
   useEffect(() => {
@@ -2466,13 +2403,6 @@ export default function EmberApp({ user, onSignOut }) {
     setTransactions(withIds);
     setBankConnected(true);
 
-    // Switch to most recent month in import
-    if (newTxns.length > 0) {
-      const sorted = [...newTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
-      const latestDate = new Date(sorted[0].date);
-      setSelectedMonth({ year: latestDate.getFullYear(), month: latestDate.getMonth() });
-    }
-
     // Try to persist to Supabase in background
     if (!user) return;
     try {
@@ -2523,15 +2453,11 @@ export default function EmberApp({ user, onSignOut }) {
         <style>{`*{box-sizing:border-box}input::placeholder{color:#4b5563}select{appearance:none}::-webkit-scrollbar{width:0}`}</style>
 
         {/* Month Picker — shown on all main tabs */}
-        {["home","insights","categories"].includes(tab) && (
-          <MonthPicker selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} availableMonths={availableMonths} />
-        )}
-
-        {tab === "home"       && <HomeTab income={totalIncome} transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} selectedMonth={selectedMonth} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
-        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={monthTxns} splits={splits} selectedMonth={selectedMonth} catMeta={catMeta} />}
-        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={monthTxns} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
+        {tab === "home"       && <HomeTab income={totalIncome} transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
+        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={transactions} splits={splits} catMeta={catMeta} />}
+        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={transactions} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
         {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
-        {tab === "categories" && <CategoriesTab transactions={monthTxns} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} selectedMonth={selectedMonth} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
+        {tab === "categories" && <CategoriesTab transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
         {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
 
         <BottomNav tab={tab} setTab={setTab} />
