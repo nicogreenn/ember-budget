@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ember — Finally know where your money goes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --fire: #f97316;
+      --fire-dim: #fb923c;
+      --gold: #facc15;
+      --bg: #0a0a0a;
+      --card: #141414;
+      --card2: #1c1c1c;
+      --border: #252525;
+      --text: #f5f5f5;
+      --muted: #9ca3af;
+      --dim: #4b5563;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(249,115,22,0.08);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-flame {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(249,115,22,0.4);
+    }
+
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, #f97316, #facc15aa);
+      border: 1px solid var(--fire);
+      border-radius: 10px;
+      color: #000 !important;
+      font-weight: 700 !important;
+      padding: 10px 22px;
+      transition: opacity 0.2s, box-shadow 0.2s !important;
+      box-shadow: 0 0 20px rgba(249,115,22,0.25);
+    }
+
+    .nav-cta:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 30px rgba(249,115,22,0.4) !important;
+      color: #000 !important;
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(249,115,22,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-glow-2 {
+      position: absolute;
+      top: 40%;
+      left: 20%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(250,204,21,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--fire);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge span { width: 6px; height: 6px; background: var(--fire); border-radius: 50%; animation: pulse 2s ease infinite; }
+
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(42px, 7vw, 88px);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero-title-fire {
+      background: linear-gradient(135deg, #f97316 0%, #facc15 50%, #fb923c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .hero-tagline {
+      font-size: clamp(16px, 2.5vw, 22px);
+      color: var(--muted);
+      font-weight: 300;
+      letter-spacing: 0.01em;
+      margin-bottom: 48px;
+      max-width: 480px;
+      line-height: 1.6;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #facc1588);
+      border: 1px solid var(--fire);
+      border-radius: 12px;
+      color: #000;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 40px rgba(249,115,22,0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 60px rgba(249,115,22,0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      padding: 16px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: var(--dim); color: var(--text); }
+
+    /* SHOWCASE IMAGE */
+    .showcase {
+      width: 100%;
+      max-width: 1100px;
+      margin: 80px auto 0;
+      padding: 0 24px;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .showcase-img {
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid rgba(249,115,22,0.15);
+      box-shadow: 0 0 80px rgba(249,115,22,0.1), 0 40px 80px rgba(0,0,0,0.6);
+    }
+
+    .showcase-caption {
+      text-align: center;
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: 16px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* FEATURES */
+    .features {
+      max-width: 1100px;
+      margin: 120px auto;
+      padding: 0 24px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 11px;
+      color: var(--fire);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 64px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(249,115,22,0.4), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover { border-color: rgba(249,115,22,0.3); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--fire);
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 100px;
+      padding: 4px 12px;
+      letter-spacing: 0.04em;
+    }
+
+    /* SCREENSHOTS ROW */
+    .screenshots {
+      max-width: 1100px;
+      margin: 0 auto 120px;
+      padding: 0 24px;
+    }
+
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .screenshot-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .screenshot-item:hover { transform: translateY(-6px); border-color: rgba(249,115,22,0.3); }
+
+    .screenshot-item img {
+      width: 100%;
+      display: block;
+    }
+
+    .screenshot-label {
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .screenshot-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--fire);
+      flex-shrink: 0;
+    }
+
+    /* WAITLIST */
+    .waitlist {
+      max-width: 680px;
+      margin: 0 auto 120px;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    .waitlist-card {
+      background: var(--card);
+      border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 28px;
+      padding: 56px 48px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(249,115,22,0.08);
+    }
+
+    .waitlist-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--fire), var(--gold), transparent);
+    }
+
+    .waitlist-glow {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .waitlist-emoji { font-size: 48px; margin-bottom: 20px; display: block; }
+
+    .waitlist-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .waitlist-sub {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .tally-embed {
+      width: 100%;
+      border: none;
+      min-height: 120px;
+      border-radius: 12px;
+    }
+
+    .waitlist-note {
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: 16px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 100%;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .footer-flame {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      color: var(--dim);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .screenshots-grid { grid-template-columns: 1fr; }
+      .waitlist-card { padding: 36px 24px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-flame">🔥</div>
+      <span class="nav-logo-text">Ember</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#screenshots">Screenshots</a></li>
+      <li><a href="#waitlist" class="nav-cta">Get Early Access</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+
+    <div class="hero-badge">
+      <span></span>
+      Early Access — UK Only
+    </div>
+
+    <h1 class="hero-title">
+      <span class="hero-title-fire">Finally know</span>
+      where your money goes
+    </h1>
+
+    <p class="hero-tagline">
+      A premium budgeting app built for real life — couples, bills, savings, and everything in between.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="#waitlist" class="btn-primary">
+        🔥 Get Early Access
+      </a>
+      <a href="#features" class="btn-secondary">
+        See how it works
+      </a>
+    </div>
+
+    <!-- Showcase image — replace src with your postimg URL -->
+    <div class="showcase">
+      <img
+        id="showcase-img"
+        src="https://i.postimg.cc/23BVzx5D/Ember-Showcase.png"
+        alt="Ember — 5 themes showcase"
+        class="showcase-img"
+        onerror="this.style.display='none'"
+      />
+      <p class="showcase-caption">Five themes · Fire · Water · Nature · Earth · Floral</p>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <p class="section-label">What makes it different</p>
+    <h2 class="section-title">Built for how you <em>actually</em> live</h2>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">💑</span>
+        <div class="feature-title">Bill Splitting That Actually Works</div>
+        <div class="feature-desc">Set your share on every transaction — 100%, 75%, 50%, 25%. Your totals always show your money, not the household total. Finally.</div>
+        <span class="feature-tag">Core feature</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">⭐</span>
+        <div class="feature-title">Spending Money Tracker</div>
+        <div class="feature-desc">Star your essential bills. Set a budget for everything else. See exactly what's left for the fun stuff — in real time.</div>
+        <span class="feature-tag">Budgeting</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">📈</span>
+        <div class="feature-title">Savings Projections</div>
+        <div class="feature-desc">Set savings goals with regular contributions, AER and compound interest. A slider takes you from 1 month to 20 years instantly.</div>
+        <span class="feature-tag">Savings</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🧮</span>
+        <div class="feature-title">Take-Home Pay Calculator</div>
+        <div class="feature-desc">2025/26 UK tax rates. Salary sacrifice pension, all student loan plans, Scottish rates. Know your real take-home before you commit to anything.</div>
+        <span class="feature-tag">Income</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🏦</span>
+        <div class="feature-title">Lloyds CSV Import</div>
+        <div class="feature-desc">Export from Lloyds, import into Ember. Auto-categorises your transactions. Takes about 2 minutes a month — less faff than you'd think.</div>
+        <span class="feature-tag">Import</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <div class="feature-title">5 Themes, Dark & Light</div>
+        <div class="feature-desc">Fire, Water, Nature, Earth, Floral. Dark and light mode on each. It looks good and that actually matters — you'll open it more.</div>
+        <span class="feature-tag">Design</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="screenshots" id="screenshots">
+    <p class="section-label">See it in action</p>
+    <h2 class="section-title">Every detail, considered</h2>
+
+    <div class="screenshots-grid">
+      <div class="screenshot-item">
+        <img src="https://i.postimg.cc/vxdM8f0N/ember-bills.png" alt="Bills tab" onerror="this.parentElement.style.display='none'" />
+        <div class="screenshot-label">
+          <span class="screenshot-dot"></span>
+          Bills & Splitting
+        </div>
+      </div>
+      <div class="screenshot-item">
+        <img src="https://i.postimg.cc/PvkhfY6G/ember-savings.png" alt="Savings tab" onerror="this.parentElement.style.display='none'" />
+        <div class="screenshot-label">
+          <span class="screenshot-dot" style="background:#4ade80"></span>
+          Savings Goals
+        </div>
+      </div>
+      <div class="screenshot-item">
+        <img src="https://i.postimg.cc/2Lfmjh0s/ember-takehome.png" alt="Take-home calculator" onerror="this.parentElement.style.display='none'" />
+        <div class="screenshot-label">
+          <span class="screenshot-dot" style="background:#facc15"></span>
+          Take-Home Calculator
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section class="waitlist" id="waitlist">
+    <div class="waitlist-card">
+      <div class="waitlist-glow"></div>
+      <span class="waitlist-emoji">🔥</span>
+      <h2 class="waitlist-title">Get Early Access</h2>
+      <p class="waitlist-sub">Ember is invite-only right now. Drop your email and you'll be first to know when a spot opens up.</p>
+
+      <iframe
+        class="tally-embed"
+        src="https://tally.so/embed/1AG8b4?alignLeft=0&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+        loading="lazy"
+        title="Get early access to Ember"
+      ></iframe>
+
+      <p class="waitlist-note">No spam. No selling your data. Just an email when you're in.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <div class="footer-flame">🔥</div>
+      Ember
+    </div>
+    <p class="footer-text">Built in the UK · © 2026 N2Builds</p>
+  </footer>
+
+  <script>
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Fade in feature cards on scroll
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => {
+            e.target.style.opacity = '1';
+            e.target.style.transform = 'translateY(0)';
+          }, i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .screenshot-item').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.3s';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
