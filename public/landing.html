@@ -205,10 +205,76 @@
 
     .hero-cta-group {
       display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
       animation: fadeUp 0.6s 0.3s ease both;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .hero-email-form {
+      display: flex;
+      width: 100%;
+      gap: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(249,115,22,0.35);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(249,115,22,0.15);
+      transition: box-shadow 0.3s, border-color 0.3s;
+    }
+
+    .hero-email-form:focus-within {
+      border-color: var(--fire);
+      box-shadow: 0 0 60px rgba(249,115,22,0.3);
+    }
+
+    .hero-email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 16px 20px;
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: 15px;
+      outline: none;
+      min-width: 0;
+    }
+
+    .hero-email-input::placeholder { color: var(--muted); }
+
+    .hero-email-btn {
+      background: linear-gradient(135deg, #f97316, #facc1588);
+      border: none;
+      padding: 16px 24px;
+      color: #000;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+
+    .hero-email-btn:hover { opacity: 0.9; }
+
+    .hero-form-note {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .hero-success {
+      display: none;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.3);
+      border-radius: 12px;
+      padding: 14px 20px;
+      color: #4ade80;
+      font-size: 14px;
+      width: 100%;
+      text-align: center;
     }
 
     .btn-primary {
@@ -564,12 +630,12 @@
     </p>
 
     <div class="hero-cta-group">
-      <a href="#waitlist" class="btn-primary">
-        🔥 Get Early Access
-      </a>
-      <a href="#features" class="btn-secondary">
-        See how it works
-      </a>
+      <div class="hero-success" id="hero-success">🔥 You're on the list — we'll be in touch soon!</div>
+      <div class="hero-email-form" id="hero-form">
+        <input class="hero-email-input" type="email" placeholder="Enter your email address" id="hero-email" />
+        <button class="hero-email-btn" onclick="submitHeroEmail()">Get Early Access →</button>
+      </div>
+      <p class="hero-form-note">Invite-only · Free · No spam · UK only</p>
     </div>
 
     <!-- Showcase image — replace src with your postimg URL -->
@@ -700,6 +766,31 @@
         e.preventDefault();
         document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
       });
+    });
+
+    // Hero email form — submits to Tally via their hidden form endpoint
+    async function submitHeroEmail() {
+      const email = document.getElementById('hero-email').value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById('hero-email').focus();
+        return;
+      }
+      try {
+        await fetch('https://tally.so/r/1AG8b4', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+      } catch(e) {}
+      // Show success regardless (no-cors means we can't read the response)
+      document.getElementById('hero-form').style.display = 'none';
+      document.getElementById('hero-success').style.display = 'block';
+    }
+
+    // Allow Enter key on email input
+    document.getElementById('hero-email')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitHeroEmail();
     });
 
     // Fade in feature cards on scroll
