@@ -170,7 +170,7 @@ function BottomNav({ tab, setTab }) {
     { id: "settings",   label: "Settings", icon: "◬" },
   ];
   return (
-    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
+    <div className="ember-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
       {tabs.map(t => {
         const active = tab === t.id;
         return (
@@ -2462,6 +2462,7 @@ export default function EmberApp({ user, onSignOut }) {
             align-items:stretch;
           }
           .ember-sidebar{display:flex !important;}
+          .ember-bottom-nav{display:none !important;}
           .ember-phone-wrap{
             flex:1;
             display:flex;
