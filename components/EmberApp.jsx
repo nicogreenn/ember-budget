@@ -258,7 +258,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       </div>
 
       {/* Spending Money Card */}
-      <Card style={{ marginBottom: 16, border: `1px solid ${spendingBudget > 0 && spendingRemaining < 0 ? T.red : T.primary}44` }}>
+      <Card style={{ marginBottom: 16, border: `1px solid ${spendingBudget > 0 && spendingRemaining < 0 ? T.red : T.primary}44`, overflow: "hidden" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
             <Label>Spending Money</Label>
@@ -280,21 +280,21 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
           )}
         </div>
 
-        <div style={{ display: "flex", gap: 10, marginBottom: spendingBudget > 0 ? 12 : 0 }}>
-          <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
-            <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(spendingTotal)}</div>
+        <div style={{ display: "flex", gap: 8, marginBottom: spendingBudget > 0 ? 12 : 0, width: "100%" }}>
+          <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
+            <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fmt(spendingTotal)}</div>
           </div>
           {spendingBudget > 0 && (
-            <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>{spendingRemaining >= 0 ? "Remaining" : "Over by"}</div>
-              <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: spendingRemaining >= 0 ? T.green : T.red }}>{fmt(Math.abs(spendingRemaining))}</div>
+            <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{spendingRemaining >= 0 ? "Remaining" : "Over by"}</div>
+              <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: spendingRemaining >= 0 ? T.green : T.red, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fmt(Math.abs(spendingRemaining))}</div>
             </div>
           )}
           {starredTotal > 0 && (
-            <div style={{ flex: 1, background: T.card2, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>⭐ Bills</div>
-              <div style={{ fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.muted }}>{fmt(starredTotal)}</div>
+            <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>⭐ Bills</div>
+              <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fmt(starredTotal)}</div>
             </div>
           )}
         </div>
