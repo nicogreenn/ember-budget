@@ -170,7 +170,7 @@ function BottomNav({ tab, setTab }) {
     { id: "settings",   label: "Settings", icon: "◬" },
   ];
   return (
-    <div className="ember-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
+    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
       {tabs.map(t => {
         const active = tab === t.id;
         return (
@@ -223,7 +223,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       <div style={{ paddingTop: 24, paddingBottom: 20, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
         <div style={{ cursor: "default" }}>
-          <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, textShadow: `0 0 40px ${T.glow}` }}>{fmt(income)}</span>
+          <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(income)}</span>
           <div style={{ fontSize: 11, color: T.dim, marginTop: 4 }}>edit in Income tab</div>
         </div>
       </div>
@@ -262,7 +262,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
             <Label>Spending Money</Label>
-            <div style={{ fontSize: 11, color: T.muted, marginTop: -6, marginBottom: 8 }}>Unstarred transactions only · tap ⭐ to mark essentials</div>
+            <div style={{ fontSize: 11, color: T.muted, marginTop: -6, marginBottom: 8 }}>⭐ = essential bill · unstarred = spending</div>
           </div>
           {!editingSpendBudget ? (
             <button onClick={() => { setEditingSpendBudget(true); setSpendBudgetDraft(String(spendingBudget || "")); }}
@@ -2448,110 +2448,19 @@ export default function EmberApp({ user, onSignOut }) {
 
   return (
     <ThemeCtx.Provider value={T}>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
-      <style>{`
-        *{box-sizing:border-box}
-        input::placeholder{color:#4b5563}
-        select{appearance:none}
-        ::-webkit-scrollbar{width:0}
-        body{margin:0;background:${T.bg}}
-        @media(min-width:900px){
-          .ember-desktop-shell{
-            display:flex !important;
-            min-height:100vh;
-            align-items:stretch;
-          }
-          .ember-sidebar{display:flex !important;}
-          .ember-bottom-nav{display:none !important;}
-          .ember-phone-wrap{
-            flex:1;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:40px;
-            background: radial-gradient(ellipse at 60% 50%, ${T.glow} 0%, transparent 60%);
-          }
-          .ember-phone{
-            width:420px !important;
-            max-width:420px !important;
-            height:88vh;
-            max-height:860px;
-            border-radius:40px !important;
-            overflow:hidden;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px ${T.border}, 0 0 60px ${T.glow};
-            position:relative;
-          }
-        }
-      `}</style>
+      <div style={{ background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "'Jost',sans-serif", transition: "background .4s" }}>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+        <style>{`*{box-sizing:border-box}input::placeholder{color:#4b5563}select{appearance:none}::-webkit-scrollbar{width:0}`}</style>
 
-      {/* Desktop shell */}
-      <div className="ember-desktop-shell" style={{ display: "block", background: T.bg, fontFamily: "'Jost',sans-serif", transition: "background .4s" }}>
+        {/* Month Picker — shown on all main tabs */}
+        {tab === "home"       && <HomeTab income={totalIncome} transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
+        {tab === "insights"   && <InsightsTab income={totalIncome} transactions={transactions} splits={splits} catMeta={catMeta} />}
+        {tab === "savings"    && <SavingsTab income={totalIncome} transactions={transactions} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
+        {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
+        {tab === "categories" && <CategoriesTab transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
+        {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
 
-        {/* Sidebar — hidden on mobile via CSS */}
-        <div className="ember-sidebar" style={{ display: "none", width: 280, flexShrink: 0, flexDirection: "column", justifyContent: "space-between", padding: "40px 32px", background: T.card, borderRight: `1px solid ${T.border}` }}>
-          {/* Logo */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 48 }}>
-              <div style={{ width: 40, height: 40, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, boxShadow: `0 0 20px ${T.glow}` }}>🔥</div>
-              <div>
-                <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: T.text }}>Ember</div>
-                <div style={{ fontSize: 11, color: T.muted, letterSpacing: 1 }}>Budget App</div>
-              </div>
-            </div>
-
-            {/* Nav links */}
-            {[
-              { id: "home",       icon: "◈", label: "Home" },
-              { id: "insights",   icon: "◉", label: "Insights" },
-              { id: "savings",    icon: "◎", label: "Savings" },
-              { id: "income",     icon: "◐", label: "Income" },
-              { id: "categories", icon: "⊞", label: "Bills" },
-              { id: "settings",   icon: "◬", label: "Settings" },
-            ].map(item => (
-              <button key={item.id} onClick={() => setTab(item.id)} style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 14,
-                padding: "13px 16px", marginBottom: 6, borderRadius: 12, border: "none", cursor: "pointer",
-                background: tab === item.id ? `${T.primary}18` : "transparent",
-                color: tab === item.id ? T.primary : T.muted,
-                fontFamily: "inherit", fontSize: 15, fontWeight: tab === item.id ? 600 : 400,
-                textAlign: "left", transition: "all .15s",
-                borderLeft: tab === item.id ? `3px solid ${T.primary}` : "3px solid transparent",
-              }}>
-                <span style={{ fontSize: 18 }}>{item.icon}</span>
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Bottom of sidebar */}
-          <div>
-            <div style={{ fontSize: 11, color: T.dim, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Theme</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {Object.entries(THEMES).map(([key, theme]) => (
-                <button key={key} onClick={() => handleSetThemeKey(key)} title={theme.name}
-                  style={{ width: 32, height: 32, borderRadius: 8, border: `2px solid ${themeKey === key ? T.primary : "transparent"}`, background: `linear-gradient(135deg,${theme.gradA},${theme.gradB})`, cursor: "pointer", fontSize: 14, transition: "all .2s", boxShadow: themeKey === key ? `0 0 12px ${theme.glow}` : "none" }}>
-                  {theme.emoji}
-                </button>
-              ))}
-            </div>
-            <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${T.border}` }}>
-              <div style={{ fontSize: 12, color: T.dim }}>{user?.email}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Phone / app area */}
-        <div className="ember-phone-wrap">
-          <div className="ember-phone" style={{ background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", transition: "background .4s", overflowY: "auto" }}>
-            {tab === "home"       && <HomeTab income={totalIncome} transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
-            {tab === "insights"   && <InsightsTab income={totalIncome} transactions={transactions} splits={splits} catMeta={catMeta} />}
-            {tab === "savings"    && <SavingsTab income={totalIncome} transactions={transactions} splits={splits} goals={savingsGoals} setGoals={handleSetSavingsGoals} />}
-            {tab === "income"     && <IncomeTab income={income} setIncome={handleSetIncome} sideHustles={sideHustles} setSideHustles={handleSetSideHustles} />}
-            {tab === "categories" && <CategoriesTab transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} budgets={budgets} setBudgets={handleSetBudgets} catNames={catNames} setCatNames={handleSetCatNames} splits={splits} setSplits={setSplits} partnerName={partnerName} user={user} oneOff={oneOff} setOneOff={handleSetOneOff} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} onAddManual={onAddManual} />}
-            {tab === "settings"   && <SettingsTab themeKey={themeKey} setThemeKey={handleSetThemeKey} partnerName={partnerName} setPartnerName={handleSetPartnerName} lightMode={lightMode} setLightMode={handleSetLightMode} onSignOut={onSignOut} onReset={onReset} user={user} catMeta={catMeta} setCatMeta={handleSetCatMeta} />}
-            <BottomNav tab={tab} setTab={setTab} />
-          </div>
-        </div>
+        <BottomNav tab={tab} setTab={setTab} />
       </div>
     </ThemeCtx.Provider>
   );
