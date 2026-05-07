@@ -8,6 +8,8 @@ const EmberApp = dynamic(() => import('@/components/EmberApp'), { ssr: false })
 export default function Home() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [whitelistChecking, setWhitelistChecking] = useState(false)
+  const [whitelisted, setWhitelisted] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
@@ -23,6 +25,21 @@ export default function Home() {
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  // Check whitelist when user logs in
+  useEffect(() => {
+    if (!user) { setWhitelisted(false); return; }
+    setWhitelistChecking(true)
+    supabase
+      .from('whitelist')
+      .select('email')
+      .eq('email', user.email)
+      .single()
+      .then(({ data }) => {
+        setWhitelisted(!!data)
+        setWhitelistChecking(false)
+      })
+  }, [user])
 
   const handleAuth = async (e) => {
     e.preventDefault()
@@ -41,12 +58,15 @@ export default function Home() {
     await supabase.auth.signOut()
   }
 
-  if (loading) return (
+  // Loading spinner
+  if (loading || whitelistChecking) return (
     <div style={{ background: '#111111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#f97316', fontSize: 32 }}>🔥</div>
+      <div style={{ color: '#f97316', fontSize: 32, animation: 'pulse 1.5s ease-in-out infinite' }}>🔥</div>
+      <style>{`@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}`}</style>
     </div>
   )
 
+  // Not logged in — show login
   if (!user) return (
     <div style={{ background: '#111111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }}>
       <div style={{ background: '#1c1c1c', border: '1px solid #2a2a2a', borderRadius: 20, padding: 32, width: '100%', maxWidth: 380 }}>
@@ -74,5 +94,28 @@ export default function Home() {
     </div>
   )
 
+  // Logged in but not whitelisted — waitlist screen
+  if (!whitelisted) return (
+    <div style={{ background: '#111111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif', padding: 24 }}>
+      <div style={{ textAlign: 'center', maxWidth: 420 }}>
+        <div style={{ fontSize: 56, marginBottom: 20 }}>🔥</div>
+        <div style={{ fontSize: 28, fontWeight: 700, color: '#f5f5f5', marginBottom: 12, fontFamily: 'Georgia, serif' }}>You're on the list</div>
+        <div style={{ fontSize: 15, color: '#9ca3af', lineHeight: 1.7, marginBottom: 32 }}>
+          Ember is invite-only right now. We'll email <span style={{ color: '#f97316' }}>{user.email}</span> as soon as your spot is ready.
+        </div>
+        <div style={{ background: '#1c1c1c', border: '1px solid rgba(249,115,22,0.2)', borderRadius: 16, padding: '20px 24px', marginBottom: 24, fontSize: 13, color: '#6b7280', lineHeight: 1.8 }}>
+          💑 Bill splitting for couples<br />
+          📈 Savings projections up to 20 years<br />
+          🧮 UK take-home pay calculator<br />
+          🎨 5 premium themes
+        </div>
+        <button onClick={handleSignOut} style={{ background: 'none', border: '1px solid #2a2a2a', borderRadius: 10, color: '#6b7280', padding: '10px 20px', cursor: 'pointer', fontSize: 13 }}>
+          Sign out
+        </button>
+      </div>
+    </div>
+  )
+
+  // Whitelisted — show app
   return <EmberApp user={user} onSignOut={handleSignOut} />
 }
