@@ -223,7 +223,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       <div style={{ paddingTop: 24, paddingBottom: 20, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: T.muted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
         <div style={{ cursor: "default" }}>
-          <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(income)}</span>
+          <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, textShadow: `0 0 40px ${T.glow}` }}>{fmt(income)}</span>
           <div style={{ fontSize: 11, color: T.dim, marginTop: 4 }}>edit in Income tab</div>
         </div>
       </div>
