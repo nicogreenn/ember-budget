@@ -265,6 +265,16 @@
       color: var(--dim);
     }
 
+    .hero-founder-note {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.6;
+      text-align: center;
+      margin-top: 8px;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
     .hero-success {
       display: none;
       background: rgba(74,222,128,0.1);
@@ -606,7 +616,7 @@
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
       <li><a href="#screenshots">Screenshots</a></li>
-      <li><a href="#waitlist" class="nav-cta">Get Early Access</a></li>
+      <li><a href="#waitlist" class="nav-cta">Sort our bills out</a></li>
     </ul>
   </nav>
 
@@ -621,22 +631,24 @@
     </div>
 
     <h1 class="hero-title">
-      <span class="hero-title-fire">Finally know</span>
-      where your money goes
+      One app for your
+      <span class="hero-title-fire">messy shared bills</span>
     </h1>
 
     <p class="hero-tagline">
-      A premium budgeting app built for real life — couples, bills, savings, and everything in between.
+      My girlfriend and I pay the mortgage together, but she covers wifi and I cover groceries — Ember works out who owes what so we're not doing it on a spreadsheet every month.
     </p>
 
     <div class="hero-cta-group">
       <div class="hero-success" id="hero-success">🔥 You're on the list — we'll be in touch soon!</div>
       <div class="hero-email-form" id="hero-form">
         <input class="hero-email-input" type="email" placeholder="Enter your email address" id="hero-email" />
-        <button class="hero-email-btn" onclick="submitHeroEmail()">Get Early Access →</button>
+        <button class="hero-email-btn" onclick="submitHeroEmail()">Sort our bills out →</button>
       </div>
       <p class="hero-form-note">Invite-only · Free · No spam · UK only</p>
     </div>
+
+    <p class="hero-founder-note"><em>I built Ember because our Google Sheet for splitting bills got embarrassing fast — mortgage by percentage, one of us paying wifi, the other covering groceries, and neither of us sure who owed what at the end of the month. We use it every month now and it takes about two minutes.</em> — Nico, founder</p>
 
     <!-- Showcase image — replace src with your postimg URL -->
     <div class="showcase">
@@ -745,7 +757,7 @@
           onkeydown="if(event.key==='Enter')submitWaitlistEmail()" />
         <button id="waitlist-btn" onclick="submitWaitlistEmail()"
           style="background:linear-gradient(135deg,#f97316,#facc1588); border:none; padding:14px 22px; color:#000; font-family:'Outfit',sans-serif; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;">
-          Join Waitlist →
+          Start splitting fairly →
         </button>
       </div>
       <div id="waitlist-success" style="display:none; background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3); border-radius:12px; padding:14px 20px; color:#4ade80; font-size:14px; text-align:center; margin-bottom:12px;">
