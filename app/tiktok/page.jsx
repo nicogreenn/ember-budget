@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
 // ── OWNER ONLY ────────────────────────────────────────────────────────────────
-const OWNER_EMAIL = 'nicogreenn@gmail.com' // change to your email
+const OWNER_EMAIL = 'nico.green@hotmail.co.uk' // change to your email
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
 const FIRE = {
