@@ -579,6 +579,15 @@
       color: var(--dim);
     }
 
+    /* WAITLIST COUNTER */
+    .waitlist-counter {
+      display: none;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 10px;
+      letter-spacing: 0.01em;
+    }
+
     /* ANIMATIONS */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
@@ -636,6 +645,7 @@
         <button class="hero-email-btn" onclick="submitHeroEmail()">Get Early Access →</button>
       </div>
       <p class="hero-form-note">Invite-only · Free · No spam · UK only</p>
+      <p class="waitlist-counter" id="hero-counter"></p>
     </div>
 
     <!-- Showcase image — replace src with your postimg URL -->
@@ -752,6 +762,7 @@
         🔥 You're on the list — we'll be in touch soon!
       </div>
 
+      <p class="waitlist-counter" id="bottom-counter"></p>
       <p class="waitlist-note">No spam. No selling your data. Just an email when you're in.</p>
     </div>
   </section>
@@ -768,6 +779,33 @@
   <script>
     const SUPABASE_URL = 'https://fgrvjgnrlobtlnmlgeog.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZncnZqZ25ybG9idGxubWxnZW9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MTk1NzEsImV4cCI6MjA5MjA5NTU3MX0.t0W0xlODIDDmZAcYCPCw_0DyXQsDxtoruKa2Qp_CQ9U';
+
+    // Waitlist counter — reads row count via HEAD + Content-Range (no row data transferred).
+    // Requires RLS policy: anon role can SELECT on waitlist (read-only count).
+    (async function loadWaitlistCount() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist?select=*`, {
+          method: 'HEAD',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'count=exact',
+          },
+        });
+        if (!res.ok) return;
+        const range = res.headers.get('content-range'); // e.g. "0-9/247"
+        if (!range) return;
+        const count = parseInt(range.split('/')[1], 10);
+        if (isNaN(count) || count < 10) return;
+        const text = `🔥 ${count} couples already signed up`;
+        document.querySelectorAll('#hero-counter, #bottom-counter').forEach(el => {
+          el.textContent = text;
+          el.style.display = 'block';
+        });
+      } catch (_) {
+        // Network error or RLS block — hide counter silently.
+      }
+    })();
 
     // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(a => {
