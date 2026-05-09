@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service — Ember Budget</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --fire: #f97316;
+      --fire-dim: #fb923c;
+      --gold: #facc15;
+      --bg: #0a0a0a;
+      --card: #141414;
+      --card2: #1c1c1c;
+      --border: #252525;
+      --text: #f5f5f5;
+      --muted: #9ca3af;
+      --dim: #4b5563;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(249,115,22,0.08);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-flame {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(249,115,22,0.4);
+    }
+
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, #f97316, #facc15aa);
+      border: 1px solid var(--fire);
+      border-radius: 10px;
+      color: #000 !important;
+      font-weight: 700 !important;
+      padding: 10px 22px;
+      transition: opacity 0.2s, box-shadow 0.2s !important;
+      box-shadow: 0 0 20px rgba(249,115,22,0.25);
+    }
+
+    .nav-cta:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 30px rgba(249,115,22,0.4) !important;
+      color: #000 !important;
+    }
+
+    /* CONTENT */
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 140px 24px 80px;
+    }
+
+    .page-label {
+      font-size: 11px;
+      color: var(--fire);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #f97316 0%, #facc15 50%, #fb923c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .last-updated {
+      font-size: 13px;
+      color: var(--dim);
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 48px;
+      margin-bottom: 14px;
+      padding-left: 14px;
+      border-left: 3px solid var(--fire);
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 14px;
+    }
+
+    ul {
+      list-style: none;
+      margin-bottom: 14px;
+    }
+
+    ul li {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--fire);
+    }
+
+    a {
+      color: var(--fire-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover { color: var(--gold); }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 100%;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .footer-flame {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .footer-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      color: var(--dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--muted); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 20px; }
+      .footer-right { align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-flame">🔥</div>
+      <span class="nav-logo-text">Ember</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">← Back to landing page</a></li>
+      <li><a href="/" class="nav-cta">Sort our bills out</a></li>
+    </ul>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content-wrap">
+    <p class="page-label">Legal</p>
+    <h1>Terms of Service</h1>
+    <p class="last-updated">Last updated: 9 May 2026</p>
+
+    <h2>1. About Ember Budget</h2>
+    <p>Ember Budget ("Ember") is a personal budgeting app that helps couples and households split bills, track spending, and manage shared finances. It is operated by Nico Green, a sole trader based in the United Kingdom. Ember is currently in public beta — it is actively being developed and improved.</p>
+
+    <h2>2. Beta Software</h2>
+    <p>Ember is beta software. That means:</p>
+    <ul>
+      <li>Features may change, break, or be removed without notice.</li>
+      <li>There is no guarantee of uptime, data retention, or continued availability.</li>
+      <li>Nico Green may revoke, suspend, or end beta access at any time and for any reason.</li>
+    </ul>
+    <p>We will try to give you reasonable notice of significant changes or shutdowns where possible, but we cannot commit to it during the beta period.</p>
+
+    <h2>3. Not Financial Advice</h2>
+    <p>Ember helps you record and view your own budget data. It is a tool for your personal organisation — nothing more. Nothing in Ember constitutes financial advice, tax advice, or any other regulated advice.</p>
+    <p>You are solely responsible for your own financial decisions. Do not rely on Ember's calculations or displays as a substitute for professional financial guidance.</p>
+
+    <h2>4. Your Data</h2>
+    <p>Ember stores only what you enter manually. It does <strong>not</strong> connect to your bank account, access open banking APIs, or pull in any transaction data from external sources. The accuracy of what appears in Ember is entirely down to what you type in.</p>
+    <p>See our <a href="/privacy.html">Privacy Policy</a> for full details of what data we hold and how we handle it.</p>
+
+    <h2>5. Acceptable Use</h2>
+    <p>By using Ember you agree not to:</p>
+    <ul>
+      <li>Scrape, crawl, or programmatically extract data from the app or its API.</li>
+      <li>Attempt to reverse engineer, decompile, or otherwise extract Ember's source code.</li>
+      <li>Use the service to harass, abuse, or harm any other person.</li>
+      <li>Send automated or bulk requests that place unreasonable load on Ember's infrastructure.</li>
+      <li>Use the service in any way that violates applicable UK law.</li>
+    </ul>
+
+    <h2>6. Account Termination</h2>
+    <p>During the beta, Nico Green may suspend or permanently revoke your access if you breach these terms or for any other reason. We will try to give you notice where practical.</p>
+    <p>You can request deletion of your account and data at any time by emailing <a href="mailto:n2buildz@gmail.com">n2buildz@gmail.com</a> from the address you used to sign up. See our <a href="/privacy.html">Privacy Policy</a> for how we handle deletion requests.</p>
+
+    <h2>7. Liability</h2>
+    <p>Ember is provided "as is" and "as available", without warranties of any kind — express or implied.</p>
+    <p>To the maximum extent permitted by UK law, Nico Green is not liable for any indirect, incidental, consequential, or financial losses arising from your use of Ember or your inability to use it. This includes losses arising from inaccurate budget data, reliance on Ember's calculations, or service downtime.</p>
+    <p>Ember is currently free to use during the beta. Accordingly, if a liability cap applied, it would be nil (no fees have been paid). If paid plans are introduced in the future, liability will be capped at the total fees you paid in the 12 months preceding the claim.</p>
+
+    <h2>8. Intellectual Property</h2>
+    <p>Ember — including the app, its design, branding, and any original content — is owned by Nico Green. All rights reserved.</p>
+    <p>You own your own data. The budget entries, transactions, and other information you add to Ember belong to you. Ember does not claim any ownership over what you input.</p>
+
+    <h2>9. Changes to These Terms</h2>
+    <p>We may update these terms from time to time. If we make a material change, we will notify you by email. Continuing to use Ember after a change takes effect means you accept the updated terms.</p>
+    <p>Minor changes (formatting, clarifications that do not affect your rights) may be made without notification.</p>
+
+    <h2>10. Governing Law</h2>
+    <p>These terms are governed by the laws of England and Wales. Any disputes arising from these terms or your use of Ember will be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+
+    <h2>11. Contact</h2>
+    <p>For any legal queries, questions about these terms, or to request account deletion, please email: <a href="mailto:n2buildz@gmail.com">n2buildz@gmail.com</a></p>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="footer-logo">
+      <div class="footer-flame">🔥</div>
+      Ember
+    </a>
+    <div class="footer-right">
+      <p class="footer-text">Built in the UK · © 2026 N2Builds</p>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

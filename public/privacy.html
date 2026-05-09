@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Ember Budget</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --fire: #f97316;
+      --fire-dim: #fb923c;
+      --gold: #facc15;
+      --bg: #0a0a0a;
+      --card: #141414;
+      --card2: #1c1c1c;
+      --border: #252525;
+      --text: #f5f5f5;
+      --muted: #9ca3af;
+      --dim: #4b5563;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(249,115,22,0.08);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-flame {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(249,115,22,0.4);
+    }
+
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, #f97316, #facc15aa);
+      border: 1px solid var(--fire);
+      border-radius: 10px;
+      color: #000 !important;
+      font-weight: 700 !important;
+      padding: 10px 22px;
+      transition: opacity 0.2s, box-shadow 0.2s !important;
+      box-shadow: 0 0 20px rgba(249,115,22,0.25);
+    }
+
+    .nav-cta:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 30px rgba(249,115,22,0.4) !important;
+      color: #000 !important;
+    }
+
+    /* CONTENT */
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 140px 24px 80px;
+    }
+
+    .page-label {
+      font-size: 11px;
+      color: var(--fire);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #f97316 0%, #facc15 50%, #fb923c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .last-updated {
+      font-size: 13px;
+      color: var(--dim);
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 48px;
+      margin-bottom: 14px;
+      padding-left: 14px;
+      border-left: 3px solid var(--fire);
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 14px;
+    }
+
+    ul {
+      list-style: none;
+      margin-bottom: 14px;
+    }
+
+    ul li {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--fire);
+    }
+
+    a {
+      color: var(--fire-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover { color: var(--gold); }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 100%;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .footer-flame {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .footer-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      color: var(--dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--muted); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 20px; }
+      .footer-right { align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-flame">🔥</div>
+      <span class="nav-logo-text">Ember</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">← Back to landing page</a></li>
+      <li><a href="/" class="nav-cta">Sort our bills out</a></li>
+    </ul>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content-wrap">
+    <p class="page-label">Legal</p>
+    <h1>Privacy Policy</h1>
+    <p class="last-updated">Last updated: 9 May 2026</p>
+
+    <h2>1. Who We Are</h2>
+    <p>Ember Budget is operated by Nico Green, a sole trader based in the United Kingdom. Nico Green is the data controller for all personal data processed in connection with Ember.</p>
+    <p>Contact: <a href="mailto:n2buildz@gmail.com">n2buildz@gmail.com</a></p>
+
+    <h2>2. What We Collect</h2>
+    <p>We collect as little as possible. Here is exactly what Ember currently holds:</p>
+    <ul>
+      <li><strong>Waitlist:</strong> your email address, if you joined the waitlist on the landing page. Nothing else — no name, no phone, no payment details.</li>
+      <li><strong>App account:</strong> budget data you enter manually — income figures, transactions, bill splits, savings goals. This is stored in a Supabase Postgres database.</li>
+    </ul>
+    <p>Ember does <strong>not</strong> connect to your bank account. It does not use open banking, bank feeds, or any third-party financial data provider. It does not store bank credentials, card numbers, or any payment information.</p>
+
+    <h2>3. Why We Collect It</h2>
+    <ul>
+      <li><strong>Waitlist email:</strong> to notify you when a beta access invite is ready, and occasionally to share updates about Ember's launch. You will not be added to any unrelated mailing list.</li>
+      <li><strong>Budget data:</strong> so that when you sign in, you can see your own figures. That is the entire purpose of the app. We do not analyse your spending data, sell it, or use it for anything other than showing it back to you.</li>
+    </ul>
+
+    <h2>4. Lawful Basis</h2>
+    <p>Under UK GDPR and the Data Protection Act 2018:</p>
+    <ul>
+      <li><strong>Waitlist emails:</strong> legitimate interests — you signed up specifically to hear about Ember, and sending you a beta invite is what you asked for.</li>
+      <li><strong>Budget data:</strong> contract — storing your data is necessary to provide the service you signed up to use.</li>
+    </ul>
+
+    <h2>5. Who Can See Your Data</h2>
+    <p>Only Nico Green (the founder and sole operator of Ember) has access to user data for support and maintenance purposes.</p>
+    <p>Ember does <strong>not</strong> sell, rent, share, or pass your personal data to any third party for marketing or advertising purposes. Full stop.</p>
+
+    <h2>6. Where Data Is Stored</h2>
+    <p>Your data is stored in Supabase (a Postgres database platform), hosted on AWS infrastructure in EU/UK regions. Supabase acts as a data processor on Ember's behalf, under their standard data processing terms.</p>
+    <p>The Ember landing page is hosted on Vercel. Vercel may process request logs (IP addresses, user-agent strings) in the normal course of serving web pages. This is standard web infrastructure and is governed by Vercel's own data processing agreements.</p>
+    <p>No data is transferred to countries outside the UK/EEA without appropriate safeguards in place.</p>
+
+    <h2>7. How Long We Keep It</h2>
+    <ul>
+      <li><strong>Waitlist emails:</strong> retained until you request deletion, or until the waitlist is closed and the list is deleted — whichever comes first.</li>
+      <li><strong>App account data:</strong> retained for as long as your account is active, or until you request deletion.</li>
+    </ul>
+    <p>We do not hold data longer than necessary.</p>
+
+    <h2>8. Your Rights</h2>
+    <p>Under UK GDPR, you have the following rights. We have tried to explain each one plainly:</p>
+    <ul>
+      <li><strong>Access:</strong> you can ask us what data we hold about you and receive a copy of it.</li>
+      <li><strong>Correction:</strong> if something we hold is wrong, you can ask us to correct it.</li>
+      <li><strong>Deletion:</strong> you can ask us to delete your data. We will do so within 30 days (see section 9).</li>
+      <li><strong>Restriction:</strong> you can ask us to pause processing your data in certain circumstances — for example, while a dispute is being resolved.</li>
+      <li><strong>Portability:</strong> you can ask for your data in a structured, machine-readable format so you can take it elsewhere.</li>
+      <li><strong>Objection:</strong> you can object to us processing your data where we rely on legitimate interests as our lawful basis.</li>
+      <li><strong>Complaint:</strong> if you are unhappy with how we handle your data, you have the right to complain to the Information Commissioner's Office (ICO) at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>. We would appreciate the chance to sort things out directly first.</li>
+    </ul>
+
+    <h2>9. How to Request Deletion</h2>
+    <p>Email <a href="mailto:n2buildz@gmail.com">n2buildz@gmail.com</a> from the address you signed up with. State that you want your account and/or waitlist entry deleted.</p>
+    <p>We will confirm receipt and complete the deletion within 30 days.</p>
+
+    <h2>10. Cookies and Tracking</h2>
+    <p>We do not currently use cookies or third-party analytics on the landing page. The only external network requests the landing page makes are to Google Fonts (to load typefaces) and to Supabase (to record waitlist sign-ups and retrieve the signup count). No advertising pixels, no session recording, no behavioural tracking.</p>
+    <p>If we introduce analytics or cookies in the future, we will update this policy and — where required — ask for your consent.</p>
+
+    <h2>11. Changes to This Policy</h2>
+    <p>We may update this privacy policy from time to time. If we make a material change — one that affects your rights or how we use your data — we will notify you by email before the change takes effect.</p>
+    <p>Minor clarifications or formatting changes may be made without notification. The "Last updated" date at the top of this page always reflects the most recent version.</p>
+
+    <h2>12. Contact</h2>
+    <p>For any privacy-related queries, rights requests, or concerns, contact: <a href="mailto:n2buildz@gmail.com">n2buildz@gmail.com</a></p>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="footer-logo">
+      <div class="footer-flame">🔥</div>
+      Ember
+    </a>
+    <div class="footer-right">
+      <p class="footer-text">Built in the UK · © 2026 N2Builds</p>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
