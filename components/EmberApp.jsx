@@ -13,7 +13,7 @@ const THEMES = {
     gradA: "#f97316", gradB: "#facc15", glow: "rgba(249,115,22,0.25)",
     partnerBg: "#0f1a0f", partnerBorder: "#2a4a2a", partnerText: "#4ade80",
     catColors: ["#f97316","#fb923c","#facc15","#fbbf24","#f59e0b","#ea580c","#fdba74","#fed7aa","#4ade80","#6b7280"],
-    light: { bg: "#fafaf9", card: "#ffffff", card2: "#f5f0eb", border: "#e8ddd0", navBg: "#ffffff", text: "#1a1208", muted: "#78716c", dim: "#c4b5a0", partnerBg: "#f0fdf4", partnerBorder: "#bbf7d0", partnerText: "#16a34a" },
+    light: { bg: "#f0ebe2", card: "#fbf6ec", card2: "#ece3d3", border: "#d8c9b2", navBg: "#fbf6ec", text: "#2a1d0e", muted: "#7a6a55", dim: "#b8a78b", green: "#15803d", red: "#b91c1c", partnerBg: "#e6f0e2", partnerBorder: "#bbd5a3", partnerText: "#3a6a26" },
   },
   water: {
     name: "Water", emoji: "🌊",
@@ -23,7 +23,7 @@ const THEMES = {
     gradA: "#38bdf8", gradB: "#818cf8", glow: "rgba(56,189,248,0.25)",
     partnerBg: "#0a1420", partnerBorder: "#1a3a5c", partnerText: "#34d399",
     catColors: ["#38bdf8","#0ea5e9","#7dd3fc","#818cf8","#a78bfa","#60a5fa","#93c5fd","#bae6fd","#34d399","#64748b"],
-    light: { bg: "#f0f9ff", card: "#ffffff", card2: "#e0f2fe", border: "#bae6fd", navBg: "#ffffff", text: "#082f49", muted: "#4a90a4", dim: "#a5d8f0", partnerBg: "#f0fdf4", partnerBorder: "#bbf7d0", partnerText: "#0f766e" },
+    light: { bg: "#dde9f0", card: "#ecf3f8", card2: "#cfdfeb", border: "#a8c2d6", navBg: "#ecf3f8", text: "#0d2436", muted: "#506b80", dim: "#92aebf", primary: "#0369a1", secondary: "#0284c7", accent: "#075985", gradA: "#0369a1", gradB: "#6366f1", glow: "rgba(3,105,161,0.20)", green: "#15803d", red: "#b91c1c", partnerBg: "#e1ecdf", partnerBorder: "#a8c79e", partnerText: "#2a5a3a" },
   },
   nature: {
     name: "Nature", emoji: "🌿",
@@ -33,7 +33,7 @@ const THEMES = {
     gradA: "#4ade80", gradB: "#a3e635", glow: "rgba(74,222,128,0.25)",
     partnerBg: "#0a1a14", partnerBorder: "#1a4a2a", partnerText: "#86efac",
     catColors: ["#4ade80","#22c55e","#a3e635","#84cc16","#65a30d","#16a34a","#86efac","#bbf7d0","#34d399","#6b7280"],
-    light: { bg: "#f7fef7", card: "#ffffff", card2: "#f0fdf4", border: "#bbf7d0", navBg: "#ffffff", text: "#052e16", muted: "#4a7c59", dim: "#a7d9b2", partnerBg: "#f0fdf4", partnerBorder: "#86efac", partnerText: "#15803d" },
+    light: { bg: "#dde8de", card: "#ecf3ec", card2: "#cfdccf", border: "#a3c0a3", navBg: "#ecf3ec", text: "#0f2615", muted: "#557d63", dim: "#92b39a", primary: "#15803d", secondary: "#16a34a", accent: "#166534", gradA: "#15803d", gradB: "#65a30d", glow: "rgba(21,128,61,0.20)", green: "#14532d", red: "#b91c1c", partnerBg: "#dee8d8", partnerBorder: "#a3c79b", partnerText: "#2d6638" },
   },
   earth: {
     name: "Earth", emoji: "🪨",
@@ -43,7 +43,7 @@ const THEMES = {
     gradA: "#c8854a", gradB: "#e8b87a", glow: "rgba(200,133,74,0.25)",
     partnerBg: "#0f1a0a", partnerBorder: "#2a4a1a", partnerText: "#7abf7a",
     catColors: ["#c8854a","#a0622a","#e8b87a","#d4955a","#b87040","#8b4513","#deb887","#f5deb3","#7abf7a","#6b5a4a"],
-    light: { bg: "#fdf8f2", card: "#ffffff", card2: "#faf0e6", border: "#e8d5bc", navBg: "#ffffff", text: "#2c1a0a", muted: "#8b6040", dim: "#d4b896", partnerBg: "#f0fdf4", partnerBorder: "#bbf7d0", partnerText: "#15803d" },
+    light: { bg: "#ebdfce", card: "#f5ead7", card2: "#dccbb1", border: "#bfa888", navBg: "#f5ead7", text: "#3a230f", muted: "#8a6a47", dim: "#bfa07a", primary: "#8b4513", secondary: "#a0622a", accent: "#6b3410", gradA: "#8b4513", gradB: "#c8854a", glow: "rgba(139,69,19,0.20)", green: "#15803d", red: "#b91c1c", partnerBg: "#e0e8da", partnerBorder: "#a3c79b", partnerText: "#2d6638" },
   },
   floral: {
     name: "Floral", emoji: "🌸",
@@ -53,11 +53,24 @@ const THEMES = {
     gradA: "#e879f9", gradB: "#f9a8d4", glow: "rgba(232,121,249,0.25)",
     partnerBg: "#0a100a", partnerBorder: "#1a3a20", partnerText: "#4ade80",
     catColors: ["#e879f9","#c026d3","#f9a8d4","#f0abfc","#a855f7","#db2777","#fda4af","#fbcfe8","#4ade80","#6b7280"],
-    light: { bg: "#fdf4ff", card: "#ffffff", card2: "#fae8ff", border: "#f0abfc", navBg: "#ffffff", text: "#3b0764", muted: "#9d5aad", dim: "#e4b8f0", partnerBg: "#f0fdf4", partnerBorder: "#bbf7d0", partnerText: "#15803d" },
+    light: { bg: "#e8dde8", card: "#f1e8f1", card2: "#d6c5d8", border: "#b89cbf", navBg: "#f1e8f1", text: "#3a1a4a", muted: "#7a567f", dim: "#b89cc0", primary: "#a21caf", secondary: "#c026d3", accent: "#86198f", gradA: "#a21caf", gradB: "#db2777", glow: "rgba(162,28,175,0.20)", green: "#15803d", red: "#b91c1c", partnerBg: "#dee8d8", partnerBorder: "#a3c79b", partnerText: "#2d6638" },
   },
 };
 
 const applyMode = (theme, isLight) => isLight ? { ...theme, ...theme.light } : theme;
+
+// ── DESIGN TOKENS ────────────────────────────────────────────────────────────
+const TOKENS = {
+  radius:     16,   // standard card
+  radiusLg:   24,   // hero card
+  radiusXl:   28,   // floating nav / large surfaces
+  radiusPill: 999,  // buttons, chips
+  pad:        20,   // standard card padding
+  padLg:      24,   // hero padding
+  shadowSm:  '0 2px 8px rgba(0,0,0,0.08)',
+  shadowMd:  '0 8px 24px rgba(0,0,0,0.12)',
+  shadowLg:  '0 16px 40px rgba(0,0,0,0.18)',
+};
 
 const ThemeCtx = createContext(THEMES.fire);
 const useT = () => useContext(ThemeCtx);
@@ -113,7 +126,7 @@ const myShare = (t, splits) => t.amount * ((splits[t.id] ?? 100) / 100);
 // ── SHARED UI ────────────────────────────────────────────────────────────────
 function Card({ children, style = {} }) {
   const T = useT();
-  return <div style={{ background: T.card, borderRadius: 16, padding: 18, border: `1px solid ${T.border}`, ...style }}>{children}</div>;
+  return <div style={{ background: T.card, borderRadius: TOKENS.radius, padding: TOKENS.pad, border: `1px solid ${T.border}`, boxShadow: TOKENS.shadowSm, ...style }}>{children}</div>;
 }
 function Label({ children }) {
   const T = useT();
@@ -121,21 +134,111 @@ function Label({ children }) {
 }
 function GhostBtn({ children, onClick, style = {} }) {
   const T = useT();
-  return <button onClick={onClick} style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, cursor: "pointer", fontFamily: "inherit", fontSize: 13, padding: "6px 12px", ...style }}>{children}</button>;
+  return <button onClick={onClick} className="ember-press" style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: TOKENS.radiusPill, color: T.muted, cursor: "pointer", fontFamily: "inherit", fontSize: 13, padding: "8px 16px", ...style }}>{children}</button>;
 }
 function PrimaryBtn({ children, onClick, style = {} }) {
   const T = useT();
-  return <button onClick={onClick} style={{ background: `linear-gradient(135deg,${T.gradA},${T.gradB}88)`, border: `1px solid ${T.primary}`, borderRadius: 10, color: "#000", cursor: "pointer", fontFamily: "inherit", fontSize: 14, fontWeight: 700, padding: "11px 16px", ...style }}>{children}</button>;
+  return <button onClick={onClick} className="ember-press" style={{ background: `linear-gradient(135deg,${T.gradA},${T.gradB}88)`, border: `1px solid ${T.primary}`, borderRadius: TOKENS.radiusPill, color: "#000", cursor: "pointer", fontFamily: "inherit", fontSize: 15, fontWeight: 700, padding: "14px 24px", boxShadow: TOKENS.shadowMd, ...style }}>{children}</button>;
 }
 function OutlineBtn({ children, onClick, style = {} }) {
   const T = useT();
-  return <button onClick={onClick} style={{ background: "transparent", border: `1px solid ${T.primary}`, borderRadius: 10, color: T.primary, cursor: "pointer", fontFamily: "inherit", fontSize: 14, padding: "11px 16px", ...style }}>{children}</button>;
+  return <button onClick={onClick} className="ember-press" style={{ background: "transparent", border: `1px solid ${T.primary}`, borderRadius: TOKENS.radiusPill, color: T.primary, cursor: "pointer", fontFamily: "inherit", fontSize: 14, padding: "13px 23px", ...style }}>{children}</button>;
+}
+function HeroCard({ children, style = {} }) {
+  const T = useT();
+  return (
+    <div style={{
+      background: T.card,
+      borderRadius: TOKENS.radiusLg,
+      padding: TOKENS.padLg,
+      border: `1px solid ${T.border}`,
+      boxShadow: `${TOKENS.shadowLg}, inset 0 1px 0 ${T.primary}33`,
+      position: "relative",
+      overflow: "hidden",
+      ...style,
+    }}>
+      {/* Radial accent top-right */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        background: `radial-gradient(circle at 100% 0%, ${T.primary}25, transparent 60%)`,
+        borderRadius: TOKENS.radiusLg,
+        pointerEvents: "none",
+      }} />
+      {/* Diagonal overlay */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        background: `linear-gradient(135deg,${T.gradA}15,transparent 50%,${T.gradB}10)`,
+        borderRadius: TOKENS.radiusLg,
+        pointerEvents: "none",
+      }} />
+      {/* Decorative blurred orb — bleeds in from top-right */}
+      <div style={{
+        position: "absolute", top: -80, right: -80,
+        width: 200, height: 200, borderRadius: "50%",
+        background: T.primary, filter: "blur(60px)", opacity: 0.15,
+        pointerEvents: "none",
+      }} />
+      <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
+    </div>
+  );
+}
+function IconTile({ icon, label, onClick, accent = false }) {
+  const T = useT();
+  return (
+    <button
+      onClick={onClick}
+      className="ember-tile"
+      style={{
+        width: "100%",
+        aspectRatio: "1",
+        minHeight: 72,
+        borderRadius: 20,
+        background: accent ? `linear-gradient(135deg,${T.gradA},${T.gradB})` : T.card2,
+        border: `1px solid ${accent ? T.primary : T.border}`,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        cursor: onClick ? "pointer" : "default",
+        fontFamily: "inherit",
+        boxShadow: TOKENS.shadowSm,
+      }}
+    >
+      <span style={{ fontSize: 22 }}>{icon}</span>
+      <span style={{ fontSize: 10, color: accent ? "#000" : T.muted, fontWeight: 600, letterSpacing: 0.3, textTransform: "uppercase" }}>{label}</span>
+    </button>
+  );
+}
+function Chip({ children, active = false, onClick }) {
+  const T = useT();
+  return (
+    <button
+      onClick={onClick}
+      className="ember-press"
+      style={{
+        borderRadius: TOKENS.radiusPill,
+        padding: "6px 14px",
+        fontSize: 12,
+        cursor: "pointer",
+        border: `1px solid ${active ? T.primary : T.border}`,
+        background: active ? `${T.primary}22` : T.card2,
+        color: active ? T.primary : T.muted,
+        fontWeight: active ? 700 : 400,
+        fontFamily: "inherit",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </button>
+  );
 }
 
 // ── DONUT ────────────────────────────────────────────────────────────────────
-function DonutChart({ data, total }) {
+function DonutChart({ data, total, size: sizeProp }) {
   const T = useT();
-  const size = 220, cx = 110, cy = 110, R = 88, r = 60;
+  const size = sizeProp || 220;
+  const cx = size / 2, cy = size / 2, R = size * 0.4, r = size * 0.273;
   let cum = -Math.PI / 2;
   const arcs = data.filter(d => d.value > 0).map(d => {
     const angle = (d.value / Math.max(total, 1)) * 2 * Math.PI;
@@ -169,18 +272,94 @@ function BottomNav({ tab, setTab }) {
     { id: "categories", label: "Bills",    icon: "⊞" },
     { id: "settings",   label: "Settings", icon: "◬" },
   ];
+  const activeIdx = tabs.findIndex(t => t.id === tab);
+
   return (
-    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, maxWidth: 480, margin: "0 auto", background: T.navBg, borderTop: `1px solid ${T.border}`, display: "flex", zIndex: 100 }}>
-      {tabs.map(t => {
-        const active = tab === t.id;
-        return (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, background: "none", border: "none", padding: "10px 2px 12px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, position: "relative" }}>
-            {active && <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 2, background: `linear-gradient(90deg,${T.gradA},${T.gradB})`, borderRadius: "0 0 4px 4px", boxShadow: `0 0 10px ${T.primary}` }} />}
-            <span style={{ fontSize: 16, color: active ? T.primary : T.dim, transition: "color .2s" }}>{t.icon}</span>
-            <span style={{ fontSize: 9, letterSpacing: 0.5, color: active ? T.primary : T.dim, fontFamily: "'Outfit',sans-serif", textTransform: "uppercase" }}>{t.label}</span>
+    <div style={{
+      position: "fixed",
+      bottom: 16,
+      left: 16,
+      right: 16,
+      maxWidth: 448,
+      margin: "0 auto",
+      height: 80,   /* extra height to accommodate the protruding bubble above bar */
+      zIndex: 100,
+    }}>
+      {/* The pill bar */}
+      <div style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 60,
+        background: T.navBg,
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderRadius: TOKENS.radiusXl,
+        boxShadow: TOKENS.shadowLg,
+        border: `1px solid ${T.border}`,
+        display: "flex",
+        alignItems: "center",
+        padding: "0 4px",
+      }}>
+        {tabs.map((t, i) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className="ember-press"
+            style={{
+              flex: 1,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              height: 56,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 3,
+              fontFamily: "inherit",
+              padding: 0,
+            }}
+          >
+            <span style={{
+              fontSize: 16,
+              opacity: i === activeIdx ? 0 : 1,
+              transition: "opacity 250ms ease",
+              color: T.muted,
+            }}>{t.icon}</span>
+            <span style={{
+              fontSize: 8,
+              letterSpacing: 0.5,
+              textTransform: "uppercase",
+              fontFamily: "'Outfit',sans-serif",
+              color: T.muted,
+              opacity: i === activeIdx ? 0 : 1,
+              transition: "opacity 250ms ease",
+            }}>{t.label}</span>
           </button>
-        );
-      })}
+        ))}
+      </div>
+
+      {/* Sliding bubble — protrudes above bar, ring matches T.bg to create scoop illusion */}
+      <div style={{
+        position: "absolute",
+        bottom: 30,   /* overlaps top half of bar so bubble sits half above bar top */
+        left: `calc((${activeIdx} + 0.5) * (100% / 6) - 26px)`,
+        width: 52,
+        height: 52,
+        borderRadius: "50%",
+        background: `linear-gradient(135deg,${T.gradA},${T.gradB})`,
+        boxShadow: `0 0 0 5px ${T.bg}, 0 8px 24px ${T.primary}66`,
+        transition: "left 450ms cubic-bezier(0.34,1.56,0.64,1)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 22,
+        color: "#000",
+        pointerEvents: "none",
+        zIndex: 2,
+      }}>{tabs[activeIdx].icon}</div>
     </div>
   );
 }
@@ -219,43 +398,68 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
   const recent = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
 
   return (
-    <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 24, paddingBottom: 20, textAlign: "center" }}>
-        <div style={{ fontSize: 11, color: T.muted, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
-        <div style={{ cursor: "default" }}>
-          <span style={{ fontSize: 42, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(income)}</span>
-          <div style={{ fontSize: 11, color: T.dim, marginTop: 4 }}>edit in Income tab</div>
-        </div>
+    <div style={{ padding: "0 16px 120px" }}>
+
+      {/* ── HERO CARD ── */}
+      <div style={{ paddingTop: 20, marginBottom: 16 }}>
+        <HeroCard>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Monthly Take-Home</div>
+          <div style={{ animation: "emberFadeUp 600ms cubic-bezier(0.16,1,0.3,1)", textAlign: "center" }}>
+            <div style={{ display: "inline-block", fontSize: 56, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, letterSpacing: "-1px", marginBottom: 4 }}>
+              {fmt(income)}
+            </div>
+          </div>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.dim, marginBottom: 20 }}>edit in Income tab</div>
+
+          {/* Donut below balance, centered — scaled to 180px to avoid competing with depth layers */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+            <DonutChart data={chartData} total={myTotal} size={180} />
+          </div>
+
+          {/* Divider above 3-stat row */}
+          <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${T.primary}30,transparent)`, marginBottom: 12 }} />
+
+          {/* 3-stat row inside hero */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>💸 My Spend</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(myTotal)}</div>
+            </div>
+            {committed > 0 && (
+              <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+                <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>🔒 Committed</div>
+                <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.accent }}>{fmt(committed)}</div>
+                <div style={{ fontSize: 9, color: T.dim, marginTop: 2 }}>
+                  {spendingBudget > 0 && savingsMonthly > 0 ? `spend + savings` : spendingBudget > 0 ? `spending` : `savings`}
+                </div>
+              </div>
+            )}
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>{remaining < 0 ? "⚠️ Over" : "✅ Left"}</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: remaining < 0 ? T.red : T.green }}>{fmt(remaining)}</div>
+            </div>
+          </div>
+        </HeroCard>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 20 }}>
-        <DonutChart data={chartData} total={myTotal} />
-        <div style={{ display: "flex", gap: 10, marginTop: 16, width: "100%" }}>
-          <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>My Spend</div>
-            <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(myTotal)}</div>
-          </div>
-          {committed > 0 && (
-            <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Committed</div>
-              <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.accent }}>{fmt(committed)}</div>
-              <div style={{ fontSize: 9, color: T.dim, marginTop: 2 }}>
-                {spendingBudget > 0 && savingsMonthly > 0 ? `${fmt(spendingBudget)} spend + ${fmt(savingsMonthly)} savings` : spendingBudget > 0 ? `${fmt(spendingBudget)} spending` : `${fmt(savingsMonthly)} savings`}
-              </div>
-            </div>
-          )}
-          <div style={{ flex: 1, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Remaining</div>
-            <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: remaining < 0 ? T.red : T.green }}>{fmt(remaining)}</div>
-          </div>
-        </div>
-        {partnerTotal > 0 && (
-          <div style={{ marginTop: 10, width: "100%", background: T.partnerBg, border: `1px solid ${T.partnerBorder}`, borderRadius: 12, padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: T.muted }}>💑 {partnerName}'s share</span>
-            <span style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.partnerText }}>−{fmt(partnerTotal)}</span>
-          </div>
-        )}
+      {/* ── QUICK ACTIONS ── */}
+      <div style={{ display: "grid", gridTemplateColumns: bankConnected ? "repeat(3, 1fr)" : "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>
+        <IconTile icon="➕" label="Add" onClick={onAddManual} />
+        <IconTile icon="📥" label="Import" onClick={onImport} />
+        {bankConnected
+          ? <IconTile icon="✅" label="Synced" />
+          : <IconTile icon="🏦" label="Bank" onClick={connectBank} accent />
+        }
+        {!bankConnected && <IconTile icon="📊" label="Insights" />}
       </div>
+
+      {/* Partner share badge */}
+      {partnerTotal > 0 && (
+        <div style={{ marginBottom: 16, background: T.partnerBg, border: `1px solid ${T.partnerBorder}`, borderRadius: TOKENS.radiusPill, padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: TOKENS.shadowSm }}>
+          <span style={{ fontSize: 12, color: T.muted }}>💑 {partnerName}'s share</span>
+          <span style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.partnerText }}>−{fmt(partnerTotal)}</span>
+        </div>
+      )}
 
       {/* Spending Money Card */}
       <Card style={{ marginBottom: 16, border: `1px solid ${spendingBudget > 0 && spendingRemaining < 0 ? T.red : T.primary}44`, overflow: "hidden" }}>
@@ -266,7 +470,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
           </div>
           {!editingSpendBudget ? (
             <button onClick={() => { setEditingSpendBudget(true); setSpendBudgetDraft(String(spendingBudget || "")); }}
-              style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12, flexShrink: 0 }}>
+              style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: TOKENS.radiusPill, color: T.primary, padding: "6px 14px", cursor: "pointer", fontSize: 12, flexShrink: 0 }}>
               {spendingBudget > 0 ? "Edit budget" : "Set budget"}
             </button>
           ) : (
@@ -275,24 +479,24 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
               <input autoFocus type="number" value={spendBudgetDraft} onChange={e => setSpendBudgetDraft(e.target.value)}
                 onBlur={() => { const v = parseFloat(spendBudgetDraft); setSpendingBudget(!isNaN(v) && v > 0 ? v : 0); setEditingSpendBudget(false); }}
                 onKeyDown={e => e.key === "Enter" && e.target.blur()}
-                style={{ width: 90, background: T.card2, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "4px 8px", color: T.text, fontSize: 14, fontFamily: "'Outfit',sans-serif", outline: "none" }} />
+                style={{ width: 90, background: T.card2, border: `1px solid ${T.primary}`, borderRadius: TOKENS.radius, padding: "4px 8px", color: T.text, fontSize: 14, fontFamily: "'Outfit',sans-serif", outline: "none" }} />
             </div>
           )}
         </div>
 
         <div style={{ display: "flex", gap: 8, marginBottom: spendingBudget > 0 ? 12 : 0, width: "100%" }}>
-          <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+          <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: TOKENS.radius, padding: "14px 8px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
             <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Spent</div>
             <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fmt(spendingTotal)}</div>
           </div>
           {spendingBudget > 0 && (
-            <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+            <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: TOKENS.radius, padding: "14px 8px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
               <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{spendingRemaining >= 0 ? "Remaining" : "Over by"}</div>
               <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: spendingRemaining >= 0 ? T.green : T.red, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fmt(Math.abs(spendingRemaining))}</div>
             </div>
           )}
           {starredTotal > 0 && (
-            <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: 12, padding: "12px 8px", textAlign: "center" }}>
+            <div style={{ flex: 1, minWidth: 0, background: T.card2, borderRadius: TOKENS.radius, padding: "14px 8px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
               <div style={{ fontSize: 10, color: T.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>⭐ Bills</div>
               <div style={{ fontSize: 18, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.muted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{fmt(starredTotal)}</div>
             </div>
@@ -328,7 +532,7 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
       <Card>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <Label>Recent</Label>
-          <button onClick={() => setShowAll(!showAll)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 8, color: T.primary, padding: "4px 10px", cursor: "pointer", fontSize: 12, marginTop: -8 }}>
+          <button onClick={() => setShowAll(!showAll)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: TOKENS.radiusPill, color: T.primary, padding: "6px 14px", cursor: "pointer", fontSize: 12, marginTop: -8 }}>
             {showAll ? "Show Less" : `See All (${transactions.length})`}
           </button>
         </div>
@@ -340,24 +544,20 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
               placeholder="🔍 Search transactions..."
               value={txnSearch}
               onChange={e => setTxnSearch(e.target.value)}
-              style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, padding: "9px 12px", color: T.text, fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 8 }}
+              style={{ width: "100%", background: T.card2, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "10px 14px", color: T.text, fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 10 }}
             />
-            {/* Category filter pills */}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+            {/* Category filter chips */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
               {["All", ...getCats(catMeta).filter(c => transactions.some(t => t.category === c))].map(c => (
-                <button key={c} onClick={() => setTxnCatFilter(c)}
-                  style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${txnCatFilter === c ? T.primary : T.border}`, background: txnCatFilter === c ? `${T.primary}22` : T.card2, color: txnCatFilter === c ? T.primary : T.muted, fontWeight: txnCatFilter === c ? 700 : 400 }}>
+                <Chip key={c} active={txnCatFilter === c} onClick={() => setTxnCatFilter(c)}>
                   {c === "All" ? "All" : `${getCatMeta(c, catMeta).icon} ${c}`}
-                </button>
+                </Chip>
               ))}
             </div>
-            {/* Sort */}
+            {/* Sort chips */}
             <div style={{ display: "flex", gap: 6 }}>
               {[["date-desc","Newest"],["date-asc","Oldest"],["amount-desc","Highest"],["amount-asc","Lowest"]].map(([val, label]) => (
-                <button key={val} onClick={() => setTxnSort(val)}
-                  style={{ flex: 1, padding: "5px 4px", borderRadius: 8, fontSize: 11, cursor: "pointer", border: `1px solid ${txnSort === val ? T.primary : T.border}`, background: txnSort === val ? `${T.primary}22` : T.card2, color: txnSort === val ? T.primary : T.muted, fontWeight: txnSort === val ? 700 : 400 }}>
-                  {label}
-                </button>
+                <Chip key={val} active={txnSort === val} onClick={() => setTxnSort(val)}>{label}</Chip>
               ))}
             </div>
           </div>
@@ -375,37 +575,38 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
           }
           if (list.length === 0) return <div style={{ fontSize: 13, color: T.dim, textAlign: "center", padding: "16px 0" }}>No transactions found</div>;
           return list.map((t, i, arr) => (
-            <div key={t.id} style={{ paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
+            <div key={t.id} style={{ paddingBottom: i < arr.length - 1 ? 14 : 0, marginBottom: i < arr.length - 1 ? 14 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
               {editingTxn === t.id ? (
-                <div style={{ background: T.card2, borderRadius: 12, padding: 12 }}>
+                <div style={{ background: T.card2, borderRadius: TOKENS.radius, padding: 14 }}>
                   <input value={editTxnDraft.name} onChange={e => setEditTxnDraft(p => ({ ...p, name: e.target.value }))}
-                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
+                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.primary}`, borderRadius: TOKENS.radius, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", marginBottom: 8 }} />
                   <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                     <input type="number" value={editTxnDraft.amount} onChange={e => setEditTxnDraft(p => ({ ...p, amount: e.target.value }))}
-                      style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                      style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
                     <input type="date" value={editTxnDraft.date} onChange={e => setEditTxnDraft(p => ({ ...p, date: e.target.value }))}
-                      style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                      style={{ flex: 1, background: T.bg, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
                   </div>
                   <select value={editTxnDraft.category} onChange={e => setEditTxnDraft(p => ({ ...p, category: e.target.value }))}
-                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", marginBottom: 10 }}>
+                    style={{ width: "100%", background: T.bg, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "8px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none", marginBottom: 10 }}>
                     {getCats(catMeta).map(c => <option key={c}>{c}</option>)}
                   </select>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <PrimaryBtn style={{ flex: 2, padding: "8px" }} onClick={() => {
+                    <PrimaryBtn style={{ flex: 2, padding: "10px" }} onClick={() => {
                       onEditTransaction({ ...t, ...editTxnDraft, amount: Number(editTxnDraft.amount) });
                       setEditingTxn(null);
                     }}>Save</PrimaryBtn>
-                    <GhostBtn style={{ flex: 1, padding: "8px" }} onClick={() => setEditingTxn(null)}>Cancel</GhostBtn>
+                    <GhostBtn style={{ flex: 1, padding: "10px" }} onClick={() => setEditingTxn(null)}>Cancel</GhostBtn>
                   </div>
                 </div>
               ) : (
                 <>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{getCatMeta(t.category, catMeta).icon}</div>
+                    {/* Full circle icon */}
+                    <div style={{ width: 42, height: 42, borderRadius: "50%", background: T.card2, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{getCatMeta(t.category, catMeta).icon}</div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, color: T.text }}>{t.name}</div>
+                      <div style={{ fontSize: 14, color: T.text, marginBottom: 3 }}>{t.name}</div>
                       <button onClick={() => setReassignTxn(reassignTxn === t.id ? null : t.id)}
-                        style={{ background: `${T.primary}18`, border: `1px solid ${T.primary}44`, borderRadius: 10, color: T.primary, padding: "2px 8px", fontSize: 10, cursor: "pointer", marginTop: 3, fontFamily: "inherit" }}>
+                        style={{ background: `${T.primary}18`, border: `1px solid ${T.primary}44`, borderRadius: TOKENS.radiusPill, color: T.primary, padding: "2px 8px", fontSize: 10, cursor: "pointer", fontFamily: "inherit" }}>
                         {getCatMeta(t.category, catMeta).icon} {t.category} ▾
                       </button>
                     </div>
@@ -414,19 +615,19 @@ function HomeTab({ income, transactions, setTransactions, splits, setSplits, par
                       <div style={{ fontSize: 10, color: T.muted }}>{t.date}</div>
                     </div>
                     <button onClick={() => { setEditingTxn(t.id); setEditTxnDraft({ name: t.name, amount: t.amount, category: t.category, date: t.date }); setReassignTxn(null); }}
-                      style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: 8, color: T.muted, padding: "5px 8px", cursor: "pointer", fontSize: 11, flexShrink: 0 }}>✏️</button>
+                      style={{ background: T.card2, border: `1px solid ${T.border}`, borderRadius: TOKENS.radiusPill, color: T.muted, padding: "5px 8px", cursor: "pointer", fontSize: 11, flexShrink: 0 }}>✏️</button>
                     <button onClick={() => toggleStar(t.id)} title={starred[t.id] ? "Unmark essential" : "Mark as essential bill"}
-                      style={{ background: starred[t.id] ? "#facc1522" : T.card2, border: `1px solid ${starred[t.id] ? "#facc15" : T.border}`, borderRadius: 8, color: starred[t.id] ? "#facc15" : T.dim, padding: "5px 8px", cursor: "pointer", fontSize: 13, flexShrink: 0 }}>⭐</button>
+                      style={{ background: starred[t.id] ? "#facc1522" : T.card2, border: `1px solid ${starred[t.id] ? "#facc15" : T.border}`, borderRadius: TOKENS.radiusPill, color: starred[t.id] ? "#facc15" : T.dim, padding: "5px 8px", cursor: "pointer", fontSize: 13, flexShrink: 0 }}>⭐</button>
                   </div>
                   {reassignTxn === t.id && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8, padding: "8px 10px", background: T.card2, borderRadius: 10 }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10, padding: "10px 12px", background: T.card2, borderRadius: TOKENS.radius }}>
                       {getCats(catMeta).map(c => (
                         <button key={c} onClick={async () => {
                           setTransactions(p => p.map(x => x.id === t.id ? { ...x, category: c } : x));
                           setReassignTxn(null);
                           try { await supabase.from('transactions').update({ category: c }).eq('id', t.id); } catch (e) {}
                         }}
-                          style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", border: `1px solid ${t.category === c ? T.primary : T.border}`, background: t.category === c ? `${T.primary}22` : T.card, color: t.category === c ? T.primary : T.muted, fontWeight: t.category === c ? 700 : 400 }}>
+                          style={{ padding: "5px 12px", borderRadius: TOKENS.radiusPill, fontSize: 11, cursor: "pointer", border: `1px solid ${t.category === c ? T.primary : T.border}`, background: t.category === c ? `${T.primary}22` : T.card, color: t.category === c ? T.primary : T.muted, fontWeight: t.category === c ? 700 : 400 }}>
                           {getCatMeta(c, catMeta).icon} {c}
                         </button>
                       ))}
@@ -879,54 +1080,81 @@ function InsightsTab({ income, transactions, splits, catMeta }) {
     return tips;
   })();
 
-  return (
-    <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 24, paddingBottom: 20 }}>
-        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Insights</div>
-      </div>
+  const prevTotal = Object.values(PREV_MONTH).reduce((s, v) => s + v, 0);
+  const monthDelta = total - prevTotal;
 
-      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-        {[
-          { label: "Health Score", val: healthScore, suffix: "/100", col: scoreColor },
-          { label: "Savings Rate", val: `${savingsRate}%`, suffix: "of income", col: savingsRateNum > 10 ? T.green : T.red },
-        ].map(s => (
-          <Card key={s.label} style={{ flex: 1, textAlign: "center" }}>
-            <Label>{s.label}</Label>
-            <div style={{ fontSize: 34, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: s.col }}>{s.val}</div>
-            <div style={{ fontSize: 11, color: T.muted }}>{s.suffix}</div>
-          </Card>
-        ))}
+  return (
+    <div style={{ padding: "0 16px 120px" }}>
+
+      {/* ── HERO CARD ── */}
+      <div style={{ paddingTop: 20, marginBottom: 16 }}>
+        <HeroCard>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Total Spend This Month</div>
+          <div style={{ animation: "emberFadeUp 600ms cubic-bezier(0.16,1,0.3,1)", textAlign: "center" }}>
+            <div style={{ display: "inline-block", fontSize: 56, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, letterSpacing: "-1px", marginBottom: 4 }}>
+              {fmt(total)}
+            </div>
+          </div>
+          <div style={{ textAlign: "center", fontSize: 12, color: monthDelta > 0 ? T.red : T.green, marginBottom: 20, fontWeight: 600 }}>
+            {monthDelta > 0 ? "▲" : "▼"} {fmt(Math.abs(monthDelta))} vs last month
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${T.primary}30,transparent)`, marginBottom: 12 }} />
+
+          {/* 2-stat row inside hero */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>🧠 Health Score</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: scoreColor }}>{healthScore}<span style={{ fontSize: 11, fontWeight: 400 }}>/100</span></div>
+            </div>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>💰 Savings Rate</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: savingsRateNum > 10 ? T.green : T.red }}>{savingsRate}%</div>
+            </div>
+          </div>
+        </HeroCard>
       </div>
 
       <Card style={{ marginBottom: 16 }}>
         <Label>This Month vs Last (My Share)</Label>
         {byCat.length === 0 && <div style={{ fontSize: 13, color: T.dim, textAlign: "center", padding: "12px 0" }}>No transactions this month</div>}
-        {byCat.map(d => (
-          <div key={d.cat} style={{ marginBottom: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-              <span style={{ fontSize: 13, color: T.text }}>{getCatMeta(d.cat, catMeta).icon} {d.cat}</span>
-              <span style={{ fontSize: 12, color: d.curr > d.prev ? T.red : T.green }}>{d.curr > d.prev ? "▲" : d.curr < d.prev ? "▼" : "–"} {fmt(d.curr)}</span>
-            </div>
-            {[{ v: d.curr, c: T.primary, label: "This" }, { v: d.prev, c: T.dim, label: "Last" }].map(b => (
-              <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                <div style={{ width: 28, fontSize: 10, color: T.muted, textAlign: "right", flexShrink: 0 }}>{b.label}</div>
-                <div style={{ flex: 1, height: 6, background: T.card2, borderRadius: 3 }}>
-                  <div style={{ height: "100%", borderRadius: 3, background: b.c, width: `${(b.v / maxBar) * 100}%`, transition: "width .5s" }} />
+        {byCat.map(d => {
+          const delta = d.curr - d.prev;
+          const isUp = delta > 0;
+          return (
+            <div key={d.cat} style={{ marginBottom: 12, padding: "12px 14px", background: T.card2, borderRadius: TOKENS.radius, border: `1px solid ${T.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: T.card, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{getCatMeta(d.cat, catMeta).icon}</div>
+                  <span style={{ fontSize: 14, color: T.text, fontWeight: 600 }}>{d.cat}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 14, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.text }}>{fmt(d.curr)}</span>
+                  <Chip active={isUp}>{isUp ? "▲" : "▼"} {fmt(Math.abs(delta))}</Chip>
                 </div>
               </div>
-            ))}
-          </div>
-        ))}
+              {[{ v: d.curr, c: T.primary, label: "This" }, { v: d.prev, c: T.dim, label: "Last" }].map(b => (
+                <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                  <div style={{ width: 28, fontSize: 10, color: T.muted, textAlign: "right", flexShrink: 0 }}>{b.label}</div>
+                  <div style={{ flex: 1, height: 6, background: T.card, borderRadius: 3 }}>
+                    <div style={{ height: "100%", borderRadius: 3, background: b.c, width: `${(b.v / maxBar) * 100}%`, transition: "width .5s" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </Card>
 
       <Card>
         <Label>Spending Analysis</Label>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {insights.map((tip, i) => (
-            <div key={i} style={{ display: "flex", gap: 12, padding: "12px 14px", background: T.card2, borderRadius: 12, borderLeft: `3px solid ${tip.color}` }}>
-              <span style={{ fontSize: 20, flexShrink: 0 }}>{tip.icon}</span>
+            <div key={i} style={{ display: "flex", gap: 12, padding: "14px", background: T.card2, borderRadius: TOKENS.radius, borderLeft: `3px solid ${tip.color}` }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{tip.icon}</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 3 }}>{tip.title}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 4 }}>{tip.title}</div>
                 <div style={{ fontSize: 12, color: T.muted, lineHeight: 1.6 }}>{tip.body}</div>
               </div>
             </div>
@@ -1004,12 +1232,44 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
     };
   }).filter(d => d.txns.length > 0);
 
+  const totalBudgeted = catTotals.reduce((s, d) => s + d.budget, 0);
+  const totalSpent = catTotals.reduce((s, d) => s + d.myTotal, 0);
+  const spentPct = totalBudgeted > 0 ? Math.min(100, (totalSpent / totalBudgeted) * 100).toFixed(0) : 0;
+
   return (
-    <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 24, paddingBottom: 4 }}>
-        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Bills</div>
-        <div style={{ fontSize: 13, color: T.muted, marginTop: 4, marginBottom: 16 }}>Tap to manage, rename & set your share</div>
+    <div style={{ padding: "0 16px 120px" }}>
+
+      {/* ── HERO CARD ── */}
+      <div style={{ paddingTop: 20, marginBottom: 16 }}>
+        <HeroCard>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Total Bills Budgeted</div>
+          <div style={{ animation: "emberFadeUp 600ms cubic-bezier(0.16,1,0.3,1)", textAlign: "center" }}>
+            <div style={{ display: "inline-block", fontSize: 56, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, letterSpacing: "-1px", marginBottom: 4 }}>
+              {totalBudgeted > 0 ? fmt(totalBudgeted) : fmt(totalSpent)}
+            </div>
+          </div>
+          <div style={{ textAlign: "center", fontSize: 12, color: T.dim, marginBottom: 20 }}>
+            {totalBudgeted > 0 ? `Spent ${fmt(totalSpent)} (${spentPct}%)` : "Set budgets per category below"}
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${T.primary}30,transparent)`, marginBottom: 12 }} />
+
+          {/* 2-stat row */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>📂 Categories</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{catTotals.length}</div>
+            </div>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>💸 Spent</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: totalSpent > totalBudgeted && totalBudgeted > 0 ? T.red : T.green }}>{fmt(totalSpent)}</div>
+            </div>
+          </div>
+        </HeroCard>
       </div>
+
+      <div style={{ fontSize: 11, color: T.muted, letterSpacing: 1, marginBottom: 12 }}>Tap a category to manage, rename & set your share</div>
 
       {catTotals.map(({ cat, fullTotal, myTotal, txns, budget }) => {
         const pct = budget > 0 ? Math.min(100, (myTotal / budget) * 100) : 0;
@@ -1023,9 +1283,9 @@ function CategoriesTab({ transactions, setTransactions, budgets, setBudgets, cat
         return (
           <div key={cat} style={{ marginBottom: 10 }}>
             <div onClick={() => { setSelectedCat(isOpen ? null : cat); setRenamingCat(null); }}
-              style={{ background: T.card, border: `1px solid ${isOpen ? T.primary : hasDupes ? T.red : T.border}`, borderRadius: isOpen ? "16px 16px 0 0" : 16, padding: 16, cursor: "pointer", transition: "border-color .2s" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: T.card2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{meta.icon}</div>
+              style={{ background: T.card, border: `1px solid ${isOpen ? T.primary : hasDupes ? T.red : T.border}`, borderRadius: isOpen ? `${TOKENS.radius}px ${TOKENS.radius}px 0 0` : TOKENS.radius, padding: TOKENS.pad, cursor: "pointer", transition: "border-color .2s", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: T.card2, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{meta.icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -1279,10 +1539,41 @@ function SavingsTab({ income, transactions, splits, goals, setGoals }) {
     );
   };
 
+  const totalSaved = goals.reduce((s, g) => s + g.saved, 0);
+  const totalTarget = goals.reduce((s, g) => s + g.target, 0);
+  const overallPct = totalTarget > 0 ? Math.min(100, (totalSaved / totalTarget) * 100).toFixed(0) : 0;
+
   return (
-    <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 24, paddingBottom: 20 }}>
-        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Savings</div>
+    <div style={{ padding: "0 16px 120px" }}>
+
+      {/* ── HERO CARD ── */}
+      <div style={{ paddingTop: 20, marginBottom: 16 }}>
+        <HeroCard>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Total Saved</div>
+          <div style={{ animation: "emberFadeUp 600ms cubic-bezier(0.16,1,0.3,1)", textAlign: "center" }}>
+            <div style={{ display: "inline-block", fontSize: 56, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, letterSpacing: "-1px", marginBottom: 4 }}>
+              {fmt(totalSaved)}
+            </div>
+          </div>
+          <div style={{ textAlign: "center", fontSize: 12, color: T.dim, marginBottom: 20 }}>
+            across {goals.length} {goals.length === 1 ? "goal" : "goals"}{totalTarget > 0 ? ` · ${overallPct}% of total target` : ""}
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${T.primary}30,transparent)`, marginBottom: 12 }} />
+
+          {/* 2-stat row */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>🎯 Total Target</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(totalTarget)}</div>
+            </div>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>💵 Available</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: spare > 0 ? T.green : T.red }}>{fmt(Math.max(0, spare))}</div>
+            </div>
+          </div>
+        </HeroCard>
       </div>
 
       {/* Available to save */}
@@ -1589,7 +1880,7 @@ function SavingsTab({ income, transactions, splits, goals, setGoals }) {
 
       {/* Add goal */}
       {!addingGoal ? (
-        <button onClick={() => setAddingGoal(true)} style={{ width: "100%", padding: "14px", background: "transparent", border: `1px dashed ${T.primary}`, borderRadius: 16, color: T.primary, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>+ New Savings Goal</button>
+        <button onClick={() => setAddingGoal(true)} className="ember-press" style={{ width: "100%", padding: "14px", background: "transparent", border: `2px dashed ${T.primary}`, borderRadius: TOKENS.radiusLg, color: T.primary, fontFamily: "inherit", fontSize: 14, cursor: "pointer", fontWeight: 600 }}>+ New Savings Goal</button>
       ) : (
         <Card>
           <Label>New Goal</Label>
@@ -1799,7 +2090,7 @@ function TakeHomeCalculator({ onUseAsIncome }) {
           {/* Hero */}
           <div style={{ textAlign: "center", padding: "12px 0 16px" }}>
             <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Monthly Take-Home</div>
-            <div style={{ fontSize: 44, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(result.netMonthly)}</div>
+            <div style={{ fontSize: 44, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(result.netMonthly)}</div>
             <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>{fmt(result.netAnnual)} per year · {result.effectiveRate}% effective deduction rate</div>
           </div>
 
@@ -1854,29 +2145,53 @@ function IncomeTab({ income, setIncome, sideHustles, setSideHustles }) {
   const totalIncome = income + totalSide;
 
   return (
-    <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 24, paddingBottom: 16 }}>
-        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text, marginBottom: 14 }}>Income</div>
-        {/* Sub-tab pills */}
-        <div style={{ display: "flex", background: T.card2, borderRadius: 12, padding: 4, gap: 4 }}>
-          {[["income","💼 My Income"],["calculator","🧮 Take-Home Calc"]].map(([val, label]) => (
-            <button key={val} onClick={() => setSubTab(val)}
-              style={{ flex: 1, padding: "9px 8px", borderRadius: 9, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: subTab === val ? 700 : 400, background: subTab === val ? `linear-gradient(135deg,${T.gradA}55,${T.gradB}33)` : "transparent", color: subTab === val ? T.primary : T.muted, transition: "all .2s", boxShadow: subTab === val ? `0 0 10px ${T.glow}` : "none" }}>
-              {label}
-            </button>
-          ))}
-        </div>
+    <div style={{ padding: "0 16px 120px" }}>
+
+      {/* ── HERO CARD ── */}
+      <div style={{ paddingTop: 20, marginBottom: 16 }}>
+        <HeroCard>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Monthly Take-Home</div>
+          <div style={{ animation: "emberFadeUp 600ms cubic-bezier(0.16,1,0.3,1)", textAlign: "center" }}>
+            <div style={{ display: "inline-block", fontSize: 56, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1, letterSpacing: "-1px", marginBottom: 4 }}>
+              {fmt(totalIncome)}
+            </div>
+          </div>
+          <div style={{ textAlign: "center", fontSize: 12, color: T.dim, marginBottom: 20 }}>
+            {totalSide > 0 ? `${fmt(income)} salary + ${fmt(totalSide)} side hustles` : "Edit below to recalculate"}
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${T.primary}30,transparent)`, marginBottom: 12 }} />
+
+          {/* 2-stat row */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>💼 Base</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.primary }}>{fmt(income)}</div>
+            </div>
+            <div style={{ flex: 1, background: `${T.card2}cc`, border: `1px solid ${T.border}`, borderRadius: TOKENS.radius, padding: "14px 10px", textAlign: "center", boxShadow: TOKENS.shadowSm }}>
+              <div style={{ fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>📅 Annual</div>
+              <div style={{ fontSize: 17, fontFamily: "'Outfit',sans-serif", fontWeight: 700, color: T.accent }}>{fmt(totalIncome * 12)}</div>
+            </div>
+          </div>
+        </HeroCard>
       </div>
+
+      {/* Sub-tab pills */}
+      <div style={{ display: "flex", background: T.card2, borderRadius: TOKENS.radius, padding: 4, gap: 4, marginBottom: 16 }}>
+        {[["income","💼 My Income"],["calculator","🧮 Take-Home Calc"]].map(([val, label]) => (
+          <button key={val} onClick={() => setSubTab(val)}
+            style={{ flex: 1, padding: "9px 8px", borderRadius: TOKENS.radius - 4, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: subTab === val ? 700 : 400, background: subTab === val ? `linear-gradient(135deg,${T.gradA}55,${T.gradB}33)` : "transparent", color: subTab === val ? T.primary : T.muted, transition: "all .2s", boxShadow: subTab === val ? `0 0 10px ${T.glow}` : "none" }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
       {subTab === "calculator" && (
         <TakeHomeCalculator onUseAsIncome={(monthly) => { setIncome(monthly); setSubTab("income"); }} />
       )}
 
       {subTab === "income" && (<>
-      <Card style={{ marginBottom: 16, background: `${T.primary}11`, border: `1px solid ${T.primary}`, textAlign: "center" }}>
-        <div style={{ fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>Total Monthly Income</div>
-        <div style={{ fontSize: 44, fontFamily: "'Outfit',sans-serif", fontWeight: 700, background: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(totalIncome)}</div>
-        {totalSide > 0 && <div style={{ fontSize: 12, color: T.muted, marginTop: 6 }}><span style={{ color: T.accent }}>+{fmt(totalSide)}</span> from side hustles</div>}
-      </Card>
       <Card style={{ marginBottom: 16 }}>
         <Label>Main Income</Label>
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: T.card2, borderRadius: 12 }}>
@@ -2014,78 +2329,79 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
 
   const isDefault = (key) => Object.keys(DEFAULT_CAT_META).includes(key);
 
+  const currentTheme = THEMES[themeKey];
+
   return (
-    <div style={{ padding: "0 16px 110px" }}>
-      <div style={{ paddingTop: 24, paddingBottom: 20 }}>
-        <div style={{ fontSize: 22, fontFamily: "'Playfair Display',serif", fontWeight: 700, color: T.text }}>Settings</div>
+    <div style={{ padding: "0 16px 120px" }}>
+
+      {/* ── HERO BANNER ── */}
+      <div style={{ paddingTop: 20, marginBottom: 16 }}>
+        <HeroCard>
+          <div style={{ textAlign: "center", fontSize: 11, color: T.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>Active Theme</div>
+          <div style={{ animation: "emberFadeUp 600ms cubic-bezier(0.16,1,0.3,1)", textAlign: "center" }}>
+            <div style={{ fontSize: 56, lineHeight: 1, marginBottom: 8 }}>{currentTheme.emoji}</div>
+          </div>
+          <div style={{ textAlign: "center", fontSize: 22, fontFamily: "'Outfit',sans-serif", fontWeight: 700, backgroundImage: `linear-gradient(135deg,${T.gradA},${T.gradB})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 4 }}>{currentTheme.name}</div>
+          <div style={{ textAlign: "center", fontSize: 12, color: T.dim, marginBottom: 20 }}>Tap a theme below to switch</div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${T.primary}30,transparent)`, marginBottom: 12 }} />
+
+          {/* Dark/Light segmented control */}
+          <div style={{ display: "flex", background: T.card2, borderRadius: TOKENS.radiusPill, padding: 4, gap: 4 }}>
+            {[{ val: false, label: "🌑 Dark" }, { val: true, label: "☀️ Light" }].map(opt => {
+              const active = lightMode === opt.val;
+              return (
+                <button key={String(opt.val)} onClick={() => setLightMode(opt.val)} className="ember-press" style={{
+                  flex: 1, padding: "10px 8px", borderRadius: TOKENS.radiusPill, cursor: "pointer", border: "none",
+                  background: active ? `linear-gradient(135deg,${T.gradA}55,${T.gradB}33)` : "transparent",
+                  color: active ? T.primary : T.muted, fontFamily: "inherit", fontSize: 13, fontWeight: active ? 700 : 400, transition: "all .2s",
+                  boxShadow: active ? `0 0 10px ${T.glow}` : "none",
+                }}>
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </HeroCard>
       </div>
 
-      {/* Light / Dark toggle */}
-      <Card style={{ marginBottom: 16 }}>
-        <Label>Appearance</Label>
-        <div style={{ display: "flex", gap: 10 }}>
-          {[{ val: false, label: "Dark", icon: "🌑" }, { val: true, label: "Light", icon: "☀️" }].map(opt => {
-            const active = lightMode === opt.val;
-            return (
-              <button key={String(opt.val)} onClick={() => setLightMode(opt.val)} style={{
-                flex: 1, padding: "14px 10px", borderRadius: 14, cursor: "pointer",
-                border: `2px solid ${active ? T.primary : T.border}`,
-                background: active ? `${T.primary}18` : T.card2,
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 6, transition: "all .2s",
-              }}>
-                <span style={{ fontSize: 24 }}>{opt.icon}</span>
-                <span style={{ fontSize: 13, fontWeight: active ? 700 : 400, color: active ? T.primary : T.muted }}>{opt.label}</span>
-                {active && <div style={{ width: 18, height: 18, borderRadius: "50%", background: T.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#000", fontWeight: 700 }}>✓</div>}
-              </button>
-            );
-          })}
-        </div>
-      </Card>
-
+      {/* Theme swatches — horizontal scroll */}
       <Card style={{ marginBottom: 16 }}>
         <Label>Theme</Label>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
           {Object.entries(THEMES).map(([key, theme]) => {
             const active = themeKey === key;
-            const previewT = applyMode(theme, lightMode);
             return (
-              <button key={key} onClick={() => setThemeKey(key)} style={{
-                display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", width: "100%",
+              <button key={key} onClick={() => setThemeKey(key)} className="ember-press" style={{
+                flexShrink: 0, width: 100, padding: "14px 10px",
                 background: active ? `${theme.primary}18` : T.card2,
                 border: `2px solid ${active ? theme.primary : T.border}`,
-                borderRadius: 14, cursor: "pointer", textAlign: "left", transition: "all .2s",
+                borderRadius: TOKENS.radius, cursor: "pointer", textAlign: "center", transition: "all .2s", position: "relative",
               }}>
-                <div style={{ display: "flex", gap: 3, flexShrink: 0 }}>
-                  {[previewT.bg, theme.primary, theme.secondary, previewT.card].map((col, i) => (
-                    <div key={i} style={{ width: 12, height: 34, borderRadius: 4, background: col, border: `1px solid ${previewT.border}` }} />
-                  ))}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 16, color: active ? theme.primary : T.text, fontWeight: active ? 700 : 400 }}>{theme.emoji} {theme.name}</div>
-                  <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
-                    {key === "fire"   && "Warm oranges & yellows"}
-                    {key === "water"  && "Cool blues & purples"}
-                    {key === "nature" && "Fresh greens & lime"}
-                    {key === "floral" && "Soft pinks & lilac"}
-                    {key === "earth"  && "Rich browns & terracotta"}
-                  </div>
-                </div>
-                {active && <div style={{ width: 22, height: 22, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#000", fontWeight: 700, flexShrink: 0 }}>✓</div>}
+                <div style={{ fontSize: 24, marginBottom: 6 }}>{theme.emoji}</div>
+                {/* Mini gradient bar */}
+                <div style={{ height: 4, borderRadius: 2, background: `linear-gradient(90deg,${theme.gradA},${theme.gradB})`, marginBottom: 8 }} />
+                <div style={{ fontSize: 11, color: active ? theme.primary : T.muted, fontWeight: active ? 700 : 400 }}>{theme.name}</div>
+                {active && (
+                  <div style={{ position: "absolute", top: 6, right: 6, width: 18, height: 18, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#000", fontWeight: 700 }}>✓</div>
+                )}
               </button>
             );
           })}
         </div>
       </Card>
 
+      {/* Partner Name */}
       <Card style={{ marginBottom: 16 }}>
         <Label>Partner Name</Label>
-        <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ padding: "12px 14px", background: T.card2, borderRadius: TOKENS.radius, display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 20 }}>💑</span>
           {editingName ? (
             <div style={{ flex: 1, display: "flex", gap: 8 }}>
               <input autoFocus value={nameDraft} onChange={e => setNameDraft(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") { setPartnerName(nameDraft); setEditingName(false); }}}
-                style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: 8, padding: "7px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                style={{ flex: 1, background: T.bg, border: `1px solid ${T.primary}`, borderRadius: TOKENS.radius, padding: "7px 10px", color: T.text, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
               <PrimaryBtn onClick={() => { setPartnerName(nameDraft); setEditingName(false); }} style={{ padding: "7px 14px", fontSize: 13 }}>Save</PrimaryBtn>
             </div>
           ) : (
@@ -2098,15 +2414,14 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
         <div style={{ fontSize: 12, color: T.muted, marginTop: 10 }}>Shown on the home page bill split summary</div>
       </Card>
 
+      {/* Account */}
       <Card style={{ marginBottom: 16 }}>
         <Label>Account</Label>
-        <div style={{ padding: "12px 14px", background: T.card2, borderRadius: 12, marginBottom: 10 }}>
+        <div style={{ padding: "12px 14px", background: T.card2, borderRadius: TOKENS.radius, marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: T.muted, marginBottom: 4 }}>Signed in as</div>
           <div style={{ fontSize: 14, color: T.text }}>{user?.email}</div>
         </div>
-        <button onClick={onSignOut} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
-          Sign Out
-        </button>
+        <OutlineBtn onClick={onSignOut} style={{ width: "100%", borderColor: T.red, color: T.red }}>Sign Out</OutlineBtn>
       </Card>
 
       <Card style={{ marginBottom: 16 }}>
@@ -2176,21 +2491,17 @@ function SettingsTab({ themeKey, setThemeKey, partnerName, setPartnerName, light
           Reset clears all transactions, splits, category names, budgets and income. Your account stays — just the data gets wiped. This cannot be undone.
         </div>
         {!confirmReset ? (
-          <button onClick={() => setConfirmReset(true)} style={{ width: "100%", padding: "12px", background: "transparent", border: `1px solid ${T.red}`, borderRadius: 12, color: T.red, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
-            🗑 Reset App Data
-          </button>
+          <OutlineBtn onClick={() => setConfirmReset(true)} style={{ width: "100%", borderColor: T.red, color: T.red }}>🗑 Reset App Data</OutlineBtn>
         ) : (
           <div>
-            <div style={{ fontSize: 13, color: T.red, marginBottom: 12, padding: "10px 14px", background: `${T.red}18`, borderRadius: 10, textAlign: "center" }}>
+            <div style={{ fontSize: 13, color: T.red, marginBottom: 12, padding: "10px 14px", background: `${T.red}18`, borderRadius: TOKENS.radius, textAlign: "center" }}>
               Are you sure? This will wipe everything.
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => { onReset(); setConfirmReset(false); }} style={{ flex: 2, padding: "12px", background: T.red, border: "none", borderRadius: 10, color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => { onReset(); setConfirmReset(false); }} className="ember-press" style={{ flex: 2, padding: "12px", background: T.red, border: "none", borderRadius: TOKENS.radiusPill, color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 Yes, reset everything
               </button>
-              <button onClick={() => setConfirmReset(false)} style={{ flex: 1, padding: "12px", background: T.card2, border: `1px solid ${T.border}`, borderRadius: 10, color: T.muted, fontFamily: "inherit", fontSize: 14, cursor: "pointer" }}>
-                Cancel
-              </button>
+              <GhostBtn onClick={() => setConfirmReset(false)} style={{ flex: 1 }}>Cancel</GhostBtn>
             </div>
           </div>
         )}
@@ -2450,7 +2761,7 @@ export default function EmberApp({ user, onSignOut }) {
     <ThemeCtx.Provider value={T}>
       <div style={{ background: T.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "'Jost',sans-serif", transition: "background .4s" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
-        <style>{`*{box-sizing:border-box}input::placeholder{color:#4b5563}select{appearance:none}::-webkit-scrollbar{width:0}`}</style>
+        <style>{`*{box-sizing:border-box}input::placeholder{color:#4b5563}select{appearance:none}::-webkit-scrollbar{width:0}.ember-press{transition:transform 120ms ease,box-shadow 200ms ease,opacity 150ms ease}.ember-press:hover{transform:translateY(-1px)}.ember-press:active{transform:scale(0.96)}.ember-tile{transition:transform 180ms cubic-bezier(0.34,1.56,0.64,1),box-shadow 200ms ease}.ember-tile:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,0.18)}.ember-tile:active{transform:scale(0.97)}@keyframes emberFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes emberShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
 
         {/* Month Picker — shown on all main tabs */}
         {tab === "home"       && <HomeTab income={totalIncome} transactions={transactions} setTransactions={setTransactions} allTransactions={transactions} splits={splits} setSplits={setSplits} partnerName={partnerName} bankConnected={bankConnected} connectBank={connectBank} onImport={onImport} onIncomeDetected={onIncomeDetected} onAddManual={onAddManual} onEditTransaction={onEditTransaction} catMeta={catMeta} starred={starred} setStarred={handleSetStarred} spendingBudget={spendingBudget} setSpendingBudget={handleSetSpendingBudget} savingsMonthly={savingsMonthly} />}
